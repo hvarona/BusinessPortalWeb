@@ -1,0 +1,69 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="title">Sample</ui:define>
+
+    <ui:define name="content">
+       <f:view contentType="text/html" locale='#{languajeBean.languaje}' id="fview" >
+        <h:form id="ChangeIpAddressForm">
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12">
+                        <div class="card card-w-title">
+                            <h1>"#{msg.IPAdresses}"</h1>
+                            <p:panelGrid id="grid" columns="4" columnClasses="ui-grid-col-2,ui-grid-col-4" layout="grid" styleClass="ui-panelgrid-blank form-group" style="border:0px none; background-color:transparent;">
+                                <f:facet name="header">
+                                    <p:messages id="messages"  autoUpdate="true" closable="true" />
+                                </f:facet>
+                                    <p:outputLabel value="#{msg.account}" for="login" />
+                                    <p:inputText id="login" value="#{changeIPAddressController.login}" title="Login" required="true"/>
+                                    <p:commandButton   id="btnSearch" icon="ui-icon-search" actionListener="#{changeIPAddressController.search()}" update=":ChangeIpAddressForm"/>
+                                </p:panelGrid>
+                                <p:panelGrid id="grid2" columns="4" columnClasses="ui-grid-col-2,ui-grid-col-4" layout="grid" styleClass="ui-panelgrid-blank form-group" style="border:0px none; background-color:transparent;"
+                                         rendered="#{not empty changeIPAddressController.account}">
+                                <f:facet name="header">
+                                </f:facet>
+                                    <p:outputLabel value="Direccion Ip" for="ip" />
+                                    <p:inputText id="ip" value="#{changeIPAddressController.ip}" title="Ip" required="true"/>
+                                    <p:outputLabel value="Descripcion" for="desciption" />
+                                    <p:inputText id="desciption" value="#{changeIPAddressController.description}" title="Agregar" required="true"/>
+                                    <p:commandButton  value="Agregar" id="btnAdd" icon="ui-icon-add" actionListener="#{changeIPAddressController.saveIPAddress()}" update=":ChangeIpAddressForm"/>
+                                </p:panelGrid>
+                            
+                                <p:dataTable var="ipAddress" id="grid1" value="#{changeIPAddressController.accountHasIpAddress}" rendered="#{not empty changeIPAddressController.accountHasIpAddress}" style="margin-top:20px">
+                                    <f:facet name="header">
+                                        <p:row>
+                                            <p:column>"#{msg.IPAddressList}"</p:column>
+                                        </p:row>
+                                    </f:facet>
+                                    <p:column headerText="#{msg.IPAddress}" style="width:45px">
+                                        <h:outputText value="#{ipAddress.ipAddress.ipAddress}" />
+                                    </p:column>
+                                    <p:column headerText="#{msg.description}" style="width:45px">
+                                        <h:outputText value="#{ipAddress.ipAddress.description}" />
+                                    </p:column>
+                                    <p:column style="width:10px;text-align:">
+                                        <p:commandButton id="deleteIP" update=":ChangeIpAddressForm:grid1" icon="ui-icon-delete" title="#{msg.delete}" action="#{changeIPAddressController.doDelete()}" >
+                                            <f:setPropertyActionListener value="#{ipAddress}" target="#{changeIPAddressController.selectedIpAddress}" />
+                                            <p:confirm header="#{msg.confirm}" message="#{msg.blacklist3}" icon="ui-icon-alert" />
+                                        </p:commandButton>
+
+                                        <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                                            <p:commandButton value="#{msg.yes}" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+                                            <p:commandButton value="#{msg.no}" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+                                        </p:confirmDialog>
+                                    </p:column>
+                                </p:dataTable>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </h:form>
+       </f:view>
+    </ui:define>
+
+</ui:composition>

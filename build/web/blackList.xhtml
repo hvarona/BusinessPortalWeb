@@ -1,0 +1,85 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="title">Sample</ui:define>
+
+    <ui:define name="content">
+        <f:view contentType="text/html" locale='#{languajeBean.languaje}' id="fview" >
+        <h:form id="formBlackList">
+            <p:dataTable var="blackList" value="#{dtListBlackListController.ipBlackLists}" widgetVar="blackListsTable"
+                         emptyMessage="#{msg.mensajeBlacklist}" filteredValue="#{dtListBlackListController.filteredIpBlackLists}" paginator="true" rows="10" style="margin-bottom:20px"
+                 paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}" 
+                 rowsPerPageTemplate="5,10,15" id="blackListTable">
+
+                <f:facet name="header">
+                    <p:outputPanel>
+                        <h:outputText value="#{msg.mensajeBlacklist2}" />
+                        <p:inputText id="globalFilter" onkeyup="PF('blackListsTable').filter()" style="width:150px" placeholder="Inserte palabra clave"/>
+                    </p:outputPanel>
+                </f:facet>
+
+                <p:column filterBy="#{blackList.id}" headerText="Id"  filterMatchMode="contains" style="width:15px">
+                    <h:outputText value="#{blackList.id}" />
+                </p:column>
+
+                <p:column filterBy="#{blackList.ipAddress}" headerText="Nombre"  filterMatchMode="contains" style="width:30px">
+                    <h:outputText value="#{blackList.ipAddress}" />
+                </p:column>
+                 <p:column  headerText="#{msg.description}"  style="width:30px">
+                     <h:outputText value="#{blackList.info}" />
+                </p:column>
+                <p:column style="width:10px;text-align: center">
+                    <p:commandButton update=":formBlackList:blackListDetail" oncomplete="PF('ipBlackListDialog').show()" icon="ui-icon-search" title="View">
+                        <f:setPropertyActionListener value="#{blackList}" target="#{dtListBlackListController.selectedIpBlackList}" />
+                    </p:commandButton>
+                </p:column>
+                <p:column style="width:10px;text-align:">
+                    <p:commandButton id="deleteIP" update=":formBlackList:blackListTable" icon="ui-icon-delete" title="Eliminar" action="#{dtListBlackListController.doDelete()}" >
+                        <f:setPropertyActionListener value="#{blackList}" target="#{dtListBlackListController.selectedIpBlackList}" />
+                        <p:confirm header="#{msg.confirm}" message="#{msg.blacklist3}" icon="ui-icon-alert" />
+                    </p:commandButton>
+
+                    <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                        <p:commandButton value="Si" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+                        <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+                    </p:confirmDialog>
+                </p:column>
+            </p:dataTable>
+            <div class="card card-w-title">
+                <p:panelGrid id="grid" columns="5" columnClasses="ui-grid-col-2,ui-grid-col-4,ui-grid-col-2,ui-grid-col-4,ui-grid-col-2" layout="grid" styleClass="ui-panelgrid-blank form-group" style="border:0px none; background-color:transparent;">
+                    <f:facet name="header">
+                        <p:messages id="messages"  autoUpdate="true" closable="true" />
+                    </f:facet>
+                    <p:outputLabel value="#{msg.IPAddress}"/>
+                    <p:inputText id="ipAddress" value="#{dtListBlackListController.ipAddress}"/>
+                    <p:outputLabel value="#{msg.description}:"/>
+                    <p:inputText id="info" value="#{dtListBlackListController.info}"/>
+                    <p:commandButton id="btnAdd" value="#{msg.add}" ajax="true" icon="ui-icon-add" actionListener="#{dtListBlackListController.save()}" update=":formBlackList:grid,:formBlackList:blackListTable" />
+                </p:panelGrid>
+            </div>
+            <p:dialog header="#{msg.IPAddress}" widgetVar="ipBlackListDialog" modal="true" showEffect="fade" hideEffect="fade" resizable="false">
+            <p:outputPanel id="blackListDetail" style="text-align:center;">
+                <p:panelGrid  columns="2" rendered="#{not empty dtListBlackListController.selectedIpBlackList}" columnClasses="label,value">
+                <h:outputText value="Id:" />
+                <h:outputText value="#{dtListBlackListController.selectedIpBlackList.id}" />
+ 
+                <h:outputText value="#{msg.IPAddress}"/>
+                <h:outputText value="#{dtListBlackListController.selectedIpBlackList.ipAddress}" />
+ 
+                <h:outputText value="#{msg.creationDate}" />
+                <h:outputText value="#{dtListBlackListController.selectedIpBlackList.date}"/>
+                
+                 <h:outputText value="#{msg.information}" />
+                 <h:outputText value="#{dtListBlackListController.selectedIpBlackList.info}"/>
+            </p:panelGrid>
+        </p:outputPanel>
+    </p:dialog>
+        </h:form>
+            </f:view>
+    </ui:define>
+
+</ui:composition>
