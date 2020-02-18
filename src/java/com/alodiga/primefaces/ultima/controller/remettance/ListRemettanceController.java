@@ -166,18 +166,6 @@ public class ListRemettanceController implements Serializable {
 
         request.setParams(params);
         stores = new TreeMap<String, String>();
-        try {
-            List<Store> stores1 = storeData.getStore(request);
-            for (Store store : stores1) {
-                stores.put(store.getFirstName(), store.getId().toString());
-            }
-        } catch (EmptyListException ex) {
-            Logger.getLogger(ListCityController.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (GeneralException ex) {
-            Logger.getLogger(ListCityController.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (NullParameterException ex) {
-            Logger.getLogger(ListCityController.class.getName()).log(Level.SEVERE, null, ex);
-        }
         return stores;
     }
 
@@ -272,18 +260,6 @@ public class ListRemettanceController implements Serializable {
     }
     
     public void doChanceStatus() {
-        try {
-            WsRequest request = new WsRequest();
-//            selectedRemittance.setEnabled(!selectedStore.isEnabled());
-//            request.setParam(selectedStore);
-            storeData.saveStore(request);
-        } catch (NullParameterException ex) {
-            System.out.println("com.alodiga.primefaces.ultima.controller.ListStoreController.doChanceStatus()");
-            Logger.getLogger(ListUserController.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (GeneralException ex) {
-            System.out.println("com.alodiga.primefaces.ultima.controller.ListStoreController.doChanceStatus()");
-            Logger.getLogger(ListUserController.class.getName()).log(Level.SEVERE, null, ex);
-        }
     }
 
    
@@ -292,8 +268,6 @@ public class ListRemettanceController implements Serializable {
         
         try {
             RemittanceHasRemittenceStatus remittanceHasRemittenceStatus  = hasRemittenceStatusData.updateRemittenceStatus(selectedRemittance,RemittanceStatus.PROCESSED,1L,comments);
-//            se ejecuta la remesa
-//            remittanceData.executeRemittance(selectedRemittance, selectedRemittance.getRemittent(), selectedRemittance.getReceiver(), selectedRemittance.getAddressReciever(), selectedRemittance.getAddressRemittent(), selectedRemittance.getAmountDestiny(), selectedRemittance.getAmountOrigin());
         } catch (NullParameterException ex) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!", "Faltan parametros"));
         } catch (GeneralException ex) {

@@ -133,7 +133,7 @@ public class RemittanceHasRemittenceStatusController {
         try {
             List<User> users = userData.getUsers(request);
             for(User userTmp : users) {
-                userMap.put(userTmp.getFirstName() + " " + userTmp.getLastName(), userTmp.getId());
+                userMap.put(userTmp.getDisplayName(), userTmp.getId());
             }
             
         } catch (EmptyListException | GeneralException ex) {

@@ -15,33 +15,23 @@
  */
 package com.alodiga.primefaces.ultima.controller.noWorkingDays;
 
-import com.portal.business.commons.data.AccessControlData;
 import com.portal.business.commons.data.NoWorkingDaysData;
-import com.portal.business.commons.data.UserData;
 import com.portal.business.commons.exceptions.EmptyListException;
 import com.portal.business.commons.exceptions.GeneralException;
 import com.portal.business.commons.exceptions.NullParameterException;
 import com.portal.business.commons.exceptions.RegisterNotFoundException;
 import com.portal.business.commons.generic.WsRequest;
-import com.portal.business.commons.models.Profile;
 import com.portal.business.commons.models.NoWorkingDays;
-import com.portal.business.commons.models.UserHasProfile;
 import java.io.IOException;
 import java.io.Serializable;
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
-import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import org.primefaces.event.SelectEvent;
-import org.primefaces.model.DualListModel;
-import org.primefaces.model.LazyDataModel;
 
 @ManagedBean(name="dtLazyNoWorkingDaysView")
 @ViewScoped

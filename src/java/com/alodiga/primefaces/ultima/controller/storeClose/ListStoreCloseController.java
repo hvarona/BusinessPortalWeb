@@ -15,24 +15,17 @@
  */
 package com.alodiga.primefaces.ultima.controller.storeClose;
 
-import com.portal.business.commons.data.AccessControlData;
 import com.portal.business.commons.data.StoreCloseData;
 import com.portal.business.commons.data.StoreData;
-import com.portal.business.commons.data.UserData;
 import com.portal.business.commons.exceptions.EmptyListException;
 import com.portal.business.commons.exceptions.GeneralException;
 import com.portal.business.commons.exceptions.NullParameterException;
 import com.portal.business.commons.exceptions.RegisterNotFoundException;
 import com.portal.business.commons.generic.WsRequest;
-import com.portal.business.commons.models.Profile;
 import com.portal.business.commons.models.Store;
 import com.portal.business.commons.models.StoreClose;
-import com.portal.business.commons.models.UserHasProfile;
 import java.io.IOException;
 import java.io.Serializable;
-import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -40,13 +33,10 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
-import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import org.primefaces.event.SelectEvent;
-import org.primefaces.model.DualListModel;
-import org.primefaces.model.LazyDataModel;
 
 @ManagedBean(name="dtLazyStoreCloseView")
 @ViewScoped
@@ -95,10 +85,10 @@ public class ListStoreCloseController implements Serializable {
         try {
             storeClose = storeCloseData.loadStoreClose(request);
             StoreData storeData = new StoreData();
-            List<Store> stores = storeData.getStore(request);
+            /*List<Store> stores = storeData.getStore(request);
             for (Store store : stores) {
-                storesMap.put(store.getLogin(), store.getId());
-            }      
+                storesMap.put(store.getName(), store.getId());
+            } */     
         } catch (EmptyListException ex) {
             ex.printStackTrace();
         } catch (GeneralException ex) {

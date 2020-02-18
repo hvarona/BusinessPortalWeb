@@ -22,7 +22,6 @@ import com.portal.business.commons.models.PaymentNetwork;
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import java.io.IOException;
-import static java.lang.Compiler.enable;
 
 import javax.faces.context.FacesContext;
 import org.primefaces.context.RequestContext;

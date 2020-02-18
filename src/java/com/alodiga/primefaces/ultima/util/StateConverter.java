@@ -31,6 +31,7 @@ import javax.faces.convert.FacesConverter;
 @FacesConverter("stateConverter")
 public class StateConverter implements Converter {
 
+    @Override
     public Object getAsObject(FacesContext facesContext, UIComponent component, String submittedValue) {
         State state = null;
         try {
@@ -50,6 +51,7 @@ public class StateConverter implements Converter {
         return state;
     }
 
+    @Override
     public String getAsString(FacesContext facesContext, UIComponent component, Object value) {
         if (value == null || value.equals("")) {
             return "";

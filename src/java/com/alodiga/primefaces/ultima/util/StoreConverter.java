@@ -31,6 +31,7 @@ import javax.faces.convert.FacesConverter;
 @FacesConverter("storeConverter")
 public class StoreConverter implements Converter {
 
+    @Override
     public Object getAsObject(FacesContext facesContext, UIComponent component, String submittedValue) {
         Store store = null;
         try {
@@ -50,11 +51,17 @@ public class StoreConverter implements Converter {
         return store;
     }
 
+    @Override
     public String getAsString(FacesContext facesContext, UIComponent component, Object value) {
         if (value == null || value.equals("")) {
             return "";
         } else {
-            return String.valueOf(value);
-	}
-		}
-	}
+            if (value instanceof Store) {
+                return ((Store) value).getName();
+            } else {
+                return value.toString();
+            }
+
+        }
+    }
+}

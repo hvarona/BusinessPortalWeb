@@ -19,7 +19,6 @@ import com.portal.business.commons.data.UtilsData;
 import com.portal.business.commons.exceptions.GeneralException;
 import com.portal.business.commons.exceptions.NullParameterException;
 import com.portal.business.commons.models.City;
-import com.portal.business.commons.models.Country;
 import com.portal.business.commons.models.State;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;

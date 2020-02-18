@@ -15,8 +15,6 @@
  */
 package com.alodiga.remittance.filter;
 
-import com.alodiga.remittance.util.UserSession;
-import com.alodiga.remittance.util.Util;
 import java.io.IOException;
 import javax.faces.application.ResourceHandler;
 
