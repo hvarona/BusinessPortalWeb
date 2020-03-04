@@ -7,7 +7,7 @@ import com.portal.business.commons.exceptions.EmptyListException;
 import com.portal.business.commons.exceptions.GeneralException;
 import com.portal.business.commons.exceptions.NullParameterException;
 import com.portal.business.commons.exceptions.RegisterNotFoundException;
-import com.portal.business.commons.models.Commerce;
+import com.portal.business.commons.models.Business;
 import com.portal.business.commons.models.Operator;
 import com.portal.business.commons.models.Profile;
 import com.portal.business.commons.models.User;
@@ -44,9 +44,12 @@ public class LoginBean extends GenericController implements Serializable {
     private Profile profile;
     private UserData userData = null;
 
+    private String locale;
+
     @PostConstruct
     public void init() {
         userData = new UserData();
+        locale = "es";
     }
 
     public String getPassword() {
@@ -76,7 +79,7 @@ public class LoginBean extends GenericController implements Serializable {
     public Map<String, String> getProfiles() {
         HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
         HttpSession session = request.getSession(false);
-        String locale = (String) session.getAttribute("languaje");
+        locale = (String) session.getAttribute("languaje");
         Long languageId;
         if (locale == null) {
             locale = FacesContext.getCurrentInstance().getViewRoot().getLocale().getLanguage();
@@ -108,6 +111,14 @@ public class LoginBean extends GenericController implements Serializable {
 
     public void setProfile(Profile profile) {
         this.profile = profile;
+    }
+
+    public String getLocale() {
+        return locale;
+    }
+
+    public void setLocale(String locale) {
+        this.locale = locale;
     }
 
     public String loginProject() throws NoSuchAlgorithmException, UnsupportedEncodingException {
@@ -186,9 +197,9 @@ public class LoginBean extends GenericController implements Serializable {
         }
     }
 
-    public Commerce getCurrentCommerce() {
-        if (this.userSession instanceof Commerce) {
-            return (Commerce) this.userSession;
+    public Business getCurrentBusiness() {
+        if (this.userSession instanceof Business) {
+            return (Business) this.userSession;
         } else if (this.userSession instanceof Operator) {
             return ((Operator) this.userSession).getCommerce();
         }

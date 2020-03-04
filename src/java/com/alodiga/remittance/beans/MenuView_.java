@@ -1,30 +1,12 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.alodiga.remittance.beans;
 
-import com.alodiga.primefaces.ultima.controller.city.ListCityController;
 import com.alodiga.remittance.parent.GenericController;
-import com.portal.business.commons.data.AccessControlData;
-import com.portal.business.commons.data.UserData;
-import com.portal.business.commons.exceptions.EmptyListException;
-import com.portal.business.commons.exceptions.GeneralException;
-import com.portal.business.commons.generic.WsRequest;
 import com.portal.business.commons.managers.PermissionManager;
-import com.portal.business.commons.models.Enterprise;
 import com.portal.business.commons.models.Permission;
 import com.portal.business.commons.models.PermissionGroup;
 import com.portal.business.commons.models.Profile;
 import com.portal.business.commons.models.User;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.TreeMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.context.FacesContext;
@@ -75,11 +57,13 @@ public class MenuView_ extends GenericController {
             for (PermissionGroup pg : permissionsGroups) {
                 DefaultSubMenu dm = new DefaultSubMenu(pg.getPermissionGroupDataByLanguageId(languageId).getAlias());
                 List<Permission> permissions = pm.getPermissionByGroupId(pg.getId());
-                for (Permission p : permissions) {
-                    DefaultMenuItem menuItem_ = new DefaultMenuItem(p.getPermissionDataByLanguageId(languageId).getAlias());
-                    menuItem_.setUrl(p.getAction());
-                    menuItem_.setAjax(false);
-                    dm.addElement(menuItem_);
+                if (permissions != null) {
+                    for (Permission p : permissions) {
+                        DefaultMenuItem menuItem_ = new DefaultMenuItem(p.getPermissionDataByLanguageId(languageId).getAlias());
+                        menuItem_.setUrl(p.getAction());
+                        menuItem_.setAjax(false);
+                        dm.addElement(menuItem_);
+                    }
                 }
                 model.addElement(dm);
             }

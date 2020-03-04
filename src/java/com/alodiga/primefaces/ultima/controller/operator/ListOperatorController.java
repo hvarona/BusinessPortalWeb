@@ -7,9 +7,12 @@ import com.portal.business.commons.exceptions.GeneralException;
 import com.portal.business.commons.exceptions.NullParameterException;
 import com.portal.business.commons.models.Language;
 import com.portal.business.commons.models.Operator;
+import com.portal.business.commons.models.Permission;
+import com.portal.business.commons.models.PermissionHasProfile;
 import com.portal.business.commons.models.Profile;
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -47,13 +50,18 @@ public class ListOperatorController implements Serializable {
     @ManagedProperty(value = "#{loginBean}")
     LoginBean loginBean;
 
+    private List<Permission> availablePermissions;
+    private List<Permission> includedPermissions;
+
     @PostConstruct
     public void init() {
         try {
             operatorData = new OperatorData();
-            operatorList = operatorData.getOperatorList(loginBean.getCurrentCommerce());
-        } catch (EmptyListException | GeneralException ex) {
+            operatorList = operatorData.getOperatorList(loginBean.getCurrentBusiness());
+        } catch (GeneralException ex) {
             Logger.getLogger(ListOperatorController.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (EmptyListException ignored) {
+
         }
     }
 
@@ -63,6 +71,7 @@ public class ListOperatorController implements Serializable {
 
     public void setSelectedOperator(Operator selectedOperator) {
         this.selectedOperator = selectedOperator;
+        getPermissions();
     }
 
     public List<Operator> getOperatorList() {
@@ -86,6 +95,17 @@ public class ListOperatorController implements Serializable {
     }
 
     public Map<String, String> getLanguages() {
+        if (languages == null || languages.isEmpty()) {
+            languages = new TreeMap();
+            try {
+                List<Language> languageList = operatorData.getLanguageList();
+                for (Language singleLangugage : languageList) {
+                    languages.put(singleLangugage.getDescription(), singleLangugage.getId().toString());
+                }
+            } catch (EmptyListException | GeneralException ex) {
+                Logger.getLogger(ListOperatorController.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
         return languages;
     }
 
@@ -94,6 +114,18 @@ public class ListOperatorController implements Serializable {
     }
 
     public Map<String, String> getProfiles() {
+        if (profiles == null || profiles.isEmpty()) {
+            profiles = new TreeMap();
+            try {
+                List<Profile> profileList = operatorData.getProfileList();
+                for (Profile singleProfile : profileList) {
+                    profiles.put(singleProfile.getName(), singleProfile.getId().toString());
+                }
+
+            } catch (EmptyListException | GeneralException ex) {
+                Logger.getLogger(ListOperatorController.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
         return profiles;
     }
 
@@ -117,6 +149,50 @@ public class ListOperatorController implements Serializable {
         this.language = language;
     }
 
+    public void getPermissions() {
+        availablePermissions = new ArrayList();
+        includedPermissions = new ArrayList();
+        if (selectedOperator == null || selectedOperator.getProfile() == null) {
+            return;
+        }
+
+        List<PermissionHasProfile> phps = selectedOperator.getProfile().getPermissionHasProfiles();
+        for (PermissionHasProfile php : phps) {
+            availablePermissions.add(php.getPermission());
+        }
+
+        for (Permission perm : availablePermissions) {
+            if (!selectedOperator.getExcludedPermission().contains(perm)) {
+                includedPermissions.add(perm);
+            }
+        }
+
+    }
+
+    public List<Permission> getAvailablePermissions() {
+        return availablePermissions;
+    }
+
+    public void setAvailablePermissions(List<Permission> availablePermissions) {
+        this.availablePermissions = availablePermissions;
+    }
+
+    public List<Permission> getIncludedPermissions() {
+        return includedPermissions;
+    }
+
+    public void setIncludedPermissions(List<Permission> includedPermissions) {
+        this.includedPermissions = includedPermissions;
+    }
+
+    public void changeEnable(Operator operator) {
+        try {
+            operatorData.saveOperator(operator);
+        } catch (NullParameterException | GeneralException ex) {
+            Logger.getLogger(ListOperatorController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
     public void handleReturnDialog(SelectEvent event) {
         if (event != null && event.getObject() != null) {
         }
@@ -135,7 +211,20 @@ public class ListOperatorController implements Serializable {
             Operator operator = null;
             if (selectedOperator.getId() != null) {
                 operator = selectedOperator;
+            } else {
+                throw new NullParameterException("ID null");
             }
+
+            List<Permission> excludedPermission = new ArrayList();
+
+            for (Permission perm : availablePermissions) {
+                if (!includedPermissions.contains(perm)) {
+                    excludedPermission.add(perm);
+                }
+            }
+
+            operator.setExcludedPermission(excludedPermission);
+
             operatorData.saveOperator(operator);
         } catch (GeneralException | NullParameterException ex) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!", "Error General"));

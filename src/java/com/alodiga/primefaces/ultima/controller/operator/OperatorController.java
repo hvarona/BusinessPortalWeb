@@ -6,15 +6,20 @@ import com.portal.business.commons.exceptions.GeneralException;
 import com.portal.business.commons.exceptions.NullParameterException;
 import com.portal.business.commons.models.Language;
 import com.portal.business.commons.models.Operator;
+import com.portal.business.commons.models.Permission;
 import com.portal.business.commons.models.Profile;
+import com.portal.business.commons.utils.Encoder;
 import java.io.IOException;
-import java.security.MessageDigest;
+import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
+import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import org.primefaces.context.RequestContext;
 
@@ -23,6 +28,7 @@ import org.primefaces.context.RequestContext;
  * @author hvarona
  */
 @ManagedBean
+@ViewScoped
 public class OperatorController {
 
     private Long id;
@@ -38,8 +44,14 @@ public class OperatorController {
     private Language language;
 
     private OperatorData operatorData = null;
+
     @ManagedProperty(value = "#{loginBean}")
     LoginBean loginBean;
+
+    @ManagedProperty(value = "#{operatorPermission}")
+    operatorPermissionController operatorPermissionController;
+
+    List<Permission> includedPermissions;
 
     private String messages = null;
 
@@ -140,6 +152,24 @@ public class OperatorController {
         this.loginBean = loginBean;
     }
 
+    public List<Permission> getIncludedPermissions() {
+        return includedPermissions;
+    }
+
+    public void setIncludedPermissions(List<Permission> includedPermissions) {
+        this.includedPermissions = includedPermissions;
+    }
+
+    public void reloadPermission() {
+        operatorPermissionController.setProfile(profile);
+        operatorPermissionController.reloadPermission();
+        this.includedPermissions = operatorPermissionController.getAvailablePermissions();
+    }
+
+    public void setOperatorPermissionController(operatorPermissionController operatorPermissionController) {
+        this.operatorPermissionController = operatorPermissionController;
+    }
+
     public void save() {
         try {
             Operator operator = new Operator();
@@ -152,14 +182,25 @@ public class OperatorController {
             operator.setReceiveNotification(receiveNotification);
             operator.setProfile(profile);
             operator.setLanguage(loginBean.getUserSession().getLanguage());
-            operator.setCommerce(loginBean.getCurrentCommerce());
+            operator.setCommerce(loginBean.getCurrentBusiness());
             operator.setCreationDate(new Timestamp(System.currentTimeMillis()));
 
             try {
-                MessageDigest md = MessageDigest.getInstance("MD5");
-                operator.setPassword(new String(md.digest(password.getBytes())));
-            } catch (NoSuchAlgorithmException ignore) {
+                operator.setPassword(Encoder.MD5(password));
+            } catch (NoSuchAlgorithmException | UnsupportedEncodingException ignore) {
             }
+
+            List<Permission> excludedPermission = new ArrayList();
+
+            List<Permission> availablePermissions = operatorPermissionController.getAvailablePermissions();
+
+            for (Permission perm : availablePermissions) {
+                if (!includedPermissions.contains(perm)) {
+                    excludedPermission.add(perm);
+                }
+            }
+
+            operator.setExcludedPermission(excludedPermission);
 
             operatorData.saveOperator(operator);
             messages = "El operador " + login + " ha sido guardado con exito";

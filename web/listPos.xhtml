@@ -49,7 +49,7 @@
                     </p:commandButton>
                 </p:column>
             </p:dataTable>
-            <p:commandButton id="btnAdd" value="#{msg.add}" icon="ui-icon-add" ajax="true" actionListener="#{dtListPosController.doRediret()}"/>
+            <p:commandButton id="btnAdd" rendered="#{not empty dtListPosController.stores}" value="#{msg.add}" icon="ui-icon-add" ajax="true" actionListener="#{dtListPosController.doRediret()}"/>
             <p:dialog header="#{msg.pos}" widgetVar="posDialog" modal="true" showEffect="fade" hideEffect="fade" resizable="false">
                 <p:outputPanel id="posDetail" style="text-align:center;">
                     <p:panelGrid columns="2" rendered="#{not empty dtListPosController.selectedPos}" columnClasses="info,qr">

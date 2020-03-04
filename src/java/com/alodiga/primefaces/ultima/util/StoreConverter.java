@@ -19,7 +19,6 @@ import com.portal.business.commons.data.StoreData;
 import com.portal.business.commons.exceptions.GeneralException;
 import com.portal.business.commons.exceptions.NullParameterException;
 import com.portal.business.commons.exceptions.RegisterNotFoundException;
-import com.portal.business.commons.generic.WsRequest;
 import com.portal.business.commons.models.Store;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -36,15 +35,10 @@ public class StoreConverter implements Converter {
         Store store = null;
         try {
             StoreData storeData = new StoreData();
-            WsRequest request = new WsRequest();
-            request.setParam(Long.parseLong(submittedValue));
-            store = storeData.loadStore(request);
-
-        } catch (RegisterNotFoundException ex) {
-            Logger.getLogger(StoreConverter.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (NullParameterException ex) {
-            Logger.getLogger(StoreConverter.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (GeneralException ex) {
+            Long storeId = Long.parseLong(submittedValue);
+            store = storeData.getStore(storeId);
+            System.out.println("StoreConvertido " + store.getName());
+        } catch (GeneralException | NullParameterException | RegisterNotFoundException | NumberFormatException ex) {
             Logger.getLogger(StoreConverter.class.getName()).log(Level.SEVERE, null, ex);
         }
 
@@ -57,7 +51,7 @@ public class StoreConverter implements Converter {
             return "";
         } else {
             if (value instanceof Store) {
-                return ((Store) value).getName();
+                return ((Store) value).getId().toString();
             } else {
                 return value.toString();
             }

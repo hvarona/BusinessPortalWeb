@@ -106,7 +106,7 @@ public class StoreController {
             store.setOpenTime(openTime);
             store.setCloseTime(closeTime);
 
-            store.setCommerce(loginBean.getCurrentCommerce());
+            store.setCommerce(loginBean.getCurrentBusiness());
 
             storeData.saveStore(store);
 

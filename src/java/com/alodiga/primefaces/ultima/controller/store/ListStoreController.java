@@ -36,14 +36,11 @@ public class ListStoreController implements Serializable {
     public void init() {
         storeData = new StoreData();
         try {
-            stores = storeData.getStores(loginBean.getCurrentCommerce());
+            stores = storeData.getStores(loginBean.getCurrentBusiness());
 
-        } catch (NullParameterException ex) {
+        } catch (NullParameterException | GeneralException ex) {
             Logger.getLogger(ListStoreController.class.getName()).log(Level.SEVERE, null, ex);
         } catch (EmptyListException ex) {
-            Logger.getLogger(ListStoreController.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (GeneralException ex) {
-            Logger.getLogger(ListStoreController.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 

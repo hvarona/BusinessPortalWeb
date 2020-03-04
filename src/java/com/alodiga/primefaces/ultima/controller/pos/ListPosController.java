@@ -37,7 +37,7 @@ public class ListPosController implements Serializable {
     private List<Pos> posList;
     private List<Pos> filteredPos;
 
-    private Map<String, String> stores;
+    private Map<String, String> stores = null;
 
     private Store store = null;
 
@@ -48,9 +48,11 @@ public class ListPosController implements Serializable {
     public void init() {
         try {
             posData = new PosData();
-            posList = posData.getPosList(loginBean.getCurrentCommerce());
-        } catch (EmptyListException | GeneralException ex) {
+            posList = posData.getPosList(loginBean.getCurrentBusiness());
+        } catch (GeneralException ex) {
             Logger.getLogger(ListPosController.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (EmptyListException ignored) {
+
         }
     }
 
@@ -87,14 +89,18 @@ public class ListPosController implements Serializable {
     }
 
     public Map<String, String> getStores() {
-        stores = new TreeMap();
-        try {
-            List<Store> stores1 = posData.getStoreList(loginBean.getCurrentCommerce());
-            for (Store stor : stores1) {
-                stores.put(stor.getName(), stor.getId().toString());
+        if (stores == null) {
+            stores = new TreeMap();
+            try {
+                List<Store> stores1 = posData.getStoreList(loginBean.getCurrentBusiness());
+                for (Store stor : stores1) {
+                    stores.put(stor.getName(), stor.getId().toString());
+                }
+            } catch (GeneralException ex) {
+                Logger.getLogger(ListPosController.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (EmptyListException ignored) {
+
             }
-        } catch (EmptyListException | GeneralException ex) {
-            Logger.getLogger(ListPosController.class.getName()).log(Level.SEVERE, null, ex);
         }
         return stores;
     }

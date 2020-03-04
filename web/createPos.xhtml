@@ -28,9 +28,9 @@
                                     
                                     <p:outputLabel value="#{msg.store}" for="store" />
                                     <p:selectOneMenu id="store" value="#{posController.store}" converter="storeConverter" >
-                                        <f:selectItem itemLabel="Selecione Uno" />
+                                        <f:selectItem itemLabel="Selecione Uno" noSelectionOption="true"/>
                                         <f:selectItems value="#{dtListPosController.stores}"/>
-                                        <p:ajax event="change" update="qrCode"/>
+                                        <p:ajax event="change" update="qrCode" />
                                     </p:selectOneMenu> 
                                     
                                     <p:outputLabel value="#{msg.openTime}" for="openTime" />

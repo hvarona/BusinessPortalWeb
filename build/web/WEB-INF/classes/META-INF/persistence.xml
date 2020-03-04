@@ -71,8 +71,10 @@
         <class>com.portal.business.commons.models.StoreSetting</class>
         <class>com.portal.business.commons.models.Pos</class>
         <class>com.portal.business.commons.models.Operator</class>
-        <class>com.portal.business.commons.models.Commerce</class>
-        <class>com.portal.business.commons.models.CommerceStatus</class>
+        <class>com.portal.business.commons.models.Business</class>
+        <class>com.portal.business.commons.models.BusinessStatus</class>
+        <class>com.portal.business.commons.models.PreferenceFieldData</class>
+        <class>com.portal.business.commons.models.UserCardTransactionLog</class>
         <exclude-unlisted-classes>true</exclude-unlisted-classes>
         <properties>
             <property name="eclipselink.logging.timestamp" value="true"/>
