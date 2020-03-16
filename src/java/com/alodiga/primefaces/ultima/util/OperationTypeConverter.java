@@ -1,6 +1,6 @@
 package com.alodiga.primefaces.ultima.util;
 
-import com.alodiga.primefaces.ultima.controller.wallet.rechargeController.Product;
+import com.portal.business.commons.enumeration.OperationType;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.faces.component.UIComponent;
@@ -12,21 +12,12 @@ import javax.faces.convert.FacesConverter;
  *
  * @author hvarona
  */
-@FacesConverter("productConverter")
-public class ProductConverter implements Converter {
+@FacesConverter("operationTypeConverter")
+public class OperationTypeConverter implements Converter {
 
     @Override
     public Object getAsObject(FacesContext facesContext, UIComponent component, String submittedValue) {
-        try {
-            Long idProduct = Long.parseLong(submittedValue);
-            Product prod = new Product();
-            prod.setId(idProduct);
-            return prod;
-        } catch (NumberFormatException ex) {
-            Logger.getLogger(PosConverter.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-        return null;
+        return OperationType.valueOf(submittedValue);
     }
 
     @Override
@@ -34,8 +25,8 @@ public class ProductConverter implements Converter {
         if (value == null || value.equals("")) {
             return "";
         } else {
-            if (value instanceof Product) {
-                return Long.toString(((Product) value).getId());
+            if (value instanceof OperationType) {
+                return ((OperationType) value).name();
             } else {
                 return value.toString();
             }

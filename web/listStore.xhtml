@@ -48,7 +48,7 @@
                     </p:commandButton>
                 </p:column>
             </p:dataTable>
-            <p:commandButton id="btnAdd" value="Agregar" icon="ui-icon-add" ajax="true" actionListener="#{dtListStoreController.doRediret()}"/>
+            <p:commandButton id="btnAdd" value="Agregar" icon="ui-icon-add" ajax="true" action="storeView.xhtml?faces-redirect=true"/>
             <p:dialog header="Tienda" widgetVar="storeDialog" modal="true" showEffect="fade" hideEffect="fade" resizable="false">
                 <p:outputPanel id="storeDetail" style="text-align:center;">
                     <p:panelGrid  columns="4" rendered="#{not empty dtListStoreController.selectedStore}" columnClasses="label,value">
@@ -77,7 +77,7 @@
                     </p:panelGrid>
                 </p:outputPanel>
             </p:dialog>
-            
+
         </h:form>
         <ui:include src="editStore.xhtml"/>
 

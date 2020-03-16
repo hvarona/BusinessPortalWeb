@@ -11,7 +11,7 @@ import org.primefaces.context.RequestContext;
 /**
  * @author frank
  */
-@Named(value = "remittanceController")
+@Named(value = "remittanceHasReceiverController")
 @ManagedBean
 public class RemittentHasReceiverController {
 

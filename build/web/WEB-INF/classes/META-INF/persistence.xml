@@ -75,6 +75,9 @@
         <class>com.portal.business.commons.models.BusinessStatus</class>
         <class>com.portal.business.commons.models.PreferenceFieldData</class>
         <class>com.portal.business.commons.models.UserCardTransactionLog</class>
+        <class>com.portal.business.commons.models.UserCardTransactionLog</class>
+        <class>com.portal.business.commons.models.BusinessBalanceIncoming</class>
+        <class>com.portal.business.commons.models.BusinessBalanceOutgoing</class>
         <exclude-unlisted-classes>true</exclude-unlisted-classes>
         <properties>
             <property name="eclipselink.logging.timestamp" value="true"/>

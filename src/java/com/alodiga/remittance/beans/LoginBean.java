@@ -46,6 +46,8 @@ public class LoginBean extends GenericController implements Serializable {
 
     private String locale;
 
+    private float businessPercentFee = 1;
+
     @PostConstruct
     public void init() {
         userData = new UserData();
@@ -74,6 +76,14 @@ public class LoginBean extends GenericController implements Serializable {
 
     public void setUserSession(User userSession) {
         this.userSession = userSession;
+    }
+
+    public float getBusinessPercentFee() {
+        return businessPercentFee;
+    }
+
+    public void setBusinessPercentFee(float businessPercentFee) {
+        this.businessPercentFee = businessPercentFee;
     }
 
     public Map<String, String> getProfiles() {

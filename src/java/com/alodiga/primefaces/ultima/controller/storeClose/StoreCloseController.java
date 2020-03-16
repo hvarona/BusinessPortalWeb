@@ -172,9 +172,9 @@ public class StoreCloseController {
         System.out.println("##### Entering save");
 
         storeClose = new StoreClose();
-        storeClose.setCloseamount(closeamount);
+        storeClose.setCloseAmount(closeamount);
         Timestamp daTimestamp = new Timestamp(closedate.getTime());
-        storeClose.setClosedate(daTimestamp);
+        storeClose.setCloseDate(daTimestamp);
         
         // Segun Frank  
         WsRequest request = new WsRequest();

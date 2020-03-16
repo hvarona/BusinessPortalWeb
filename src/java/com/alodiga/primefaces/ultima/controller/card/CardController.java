@@ -170,12 +170,9 @@ public class CardController {
         try {
             String cardEncrypted = AlodigaCryptographyUtils.aloDesencrypt(cardNumber);
             ActivateCardResponses response = proxy.activateCard(userId, cardEncrypted, timezone, ACTIVE_STATUS);
-            System.out.println("codigo respuesta : " + response.getCodigoRespuesta());
-            System.out.println("Mensaje respuesta : " + response.getMensajeRespuesta());
             switch (response.getCodigoRespuesta()) {
                 case "00": {
                     if (response.getCredentialResponse() != null) {
-                        System.out.println("Mensaje respuesta : " + response.getCredentialResponse().getCode());
                         FacesContext.getCurrentInstance().addMessage(null,
                                 new FacesMessage(bundle.getString("cardActivateSuccess")));
                         saveLog(TransactionAction.ACTIVATE, true);
@@ -207,16 +204,13 @@ public class CardController {
     }
 
     public void deactivateCard() {
-                try {
+        try {
 
             String cardEncrypted = AlodigaCryptographyUtils.aloDesencrypt(cardNumber);
             DesactivateCardResponses response = proxy.desactivateCard(userId, cardEncrypted, timezone, DEACTIVE_STATUS);
-            System.out.println("codigo respuesta : " + response.getCodigoRespuesta());
-            System.out.println("Mensaje respuesta : " + response.getMensajeRespuesta());
             switch (response.getCodigoRespuesta()) {
                 case "00": {
                     if (response.getCredentialResponse() != null) {
-                        System.out.println("Estado respuesta : " + response.getCredentialResponse().getCode());
                         saveLog(TransactionAction.DEACTIVATE, true);
                         FacesContext.getCurrentInstance().addMessage(null,
                                 new FacesMessage(bundle.getString("cardDeactivateSuccess")));
@@ -250,21 +244,17 @@ public class CardController {
             hasError = false;
             String cardEncrypted = AlodigaCryptographyUtils.aloDesencrypt(cardNumber);
             CheckStatusCardResponses statusCardResponse = proxy.checkStatusCard(userId, cardEncrypted, timezone);
-            System.out.println("codigo respuesta : " + statusCardResponse.getCodigoRespuesta());
-            System.out.println("Mensaje respuesta : " + statusCardResponse.getMensajeRespuesta());
             switch (statusCardResponse.getCodigoRespuesta()) {
                 case "00": {
                     CheckStatusCredentialCard statusCard = statusCardResponse.getCheckStatusCredentialCard();
                     if (statusCard != null) {
                         String code = statusCard.getStateCode();
-                        System.out.println("state code :" + statusCard.getStateCode());
-                        System.out.println("state description :  " + statusCard.getDescription());
 
                         switch (code) {
-                            case "01":
+                            case ACTIVE_STATUS:
                                 cardStatus = "active";
                                 break;
-                            case "24":
+                            case DEACTIVE_STATUS:
                                 cardStatus = "deactive";
                                 break;
                             default:
@@ -294,8 +284,6 @@ public class CardController {
             cardInfo.setCardNumber(cardNumber);
             String cardEncrypted = AlodigaCryptographyUtils.aloDesencrypt(cardNumber);
             CheckStatusCardResponses statusCardResponse = proxy.checkStatusCard(userId, cardEncrypted, timezone);
-            System.out.println("codigo respuesta : " + statusCardResponse.getCodigoRespuesta());
-            System.out.println("Mensaje respuesta : " + statusCardResponse.getMensajeRespuesta());
             switch (statusCardResponse.getCodigoRespuesta()) {
                 case "00": {
                     CheckStatusCredentialCard statusCard = statusCardResponse.getCheckStatusCredentialCard();
