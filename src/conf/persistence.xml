@@ -2,73 +2,26 @@
 <persistence version="1.0" xmlns="http://java.sun.com/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/persistence  http://java.sun.com/xml/ns/persistence/persistence_1_0.xsd">
     <persistence-unit name="BusinessPortalWebPu" transaction-type="JTA">
         <jta-data-source>jdbc/businessPortal</jta-data-source>
-        <class>com.portal.business.commons.models.CountryTranslation</class>
-        <class>com.portal.business.commons.models.Remittent</class>
-        <class>com.portal.business.commons.models.PreferenceType</class>
-        <class>com.portal.business.commons.models.SalePrice</class>
-        <class>com.portal.business.commons.models.SMS</class>
         <class>com.portal.business.commons.models.PermissionGroupData</class>
         <class>com.portal.business.commons.models.PreferenceField</class>
+        <class>com.portal.business.commons.models.PreferenceType</class>
         <class>com.portal.business.commons.models.TinType</class>
-        <class>com.portal.business.commons.models.County</class>
         <class>com.portal.business.commons.models.Profile</class>
-        <class>com.portal.business.commons.models.RatePaymentNetwork</class>
-        <class>com.portal.business.commons.models.Remittance</class>
         <class>com.portal.business.commons.models.PermissionGroup</class>
-        <class>com.portal.business.commons.models.AuditAction</class>
-        <class>com.portal.business.commons.models.PeriodAnulment</class>
-        <class>com.portal.business.commons.models.State</class>
-        <class>com.portal.business.commons.models.Currency</class>
         <class>com.portal.business.commons.models.Enterprise</class>
-        <class>com.portal.business.commons.models.Receiver</class>
-        <class>com.portal.business.commons.models.PaymentNetworkHasDeliveryForm</class>
-        <class>com.portal.business.commons.models.PaymentNetworkHasPoint</class>
-        <class>com.portal.business.commons.models.PaymentType</class>
-        <class>com.portal.business.commons.models.StoreBalance</class>
-        <class>com.portal.business.commons.models.RemittentHasReceiver</class>
-        <class>com.portal.business.commons.models.Address</class>
-        <class>com.portal.business.commons.models.ServiceType</class>
         <class>com.portal.business.commons.models.PreferenceValue</class>
         <class>com.portal.business.commons.models.IpAddress</class>
-        <class>com.portal.business.commons.models.Correspondent</class>
-        <class>com.portal.business.commons.models.StoreBalanceHistory</class>
-        <class>com.portal.business.commons.models.RemittanceStatus</class>
         <class>com.portal.business.commons.models.ParameterType</class>
-        <class>com.portal.business.commons.models.CountyHasCity</class>
-        <class>com.portal.business.commons.models.StoreClose</class>
-        <class>com.portal.business.commons.models.Event</class>
-        <class>com.portal.business.commons.models.RemittanceHasRemittenceStatus</class>
-        <class>com.portal.business.commons.models.Account</class>
-        <class>com.portal.business.commons.models.SalePriceHistory</class>
-        <class>com.portal.business.commons.models.Document</class>
-        <class>com.portal.business.commons.models.Period</class>
-        <class>com.portal.business.commons.models.ExchangeRate</class>
         <class>com.portal.business.commons.models.Preference</class>
-        <class>com.portal.business.commons.models.PaymentMethod</class>
         <class>com.portal.business.commons.models.ProfileData</class>
-        <class>com.portal.business.commons.models.Person</class>
-        <class>com.portal.business.commons.models.StoreHasRemittent</class>
-        <class>com.portal.business.commons.models.Country</class>
-        <class>com.portal.business.commons.models.City</class>
         <class>com.portal.business.commons.models.Permission</class>
-        <class>com.portal.business.commons.models.PaymentNetworkPoint</class>
         <class>com.portal.business.commons.models.PermissionData</class>
         <class>com.portal.business.commons.models.PermissionHasProfile</class>
-        <class>com.portal.business.commons.models.ExcludeList</class>
-        <class>com.portal.business.commons.models.NoWorkingDays</class>
-        <class>com.portal.business.commons.models.Bank</class>
         <class>com.portal.business.commons.models.Store</class>
-        <class>com.portal.business.commons.models.PaymentNetwork</class>
         <class>com.portal.business.commons.models.ReportType</class>
         <class>com.portal.business.commons.models.Language</class>
-        <class>com.portal.business.commons.models.PaymentNetworkType</class>
-        <class>com.portal.business.commons.models.EnterpriseHasTinType</class>
-        <class>com.portal.business.commons.models.DeliveryForm</class>
-        <class>com.portal.business.commons.models.SaleType</class>
         <class>com.portal.business.commons.models.IpBlackList</class>
         <class>com.portal.business.commons.models.User</class>
-        <class>com.portal.business.commons.models.AccountHasIpAddress</class>
-        <class>com.portal.business.commons.models.StoreSetting</class>
         <class>com.portal.business.commons.models.Pos</class>
         <class>com.portal.business.commons.models.Operator</class>
         <class>com.portal.business.commons.models.Business</class>
@@ -78,6 +31,7 @@
         <class>com.portal.business.commons.models.UserCardTransactionLog</class>
         <class>com.portal.business.commons.models.BusinessBalanceIncoming</class>
         <class>com.portal.business.commons.models.BusinessBalanceOutgoing</class>
+        <class>com.portal.business.commons.models.BusinessClose</class>
         <exclude-unlisted-classes>true</exclude-unlisted-classes>
         <properties>
             <property name="eclipselink.logging.timestamp" value="true"/>

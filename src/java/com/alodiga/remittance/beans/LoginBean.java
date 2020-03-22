@@ -1,6 +1,5 @@
 package com.alodiga.remittance.beans;
 
-import com.alodiga.primefaces.ultima.controller.city.ListCityController;
 import com.alodiga.remittance.parent.GenericController;
 import com.portal.business.commons.data.UserData;
 import com.portal.business.commons.exceptions.EmptyListException;
@@ -106,7 +105,7 @@ public class LoginBean extends GenericController implements Serializable {
                 profiles.put(prof.getProfileDataByLanguageId(languageId).getAlias(), prof.getId().toString());
             }
         } catch (EmptyListException | GeneralException ex) {
-            Logger.getLogger(ListCityController.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(LoginBean.class.getName()).log(Level.SEVERE, null, ex);
         }
         return profiles;
     }

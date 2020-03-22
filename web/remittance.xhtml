@@ -1,0 +1,168 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:pe="http://primefaces.org/ui/extensions"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="title">#{msg.remittanceTitle}</ui:define>
+
+    <ui:define name="content">
+        <h:form id="firstForm" >
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12">
+                        <div class="card card-w-title">
+                            <div align="center">
+                                <h1>#{msg.remittanceTitle}</h1>
+                                <f:facet name="header">
+                                    <p:messages id="messages"  autoUpdate="true" closable="true" />
+                                </f:facet>
+                                <p:panelGrid id="remttianceFirstStep" columns="2" >
+                                    <h:outputText value="#{msg.country}" />
+                                    <p:selectOneMenu value="#{remittanceController.selectedReceiverCountry}" converter="countryConverter">
+                                        <f:selectItem itemLabel="#{msg.SelectOne}" itemValue="" noSelectionOption="true" />
+                                        <f:selectItems value="#{remittanceController.countries}" var="country" itemLabel="#{country.name}"/>
+                                        <p:ajax update="@form" process="@form" listener="#{remittanceController.handleReceiverCountryChange()}" />
+                                    </p:selectOneMenu>
+
+                                    <h:outputText  id="paymentText" value="#{msg.paymentNetwork}" rendered="#{not empty remittanceController.paymentNetworks}" />
+                                    <p:selectOneMenu id="paymentSelect" value="#{remittanceController.selectedPaymentNetwork}" converter="paymentNetworkConverter" rendered="#{not empty remittanceController.paymentNetworks}" >
+                                        <f:selectItem itemLabel="#{msg.SelectOne}" itemValue="" noSelectionOption="true" />
+                                        <f:selectItems value="#{remittanceController.paymentNetworks}" var="payment" itemLabel="#{payment.name}"/>
+                                        <p:ajax update="@form" listener="#{remittanceController.handlePaymentNetworkChange()}" />
+                                    </p:selectOneMenu>
+
+                                    <h:outputText id="deliveryFormText" value="#{msg.deliveryForm}" rendered="#{not empty remittanceController.deliveryForms}" />
+                                    <p:selectOneMenu id="deliveryFormSelect" value="#{remittanceController.selectedDeliveryForm}" converter="deliveryFormConverter" rendered="#{not empty remittanceController.deliveryForms}" >
+                                        <f:selectItem itemLabel="#{msg.SelectOne}" itemValue="" noSelectionOption="true" />
+                                        <f:selectItems value="#{remittanceController.deliveryForms}" var="delivery" itemLabel="#{delivery.name}"/>
+                                        <p:ajax update="@form" />
+                                    </p:selectOneMenu>
+
+                                    <h:outputText value="#{msg.rechargeWalletIncludeFee}" />
+                                    <p:selectBooleanCheckbox  id="includeFee" value="#{remittanceController.paymentInfo.includeFee}" />
+
+                                    <h:outputText value="#{msg.AmountSent}" />
+                                    <p:inputNumber id="amountOrigin" value="#{remittanceController.paymentInfo.amountOrigin}" />
+
+                                </p:panelGrid>
+                            </div>
+
+                            <div align="center">
+                                <p:panelGrid  columns="1" >
+                                    <p:commandButton  value="#{msg.next}" update="@form,:dialogForm" 
+                                                      oncomplete="PF('confirmDialog').show()" 
+                                                      id="btnSubmit" icon="ui-icon-search" 
+                                                      actionListener="#{remittanceController.submitPaymentInfo()}" />
+                                </p:panelGrid>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </h:form>
+        <p:dialog header="#{msg.rechargeWalletRechargeConfirm}" id="confirmDialog" widgetVar="confirmDialog" modal="true" showEffect="fade" hideEffect="fade" resizable="false">
+            <h:form id="dialogForm" >
+                <p:panel id="remittanceRemittentInfo" style="text-align:center;" rendered="#{not remittanceController.hasError and remittanceController.phase eq 1}">
+                    <p:panelGrid columns="2">
+                        <h:outputText value="#{msg.firstName}" />
+                        <h:inputText id="remFirstName" value="#{remittanceController.remittent.firstName}" />
+
+                        <h:outputText value="#{msg.middleName}" />
+                        <h:inputText id="remMiddleName" value="#{remittanceController.remittent.middleName}" />
+
+                        <h:outputText value="#{msg.lastName}" />
+                        <h:inputText id="remLastName" value="#{remittanceController.remittent.lastName}" />
+
+                        <h:outputText value="#{msg.secondSurName}" />
+                        <h:inputText id="remSecondSurname" value="#{remittanceController.remittent.secondSurname}" />
+
+                        <h:outputText value="#{msg.email}" />
+                        <h:inputText id="remEmail" value="#{remittanceController.remittent.email}" />
+
+                        <h:outputText value="#{msg.phone}" />
+                        <h:inputText id="remPhone" value="#{remittanceController.remittent.phoneNumber}" />
+
+                        <h:outputText value="#{msg.country}" />
+                        <p:selectOneMenu value="#{remittanceController.selectedRemittentCountry}" converter="countryConverter">
+                            <f:selectItem itemLabel="#{msg.SelectOne}" itemValue="" noSelectionOption="true" />
+                            <f:selectItems value="#{remittanceController.countries}" var="country" itemLabel="#{country.name}"/>
+                        </p:selectOneMenu>
+
+                        <h:outputText value="#{msg.state}" />
+                        <h:inputText id="remState" value="#{remittanceController.remittent.address.stateName}" />
+
+                        <h:outputText value="#{msg.city}" />
+                        <h:inputText id="remCity" value="#{remittanceController.remittent.address.cityName}" />
+
+                        <h:outputText value="#{msg.address}" />
+                        <h:inputText id="remAddress" value="#{remittanceController.remittent.address.address}" />
+
+                        <h:outputText value="#{msg.zipcode}" />
+                        <h:inputText id="remZipcode" value="#{remittanceController.remittent.address.zipCode}" />
+
+                        <p:commandButton  value="#{msg.next}" process="dialogForm:remittanceRemittentInfo " update="dialogForm" 
+                                          oncomplete="PF('confirmDialog').show()" 
+                                          id="btnRemNext" icon="ui-icon-next" 
+                                          action="#{remittanceController.submitRemittentInfo()}" />
+                        <p:commandButton  value="#{msg.cancel}" update=":confirmDialog :firstForm" 
+                                          oncomplete="PF('confirmDialog').hide()" id="btnRemCancel" 
+                                          icon="ui-icon-cancel" actionListener="#{remittanceController.reset()}"/>
+                    </p:panelGrid>
+                </p:panel>
+                <p:panel id="remittanceReceiverInfo" style="text-align:center;" rendered="#{not remittanceController.hasError and remittanceController.phase eq 2}">
+                    <p:panelGrid columns="2">
+                        <h:outputText value="#{msg.firstName}" />
+                        <h:inputText id="recFirstName" value="#{remittanceController.receiver.firstName}" />
+
+                        <h:outputText value="#{msg.middleName}" />
+                        <h:inputText id="recMiddleName" value="#{remittanceController.receiver.middleName}" />
+
+                        <h:outputText value="#{msg.lastName}" />
+                        <h:inputText id="recLastName" value="#{remittanceController.receiver.lastName}" />
+
+                        <h:outputText value="#{msg.secondSurName}" />
+                        <h:inputText id="recSecondSurname" value="#{remittanceController.receiver.secondSurname}" />
+
+                        <h:outputText value="#{msg.email}" />
+                        <h:inputText id="recEmail" value="#{remittanceController.receiver.email}" />
+
+                        <h:outputText value="#{msg.phone}" />
+                        <h:inputText id="recPhone" value="#{remittanceController.receiver.phoneNumber}" />
+
+                        <h:outputText value="#{msg.country}" />
+                        <h:outputText id="recCountry" value="#{remittanceController.selectedReceiverCountry.name}" />
+
+                        <h:outputText value="#{msg.state}" />
+                        <h:inputText id="recState" value="#{remittanceController.receiver.address.stateName}" />
+
+                        <h:outputText value="#{msg.city}" />
+                        <h:inputText id="recCity" value="#{remittanceController.receiver.address.cityName}" />
+
+                        <h:outputText value="#{msg.address}" />
+                        <h:inputText id="recAddress" value="#{remittanceController.receiver.address.address}" />
+
+                        <h:outputText value="#{msg.zipcode}" />
+                        <h:inputText id="recZipcode" value="#{remittanceController.receiver.address.zipCode}" />
+
+                        <p:commandButton  value="#{msg.next}" process="dialogForm:remittanceReceiverInfo " update="dialogForm" 
+                                          oncomplete="PF('confirmDialog').show()" 
+                                          id="btnRecNext" icon="ui-icon-next" 
+                                          action="#{remittanceController.submitReceiverInfo()}" />
+                        <p:commandButton  value="#{msg.cancel}" update=":confirmDialog :firstForm" oncomplete="PF('confirmDialog').hide()" id="btnRecCancel" icon="ui-icon-cancel" actionListener="#{remittanceController.reset()}"/>
+                    </p:panelGrid>
+                </p:panel>
+                <p:panel id="errorDetail" style="text-align:center;" rendered="#{remittanceController.hasError}">
+                    <h:outputText value="#{remittanceController.errorMessage}" />
+                </p:panel>
+            </h:form>
+        </p:dialog>
+
+
+    </ui:define>
+
+</ui:composition>
+
