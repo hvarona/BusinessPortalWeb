@@ -1,5 +1,6 @@
 package com.alodiga.primefaces.ultima.controller.operator;
 
+import com.alodiga.remittance.beans.LanguajeBean;
 import com.alodiga.remittance.beans.LoginBean;
 import com.portal.business.commons.data.OperatorData;
 import com.portal.business.commons.exceptions.GeneralException;
@@ -15,6 +16,8 @@ import java.security.NoSuchAlgorithmException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
+import java.util.ResourceBundle;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
@@ -55,8 +58,18 @@ public class OperatorController {
 
     private String messages = null;
 
+    private ResourceBundle msg;
+
+    @ManagedProperty(value = "#{languajeBean}")
+    private LanguajeBean lenguajeBean;
+
     @PostConstruct
     public void init() {
+        if (lenguajeBean == null || lenguajeBean.getLanguaje() == null || lenguajeBean.getLanguaje().isEmpty()) {
+            msg = ResourceBundle.getBundle("com.alodiga.remittance.messages.message", Locale.forLanguageTag("es"));
+        } else {
+            msg = ResourceBundle.getBundle("com.alodiga.remittance.messages.message", Locale.forLanguageTag(lenguajeBean.getLanguaje()));
+        }
         operatorData = new OperatorData();
     }
 
@@ -170,6 +183,10 @@ public class OperatorController {
         this.operatorPermissionController = operatorPermissionController;
     }
 
+    public void setLenguajeBean(LanguajeBean lenguajeBean) {
+        this.lenguajeBean = lenguajeBean;
+    }
+
     public void save() {
         try {
             Operator operator = new Operator();
@@ -191,7 +208,6 @@ public class OperatorController {
             }
 
             List<Permission> excludedPermission = new ArrayList();
-
             List<Permission> availablePermissions = operatorPermissionController.getAvailablePermissions();
 
             for (Permission perm : availablePermissions) {
@@ -199,13 +215,9 @@ public class OperatorController {
                     excludedPermission.add(perm);
                 }
             }
-
             operator.setExcludedPermission(excludedPermission);
-
             operatorData.saveOperator(operator);
-            messages = "El operador " + login + " ha sido guardado con exito";
-            FacesContext.getCurrentInstance().addMessage(null,
-                    new FacesMessage(messages));
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(msg.getString("operatorSaveSuccesfull")));
         } catch (NullParameterException ex) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!", "Faltan parametros"));
         } catch (GeneralException ex) {
@@ -215,12 +227,12 @@ public class OperatorController {
     }
 
     public void reset() {
-        RequestContext.getCurrentInstance().reset("PosCreateForm:dataGrid");
+        RequestContext.getCurrentInstance().reset("OperatorCreateForm:dataGrid");
     }
 
     public void doRediret() {
         try {
-            FacesContext.getCurrentInstance().getExternalContext().redirect("listPos.xhtml");
+            FacesContext.getCurrentInstance().getExternalContext().redirect("listOperator.xhtml");
         } catch (IOException ex) {
             System.out.println("com.alodiga.primefaces.ultima.controller.PosController.doRediret()");
         }

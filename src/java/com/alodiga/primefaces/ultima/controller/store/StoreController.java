@@ -1,12 +1,18 @@
 package com.alodiga.primefaces.ultima.controller.store;
 
+import com.alodiga.remittance.beans.LanguajeBean;
 import com.alodiga.remittance.beans.LoginBean;
 import com.portal.business.commons.data.StoreData;
 import com.portal.business.commons.exceptions.GeneralException;
 import com.portal.business.commons.exceptions.NullParameterException;
 import com.portal.business.commons.models.Store;
 import java.io.IOException;
+import java.time.Instant;
 import java.util.Date;
+import java.util.Locale;
+import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
@@ -23,17 +29,26 @@ public class StoreController {
     private String storeCode;
     private String name;
     private String address;
-    private Date openTime;
-    private Date closeTime;
+    private Date openTime = Date.from(Instant.ofEpochMilli(4 * 60 * 60 * 1000));
+    private Date closeTime = Date.from(Instant.ofEpochMilli((((27 * 60) + 55) * 60) * 1000));
 
     private StoreData storeData = null;
-    private String messages = null;
 
     @ManagedProperty(value = "#{loginBean}")
     private LoginBean loginBean;
 
+    @ManagedProperty(value = "#{languajeBean}")
+    private LanguajeBean lenguajeBean;
+
+    private ResourceBundle msg;
+
     @PostConstruct
     public void init() {
+        if (lenguajeBean == null || lenguajeBean.getLanguaje() == null || lenguajeBean.getLanguaje().isEmpty()) {
+            msg = ResourceBundle.getBundle("com.alodiga.remittance.messages.message", Locale.forLanguageTag("es"));
+        } else {
+            msg = ResourceBundle.getBundle("com.alodiga.remittance.messages.message", Locale.forLanguageTag(lenguajeBean.getLanguaje()));
+        }
         storeData = new StoreData();
     }
 
@@ -85,16 +100,12 @@ public class StoreController {
         this.closeTime = closeTime;
     }
 
-    public String getMessages() {
-        return messages;
-    }
-
-    public void setMessages(String messages) {
-        this.messages = messages;
-    }
-
     public void setLoginBean(LoginBean loginBean) {
         this.loginBean = loginBean;
+    }
+
+    public void setLenguajeBean(LanguajeBean lenguajeBean) {
+        this.lenguajeBean = lenguajeBean;
     }
 
     public void save() {
@@ -107,17 +118,23 @@ public class StoreController {
             store.setCloseTime(closeTime);
 
             store.setCommerce(loginBean.getCurrentBusiness());
+            store.setEnabled(true);
 
             storeData.saveStore(store);
 
-            messages = "La Sucursal " + name + " ha sido guardado con exito";
-            FacesContext.getCurrentInstance().addMessage(null,
-                    new FacesMessage(messages));
+
+            FacesContext.getCurrentInstance().getExternalContext().getFlash().setKeepMessages(true);
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(msg.getString("storeCreated")));
+            FacesContext.getCurrentInstance().getExternalContext().redirect("listStore.xhtml");
+
         } catch (NullParameterException ex) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!", "Faltan parametros"));
         } catch (GeneralException ex) {
             ex.printStackTrace();
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!", "Error General"));
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!", msg.getString("errorGeneral")));
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!", "Error Redireccion"));
         }
     }
 

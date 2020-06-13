@@ -2,6 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="http://java.sun.com/jsf/html"
       xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
       xmlns:p="http://primefaces.org/ui">
     <h:head>
         <f:facet name="first" >
@@ -18,35 +19,39 @@
     <h:body styleClass="login-body" >
         <f:view contentType="text/html" locale='#{languajeBean.languaje}' id="fview" >
             <p:messages autoUpdate="true" id="msgs" showDetail="true" showSummary="true" />
-            <h:form id="loginForm" >
+            <h:form id="registerForm" >
                 <div class="card login-panel ui-fluid">
                     <div class="ui-g">
                         <div class="ui-g-12">
-                            <p:graphicImage name="images/splasss.png" library="ultima-layout" />
-                            <!--<p:graphicImage name="images/img-alodiga-logo.png" library="ultima-layout" />-->
+                            <p:graphicImage name="images/img-alodiga-logo.png" library="ultima-layout" />
                         </div>
+
+
+                        <h:outputText value="#{msg.emailMessage}" />
                         <div class="ui-g-12">
+
                             <h:panelGroup styleClass="md-inputfield">
-                                <p:inputText id="username" value="#{loginBean.uname}"/>
-                                <label>#{msg.login}</label>
+
+                                <p:inputText id="email" value="#{recoverBean.emailAddress}" size="30">
+
+                                    <p:ajax event="blur" 
+                                            onstart="$('#progressind').css('visibility','visible');"
+                                            oncomplete="$('#progressind').css('visibility','hidden');"                        
+                                            listener="#{recoverBean.validateEmail()}"/>
+
+
+                                </p:inputText>
+                                <label>#{msg.email}</label>
+
                             </h:panelGroup>
                         </div>
+
                         <div class="ui-g-12">
-                            <h:panelGroup styleClass="md-inputfield">
-                                <p:password id="password" value="#{loginBean.password}"  feedback="false"/>
-                                <label>#{msg.password}</label>
-                            </h:panelGroup>
+                            <p:commandButton value="#{msg.recover}" icon="ui-icon-person" update="recoverForm" action="#{recoverBean.recover}"  ajax="true"></p:commandButton>
+                            <p:button outcome="/login"    value="#{msg.back}"   icon="ui-icon-arrow-back" styleClass="secondary"/>
                         </div>
-                        <div class="ui-g-12">
-                            <p:commandButton value="#{msg.signins}" icon="ui-icon-person" update="loginForm" action="#{loginBean.loginProject}"  ajax="true"></p:commandButton>
-                            <p:button outcome="/recover"    value="#{msg.forgot}"   icon="ui-icon-help" styleClass="secondary"/>
-                        </div>
-                        <div class="ui-g-12">
-                            <p:selectOneMenu value="#{languajeBean.languaje}" onchange="submit()" valueChangeListener="#{languajeBean.localityChanged}">
-                                <f:selectItem itemLabel="Español" itemValue="es"/>
-                                <f:selectItem itemLabel="English" itemValue="en"/>
-                            </p:selectOneMenu>
-                        </div>
+
+
                     </div>  
                 </div>
             </h:form>

@@ -1,5 +1,6 @@
 package com.alodiga.primefaces.ultima.controller.pos;
 
+import com.alodiga.remittance.beans.LanguajeBean;
 import com.alodiga.remittance.beans.LoginBean;
 import com.portal.business.commons.data.PosData;
 import com.portal.business.commons.exceptions.EmptyListException;
@@ -10,7 +11,9 @@ import com.portal.business.commons.models.Store;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.ResourceBundle;
 import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -44,11 +47,22 @@ public class ListPosController implements Serializable {
     @ManagedProperty(value = "#{loginBean}")
     LoginBean loginBean;
 
+    private ResourceBundle msg;
+
+    @ManagedProperty(value = "#{languajeBean}")
+    private LanguajeBean lenguajeBean;
+
     @PostConstruct
     public void init() {
+        if (lenguajeBean == null || lenguajeBean.getLanguaje() == null || lenguajeBean.getLanguaje().isEmpty()) {
+            msg = ResourceBundle.getBundle("com.alodiga.remittance.messages.message", Locale.forLanguageTag("es"));
+        } else {
+            msg = ResourceBundle.getBundle("com.alodiga.remittance.messages.message", Locale.forLanguageTag(lenguajeBean.getLanguaje()));
+        }
         try {
             posData = new PosData();
-            posList = posData.getPosList(loginBean.getCurrentBusiness());
+            //posList = posData.getPosList(loginBean.getCurrentBusiness());
+            posList = posData.getEnabledPosList(loginBean.getCurrentBusiness());
         } catch (GeneralException ex) {
             Logger.getLogger(ListPosController.class.getName()).log(Level.SEVERE, null, ex);
         } catch (EmptyListException ignored) {
@@ -113,6 +127,23 @@ public class ListPosController implements Serializable {
         this.loginBean = loginBean;
     }
 
+    public void setLenguajeBean(LanguajeBean lenguajeBean) {
+        this.lenguajeBean = lenguajeBean;
+    }
+
+    public void changeEnable(Pos pos) {
+        try {
+            posData.savePos(pos);
+            if (pos.getEnabled()) {
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(msg.getString("posEnabled")));
+            } else {
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(msg.getString("posDisabled")));
+            }
+        } catch (NullParameterException | GeneralException ex) {
+            Logger.getLogger(ListPosController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
     public void handleReturnDialog(SelectEvent event) {
         if (event != null && event.getObject() != null) {
         }
@@ -133,8 +164,11 @@ public class ListPosController implements Serializable {
                 pos = selectedPos;
             }
             posData.savePos(pos);
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(msg.getString("posSaveSuccesfull")));
         } catch (GeneralException | NullParameterException ex) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!", "Error General"));
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 

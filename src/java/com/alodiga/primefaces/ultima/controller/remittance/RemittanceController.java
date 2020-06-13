@@ -1,5 +1,7 @@
 package com.alodiga.primefaces.ultima.controller.remittance;
 
+import com.alodiga.remittance.beans.LanguajeBean;
+import com.alodiga.remittance.beans.LoginBean;
 import com.alodiga.ws.remittance.services.WSRemittenceMobileProxy;
 import com.alodiga.ws.remittance.services.WsCountryListResponse;
 import com.alodiga.ws.remittance.services.WsDeliveryFormsReponse;
@@ -14,12 +16,16 @@ import com.portal.business.commons.models.PaymentNetwork;
 import com.portal.business.commons.models.RemittancePaymentInfo;
 import com.portal.business.commons.models.RemittancePerson;
 import com.portal.business.commons.models.State;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
+import java.util.ResourceBundle;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 
@@ -50,6 +56,10 @@ public class RemittanceController {
     private PaymentNetwork selectedPaymentNetwork;
     private List<PaymentNetwork> paymentNetworks;
 
+    private String transactionId = "Prueba";
+    private String creationDate;
+    private String creationHour;
+
     private int phase;
 
     private boolean hasError = false;
@@ -62,6 +72,19 @@ public class RemittanceController {
     private int retries = 0;
 
     private final String correspondentId = "1";
+
+    private float businessFee = 0;
+    private float otherFee = 0;
+
+    @ManagedProperty(value = "#{loginBean}")
+    private LoginBean loginBean;
+
+    ResourceBundle msg;
+
+    @ManagedProperty(value = "#{languajeBean}")
+    LanguajeBean lenguajeBean;
+
+    private static final SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
 
     //Remettence
     public static final String COMMENTARY_REMETTENCE = "REMESA";
@@ -83,6 +106,11 @@ public class RemittanceController {
     @PostConstruct
     public void init() {
         try {
+            if (lenguajeBean == null || lenguajeBean.getLanguaje() == null || lenguajeBean.getLanguaje().isEmpty()) {
+                msg = ResourceBundle.getBundle("com.alodiga.remittance.messages.message", Locale.forLanguageTag("es"));
+            } else {
+                msg = ResourceBundle.getBundle("com.alodiga.remittance.messages.message", Locale.forLanguageTag(lenguajeBean.getLanguaje()));
+            }
             phase = 0;
             countries = new ArrayList();
             states = new ArrayList();
@@ -110,11 +138,11 @@ public class RemittanceController {
                 }
                 break;
                 default:
-                    FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!", response.getMessage()));
+                    FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!", msg.getString("error.general") + " : " + response.getCode()));
             }
         } catch (Exception ex) {
             ex.printStackTrace();
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!", ex.getMessage()));
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!", msg.getString("error.generalConnection")));
         }
 
     }
@@ -256,7 +284,6 @@ public class RemittanceController {
     }
 
     public void setSelectedPaymentNetwork(PaymentNetwork selectedPaymentNetwork) {
-        System.out.println("Set Selected Payment");
         for (PaymentNetwork paymentNetwork : paymentNetworks) {
             if (paymentNetwork.equals(selectedPaymentNetwork)) {
                 this.selectedPaymentNetwork = paymentNetwork;
@@ -277,8 +304,50 @@ public class RemittanceController {
         return errorMessage;
     }
 
+    public String getTransactionId() {
+        return transactionId;
+    }
+
+    public String getCreationDate() {
+        return creationDate;
+    }
+
+    public String getCreationHour() {
+        return creationHour;
+    }
+
     public int getPhase() {
         return phase;
+    }
+
+    public void setLoginBean(LoginBean loginBean) {
+        this.loginBean = loginBean;
+    }
+
+    public void setLenguajeBean(LanguajeBean lenguajeBean) {
+        this.lenguajeBean = lenguajeBean;
+    }
+
+    public String getDialogTitle() {
+        if (hasError) {
+            return msg.getString("error");
+        }
+        switch (phase) {
+            case 0:
+            case 1:
+            case 2:
+                return msg.getString("dataAdquisition");
+            case 3:
+                return msg.getString("confirm");
+            case 4:
+                return msg.getString("summary");
+
+        }
+        return msg.getString("confirm");
+    }
+
+    public float getTotalFee() {
+        return otherFee + businessFee;
     }
 
     public void handleReceiverCountryChange() {
@@ -308,21 +377,19 @@ public class RemittanceController {
                 }
                 break;
                 default:
-                    FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!", response.getMessage()));
+                    FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!", msg.getString("error.general") + " : " + response.getCode()));
             }
         } catch (Exception e) {
             e.printStackTrace();
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!", e.getMessage()));
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!", msg.getString("error.generalConnection")));
         }
     }
 
     public void handlePaymentNetworkChange() {
-        System.out.println("Handler Payment " + this.selectedPaymentNetwork);
         try {
             deliveryForms = new ArrayList();
             if (this.selectedPaymentNetwork != null) {
                 WsDeliveryFormsReponse response = remittenceProxy.getDeliveryFormByPamentNetwork(token, Long.toString(this.selectedPaymentNetwork.getId()));
-                System.out.println("Delivery Forms response " + response.getCode());
                 switch (response.getCode()) {
                     case "0": {
                         deliveryForms = new ArrayList();
@@ -332,7 +399,6 @@ public class RemittanceController {
                             delivery.setName(wsDelivery.getName());
                             deliveryForms.add(delivery);
                         }
-                        System.out.println("Delivery Forms " + deliveryForms.size());
                     }
                     break;
                     case "50": {
@@ -344,12 +410,12 @@ public class RemittanceController {
                     }
                     break;
                     default:
-                        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!", response.getMessage()));
+                        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!", msg.getString("error.general") + " : " + response.getCode()));
                 }
             }
         } catch (Exception e) {
             e.printStackTrace();
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!", e.getMessage()));
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!", msg.getString("error.generalConnection")));
         }
     }
 
@@ -361,21 +427,38 @@ public class RemittanceController {
         phase = 2;
     }
 
+    private float truncAmount(float in) {
+        return (float) Math.floor(in * 100) / 100;
+    }
+
     public void submitReceiverInfo() {
         try {
-            WsSummaryPaymentNetworkAndRateResponse response = remittenceProxy.getRemettenceSummary(token, 
-                    Long.toString(remittent.getAddress().getCountry().getId()), 
-                    Long.toString(receiver.getAddress().getCountry().getId()), 
-                    Long.parseLong(paymentInfo.getRatePaymentNetworkId()), 
-                    paymentInfo.getAmountOrigin(), paymentInfo.isIncludeFee());
+            float originAmount = truncAmount(paymentInfo.getAmountOrigin());
+            if (paymentInfo.isIncludeFee()) {
+                businessFee = truncAmount((paymentInfo.getAmountOrigin() * loginBean.getBusinessPercentFee()) / (100 + loginBean.getBusinessPercentFee()));
+                originAmount = originAmount - businessFee;
+            }
+
+            WsSummaryPaymentNetworkAndRateResponse response = remittenceProxy.getRemettenceSummary(token,
+                    Long.toString(remittent.getAddress().getCountry().getId()),
+                    Long.toString(receiver.getAddress().getCountry().getId()),
+                    paymentInfo.getDeliveryForm().getId(), originAmount, paymentInfo.isIncludeFee());
             switch (response.getCode()) {
                 case "0": {
-                    paymentInfo.setTotalAmount(response.getRealAmountToSend());
+                    if (!paymentInfo.isIncludeFee()) {
+                        businessFee = truncAmount((response.getRealAmountToSend() * loginBean.getBusinessPercentFee() / 100));
+                    }
+
+                    float totalAmount = response.getRealAmountToSend() + businessFee;
+
+                    paymentInfo.setTotalAmount(totalAmount);
                     paymentInfo.setAmountDestiny(Float.parseFloat(response.getReceiverAmount()));
                     paymentInfo.setAmountOrigin(response.getAmountToSendRemettence());
                     paymentInfo.setExchangeRateId(Long.toString(response.getExchangeRateDestiny().getId()));
+                    paymentInfo.setRatePaymentNetworkId(Long.toString(response.getRatePaymentNetwork().getId()));
                     remittent.setCurrencyId(Long.toString(response.getExchangeRateSource().getCurrency().getId()));
                     receiver.setCurrencyId(Long.toString(response.getExchangeRateDestiny().getCurrency().getId()));
+                    otherFee = response.getRealAmountToSend() - response.getAmountToSendRemettence();
 
                     phase = 3;
                 }
@@ -390,22 +473,24 @@ public class RemittanceController {
                 break;
                 default:
                     hasError = true;
-                    errorMessage = response.getMessage();
+                    errorMessage = msg.getString("error.general") + " : " + response.getCode();
             }
 
         } catch (Exception e) {
             e.printStackTrace();
             hasError = true;
-            errorMessage = e.getMessage();
+            errorMessage = msg.getString("error.generalConnection");
         }
 
     }
 
     public void confirmRemittance() {
+        System.out.println("en confirmRemittance");
+        applicationDate = new Date();
         try {
 
             WsRemittenceResponse response = remittenceProxy.saverRemittence(
-                    applicationDate.toString(),
+                    dateFormat.format(applicationDate),
                     COMMENTARY_REMETTENCE,
                     paymentInfo.getAmountOrigin(),
                     paymentInfo.getTotalAmount(),
@@ -457,16 +542,32 @@ public class RemittanceController {
                     receiver.getAddress().getAddress(),
                     receiver.getAddress().getZipCode()
             );
-
-            phase = 4;
+            switch (response.getCode()) {
+                case "0": {
+                    transactionId = response.getRemittanceId();
+                    creationDate = response.getRemittanceSingleResponse().getCreationDate();
+                    creationHour = response.getRemittanceSingleResponse().getCreationHour();
+                    phase = 4;
+                    FacesContext.getCurrentInstance().addMessage(null,
+                            new FacesMessage(msg.getString("remittanceSuccess")));
+                }
+                break;
+                default:
+                    hasError = true;
+                    errorMessage = msg.getString("error.general") + " : " + response.getCode();
+            }
         } catch (Exception e) {
             e.printStackTrace();
             hasError = true;
-            errorMessage = e.getMessage();
+            errorMessage = msg.getString("error.generalConnection");
         }
     }
 
     public void reset() {
         FacesContext.getCurrentInstance().getViewRoot().getViewMap().clear();
+    }
+
+    public void errorBack() {
+        hasError = false;
     }
 }

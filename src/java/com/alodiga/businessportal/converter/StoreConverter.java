@@ -37,7 +37,6 @@ public class StoreConverter implements Converter {
             StoreData storeData = new StoreData();
             Long storeId = Long.parseLong(submittedValue);
             store = storeData.getStore(storeId);
-            System.out.println("StoreConvertido " + store.getName());
         } catch (GeneralException | NullParameterException | RegisterNotFoundException | NumberFormatException ex) {
             Logger.getLogger(StoreConverter.class.getName()).log(Level.SEVERE, null, ex);
         }

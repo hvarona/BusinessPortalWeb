@@ -240,6 +240,21 @@ public class RechargeCardController {
         return truncAmount(businessFee + alodigaFee);
     }
 
+    public String getHeader() {
+        if (hasError) {
+            return msg.getString(timezone);
+        }
+        switch (phase) {
+            case 2:
+                return msg.getString("confirm");
+            case 3:
+                return msg.getString("result");
+            case 1:
+            default:
+                return msg.getString("dataAdquisition");
+        }
+    }
+
     private float truncAmount(float in) {
         return (float) Math.floor(in * 100) / 100;
     }
@@ -251,7 +266,7 @@ public class RechargeCardController {
             cardInfo = new CardInfo();
             cardInfo.setCardNumber(cardNumber);
             String cardEncrypted = AlodigaCryptographyUtils.aloDesencrypt(cardNumber);
-            CheckStatusCardResponses statusCardResponse = allodigaWS.checkStatusCard(userId, cardEncrypted, timezone);
+            CheckStatusCardResponses statusCardResponse = allodigaWS.checkStatusCardByBusiness(cardEncrypted, timezone);
             switch (statusCardResponse.getCodigoRespuesta()) {
                 case "00": {
                     CheckStatusCredentialCard statusCard = statusCardResponse.getCheckStatusCredentialCard();
@@ -279,7 +294,8 @@ public class RechargeCardController {
                 default:
                     cardInfo = null;
                     hasError = true;
-                    errorMessage = statusCardResponse.getMensajeRespuesta();
+                    //errorMessage = statusCardResponse.getMensajeRespuesta();
+                    errorMessage = msg.getString("error.general") + " : " + statusCardResponse.getCodigoRespuesta();
             }
         } catch (Exception ex) {
             Logger.getLogger(CardController.class.getName()).log(Level.SEVERE, null, ex);
@@ -314,7 +330,7 @@ public class RechargeCardController {
                     break;
                     default:
                         hasError = true;
-                        errorMessage = response.getMensajeRespuesta();
+                        errorMessage = msg.getString("error.general") + " : " + response.getCodigoRespuesta();
                 }
             } else {
                 hasError = true;
@@ -357,7 +373,7 @@ public class RechargeCardController {
                     break;
                     default:
                         hasError = true;
-                        errorMessage = response.getMensajeRespuesta();
+                        errorMessage = msg.getString("error.general") + " : " + response.getCodigoRespuesta();
                 }
             } else {
                 hasError = true;

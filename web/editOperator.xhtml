@@ -10,6 +10,7 @@
 
         <p:dialog id="OperatorEditDlg" widgetVar="OperatorEditDialog" modal="true" resizable="false" appendTo="@(body)" header="#{msg.editOperator}">
             <h:form id="OperatorEditForm">
+                <p:growl id="messages" autoUpdate="true" sticky="true" />
                 <h:panelGroup id="display">
                     <p:panelGrid columns="2" rendered="#{bpListOperatorController.selectedOperator != null}">
                         <p:panelGrid columns="2" >
@@ -58,18 +59,15 @@
                             <h:outputText value="${msg.excludedPermission}"/>
                             
                             <p:selectManyCheckbox id="excludedList" value="#{bpListOperatorController.includedPermissions}" converter="permissionConverter" layout="pageDirection" columns="1">
-                                <f:selectItems value="#{bpListOperatorController.availablePermissions}" var="perm" itemValue="#{perm}" itemLabel="#{perm.name}"/>
+                                <f:selectItems value="#{bpListOperatorController.availablePermissions}" var="perm" itemValue="#{perm}" itemLabel="#{operatorPermission.getPermissionLabel(perm)}"/>
                             </p:selectManyCheckbox>
                             
                         </p:panelGrid>
                     </p:panelGrid>
-                    <p:commandButton value="#{msg.edit}" title="#{msg.edit}" 
-                                     update="display,:formOperator:operatorTable"
+                    <p:commandButton value="#{msg.save}" title="#{msg.save}" 
+                                     update=":formOperator OperatorEditDlg"
                                      actionListener="#{bpListOperatorController.save}"
-                                     styleClass="icon-insert icon" >
-                        <p:ajax event="dialogReturn" listener="#{bpListOperatorController.handleReturnDialog}" 
-                                update="display,:formOperator:operatorTable"/>
-                    </p:commandButton>
+                                     styleClass="icon-insert icon" />
                     <p:commandButton value="#{msg.cancel}" onclick="OperatorEditDialog.hide()"/>
                 </h:panelGroup>
             </h:form>

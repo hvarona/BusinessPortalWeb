@@ -10,13 +10,13 @@
     <ui:define name="content">
         <h:form id="formStore">
             <p:dataTable var="store" value="#{dtListStoreController.stores}" widgetVar="storesTable"
-                         emptyMessage="No se encontraron sucursales con estos criterios" filteredValue="#{dtListStoreController.filteredStore}" paginator="true" rows="10" style="margin-bottom:20px"
+                         emptyMessage="#{msg.StoreNotFound}" filteredValue="#{dtListStoreController.filteredStore}" paginator="true" rows="10" style="margin-bottom:20px"
                          paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}" 
                          rowsPerPageTemplate="5,10,15" id="storeTable">
 
                 <f:facet name="header">
                     <p:outputPanel>
-                        <h:outputText value="Buscar en todos los campos:" />
+                        <h:outputText value="#{msg.searchAllFields}" />
                         <p:inputText id="globalFilter" onkeyup="PF('storesTable').filter()" style="width:150px" placeholder="Inserte palabra clave"/>
                     </p:outputPanel>
                 </f:facet>
@@ -36,20 +36,24 @@
                 <p:column filterBy="#{store.address}" headerText="#{msg.address}"  filterMatchMode="contains" style="width:30px">
                     <h:outputText value="#{store.address}" />
                 </p:column>                
+                
+                <p:column filterBy="#{store.enabled}" headerText="#{msg.enable}"  filterMatchMode="contains" style="width:15px">
+                    <h:selectBooleanCheckbox value="#{store.enabled}">
+                        <f:ajax event="change" listener="#{dtListStoreController.changeEnable(store)}" />
+                    </h:selectBooleanCheckbox>
+                </p:column>
 
                 <p:column style="width:10px;text-align: center">
                     <p:commandButton update=":formStore:storeDetail" oncomplete="PF('storeDialog').show()" icon="ui-icon-search" title="View">
                         <f:setPropertyActionListener value="#{store}" target="#{dtListStoreController.selectedStore}" />
                     </p:commandButton>
-                </p:column>
-                <p:column style="width:10px;text-align: center">
                     <p:commandButton id="editButton" update=":StoreEditForm" oncomplete="PF('StoreEditDialog').show()" icon="ui-icon-pencil" title="Edit">
                         <f:setPropertyActionListener value="#{store}" target="#{dtListStoreController.selectedStore}" />
                     </p:commandButton>
                 </p:column>
             </p:dataTable>
-            <p:commandButton id="btnAdd" value="Agregar" icon="ui-icon-add" ajax="true" action="storeView.xhtml?faces-redirect=true"/>
-            <p:dialog header="Tienda" widgetVar="storeDialog" modal="true" showEffect="fade" hideEffect="fade" resizable="false">
+            <p:commandButton id="btnAdd" value="#{msg.add}" icon="ui-icon-add" ajax="true" action="storeView.xhtml?faces-redirect=true"/>
+            <p:dialog header="#{msg.store}" widgetVar="storeDialog" modal="true" showEffect="fade" hideEffect="fade" resizable="false">
                 <p:outputPanel id="storeDetail" style="text-align:center;">
                     <p:panelGrid  columns="4" rendered="#{not empty dtListStoreController.selectedStore}" columnClasses="label,value">
                         <h:outputText value="#{msg.id}:" />

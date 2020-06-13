@@ -42,7 +42,7 @@
 
                             <div align="center">
                                 <p:panelGrid  columns="1" >
-                                    <p:commandButton  value="#{msg.reportTransactionGenerate}" update="@form,:resultList" id="btnSubmit" icon="ui-icon-search" actionListener="#{transactionReportController.doReport()}" />
+                                    <p:commandButton  value="#{msg.reportTransactionGenerate}" update="@form" id="btnSubmit" icon="ui-icon-search" actionListener="#{transactionReportController.doReport()}" />
                                 </p:panelGrid>
                             </div>
 
@@ -51,8 +51,8 @@
                 </div>
             </div>
 
-            <p:dataTable id="resultList" var="transaction" rendered="#{transactionReportController.result != null}" 
-                         value="#{transactionReportController.result}" emptyMessage="#{msg.reportTransactionEmptyResult}" 
+            <p:dataTable id="resultList" var="transaction" rendered="#{transactionReportController.resultList != null}" 
+                         value="#{transactionReportController.resultList}" emptyMessage="#{msg.reportTransactionEmptyResult}" 
                          filteredValue="#{transactionReportController.filteredResult}" paginator="true" rows="10" style="margin-bottom:20px"
                          paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}" 
                          rowsPerPageTemplate="5,10,15" >

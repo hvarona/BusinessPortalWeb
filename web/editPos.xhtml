@@ -11,6 +11,7 @@
 
         <p:dialog id="PosEditDlg" widgetVar="PosEditDialog" modal="true" resizable="false" appendTo="@(body)" header="Editar Cajas">
             <h:form id="PosEditForm">
+                <p:growl id="messages" autoUpdate="true" sticky="true" />
                 <h:panelGroup id="display">
                     <p:panelGrid columns="2" rendered="#{dtListPosController.selectedPos != null}">
                         <p:panelGrid columns="2">
@@ -24,14 +25,22 @@
                             <p:selectOneMenu id="store" value="#{dtListPosController.selectedPos.store}" converter="storeConverter" >
                                 <f:selectItem itemLabel="#{dtListPosController.selectedPos.store.name}" itemValue="#{dtListPosController.selectedPos.store.id}" />
                                 <f:selectItems value="#{dtListPosController.stores}"/>
-                                <p:ajax event="change" update="qrCode"/>
+                                <p:ajax event="change" update="qrCode openTime closeTime"/>
                             </p:selectOneMenu> 
 
                             <p:outputLabel value="#{msg.openTime}" for="openTime" />
-                            <pe:timePicker id="openTime" value="#{dtListPosController.selectedPos.openTime}" mode="popup"/>
+                            <pe:timePicker id="openTime" value="#{dtListPosController.selectedPos.openTime}" 
+                                           onHourShow="tpOpenPosOnHourShowCallback" 
+                                           onMinuteShow="tpOpenPosOnMinuteShowCallback" 
+                                           mode="popup" widgetVar="openPosTime" disabled="#{empty dtListPosController.selectedPos.store}"/>
 
                             <p:outputLabel value="#{msg.closeTime}" for="closeTime" />
-                            <pe:timePicker id="closeTime" value="#{dtListPosController.selectedPos.closeTime}" mode="popup"/>
+                            <pe:timePicker id="closeTime" value="#{dtListPosController.selectedPos.closeTime}"
+                                           onHourShow="tpClosePosOnHourShowCallback" 
+                                           onMinuteShow="tpClosePosOnMinuteShowCallback" 
+                                           mode="popup" widgetVar="closePosTime" disabled="#{empty dtListPosController.selectedPos.store}"/>
+
+                            <p:selectBooleanCheckbox id="enable" value="#{dtListPosController.selectedPos.enabled}"/>
 
                         </p:panelGrid>
                         <pe:qrCode id="qrCode" 
@@ -40,15 +49,53 @@
                                    size="200" 
                                    text="#{dtListPosController.selectedPos.qrText}"/>
                     </p:panelGrid>
-                    <p:commandButton value="#{msg.edit}" title="Editar" 
-                                     update="display,:formPos:posTable"
+                    <p:commandButton value="#{msg.save}" title="#{msg.save}" 
+                                     update="PosEditDlg :formPos:posTable"
                                      actionListener="#{dtListPosController.save}"
-                                     styleClass="icon-insert icon" >
-                        <p:ajax event="dialogReturn" listener="#{dtListPosController.handleReturnDialog}" 
-                                update="display,:formPos:posTable"/>
-                    </p:commandButton>
+                                     styleClass="icon-insert icon"/>
                     <p:commandButton value="#{msg.cancel}" onclick="PosEditDialog.hide()"/>
                 </h:panelGroup>
+                <script type="text/javascript">
+                    /* <![CDATA[ */
+                    function tpOpenPosOnHourShowCallback(hour) {
+                        if (!PrimeFaces.widgets['closePosTime']) {
+                            return false;
+                        }
+
+                        return (parseInt(hour) <= parseInt(PF('closePosTime').getHours()));
+
+                    }
+
+                    function tpOpenPosOnMinuteShowCallback(hour, minute) {
+                        if (!PrimeFaces.widgets['closePosTime']) {
+                            return false;
+                        }
+
+                        var tpCloseHour = parseInt(PF('closePosTime').getHours());
+
+                        return (parseInt(hour) < tpCloseHour) || ((parseInt(hour) == tpCloseHour) && (parseInt(minute) < parseInt(PF('closePosTime').getMinutes())));
+
+                    }
+
+                    function tpClosePosOnHourShowCallback(hour) {
+                        if (!PrimeFaces.widgets['openPosTime']) {
+                            return false;
+                        }
+
+                        return parseInt(hour) >= parseInt(PF('openPosTime').getHours());
+                    }
+
+                    function tpClosePosOnMinuteShowCallback(hour, minute) {
+                        if (!PrimeFaces.widgets['openPosTime']) {
+                            return false;
+                        }
+
+                        var tpStartHour = parseInt(PF('openPosTime').getHours());
+
+                        return (parseInt(hour) > tpStartHour) || ((parseInt(hour) == tpStartHour) && (parseInt(minute) > parseInt(PF('openPosTime').getMinutes())));
+                    }
+                    /* ]]> */
+                </script>
             </h:form>
         </p:dialog>
 

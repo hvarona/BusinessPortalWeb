@@ -1,5 +1,6 @@
 package com.alodiga.businessportal.converter;
 
+import com.alodiga.remittance.beans.LanguajeBean;
 import com.portal.business.commons.data.UserData;
 import com.portal.business.commons.exceptions.GeneralException;
 import com.portal.business.commons.exceptions.NullParameterException;
@@ -38,4 +39,5 @@ public class PermissionConverter implements Converter {
             return String.valueOf(value);
         }
     }
+
 }

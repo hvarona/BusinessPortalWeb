@@ -128,7 +128,7 @@ public class ViewQrController {
         showPos = false;
         this.qrtext = "";
         try {
-            String toEncrypt = business.getCode() + ";" + business.getName();
+            String toEncrypt = business.getCode();
             this.qrtext = AlodigaCryptographyUtils.encrypt(toEncrypt, "1nt3r4xt3l3ph0ny");
         } catch (Exception ex) {
             Logger.getLogger(Pos.class.getName()).log(Level.SEVERE, null, ex);

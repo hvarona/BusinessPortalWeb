@@ -49,55 +49,53 @@
                 <p:column style="width:10px;text-align: center">
                     <p:commandButton update=":formOperator:operatorDetail" oncomplete="PF('operatorDialog').show()" icon="ui-icon-search" title="#{msg.view}">
                         <f:setPropertyActionListener value="#{operator}" target="#{bpListOperatorController.selectedOperator}" />
-                </p:commandButton>
-            </p:column>
-            <p:column style="width:10px;text-align: center">
-                <p:commandButton id="editButton" update=":OperatorEditForm" oncomplete="PF('OperatorEditDialog').show()" icon="ui-icon-pencil" title="#{msg.edit}">
-                    <f:setPropertyActionListener value="#{operator}" target="#{bpListOperatorController.selectedOperator}" />
-                </p:commandButton>
-            </p:column>
-        </p:dataTable>
-        <p:commandButton id="btnAdd" value="#{msg.add}" icon="ui-icon-add" ajax="true" action="createOperator.xhtml?faces-redirect=true"/>
-        <p:dialog header="#{msg.operator}" widgetVar="operatorDialog" modal="true" showEffect="fade" hideEffect="fade" resizable="false">
-            <p:outputPanel id="operatorDetail" style="text-align:center;">
-                <p:panelGrid columns="2" rendered="#{not empty bpListOperatorController.selectedOperator}" columnClasses="label,value">
-                    <h:outputText value="#{msg.id}" />
+                    </p:commandButton>
+                    <p:commandButton id="editButton" update=":OperatorEditForm" oncomplete="PF('OperatorEditDialog').show()" icon="ui-icon-pencil" title="#{msg.edit}">
+                        <f:setPropertyActionListener value="#{operator}" target="#{bpListOperatorController.selectedOperator}" />
+                    </p:commandButton>
+                </p:column>
+            </p:dataTable>
+            <p:commandButton id="btnAdd" value="#{msg.add}" icon="ui-icon-add" ajax="true" action="createOperator.xhtml?faces-redirect=true"/>
+            <p:dialog header="#{msg.operator}" widgetVar="operatorDialog" modal="true" showEffect="fade" hideEffect="fade" resizable="false">
+                <p:outputPanel id="operatorDetail" style="text-align:center;">
+                    <p:panelGrid columns="2" rendered="#{not empty bpListOperatorController.selectedOperator}" columnClasses="label,value">
+                        <h:outputText value="#{msg.id}" />
 
-                    <h:outputText value="#{bpListOperatorController.selectedOperator.id}" />
+                        <h:outputText value="#{bpListOperatorController.selectedOperator.id}" />
 
-                    <h:outputText value="#{msg.login}" />
+                        <h:outputText value="#{msg.login}" />
 
-                    <h:outputText value="#{bpListOperatorController.selectedOperator.login}" />
+                        <h:outputText value="#{bpListOperatorController.selectedOperator.login}" />
 
-                    <h:outputText value="#{msg.firstName}" />
+                        <h:outputText value="#{msg.firstName}" />
 
-                    <h:outputText value="#{bpListOperatorController.selectedOperator.firstName}"/>
+                        <h:outputText value="#{bpListOperatorController.selectedOperator.firstName}"/>
 
-                    <h:outputText value="#{msg.lastName}" />
+                        <h:outputText value="#{msg.lastName}" />
 
-                    <h:outputText value="#{bpListOperatorController.selectedOperator.lastName}"/>
+                        <h:outputText value="#{bpListOperatorController.selectedOperator.lastName}"/>
 
-                    <h:outputText value="#{msg.email}" />
+                        <h:outputText value="#{msg.email}" />
 
-                    <h:outputText value="#{bpListOperatorController.selectedOperator.email}"/>
+                        <h:outputText value="#{bpListOperatorController.selectedOperator.email}"/>
 
-                    <h:outputText value="#{msg.phone}" />
+                        <h:outputText value="#{msg.phone}" />
 
-                    <h:outputText value="#{bpListOperatorController.selectedOperator.phoneNumber}"/>
+                        <h:outputText value="#{bpListOperatorController.selectedOperator.phoneNumber}"/>
 
-                    <h:outputText value="#{msg.creationDate}" />
+                        <h:outputText value="#{msg.creationDate}" />
 
-                    <h:outputText value="#{bpListOperatorController.selectedOperator.creationDate}"/>
+                        <h:outputText value="#{bpListOperatorController.selectedOperator.creationDate}"/>
 
-                    <h:outputText value="#{msg.profile}" />
+                        <h:outputText value="#{msg.profile}" />
 
-                    <h:outputText value="#{bpListOperatorController.selectedOperator.profile.name}"/>
+                        <h:outputText value="#{bpListOperatorController.selectedOperator.profile.name}"/>
 
-                </p:panelGrid>
-            </p:outputPanel>
-        </p:dialog>
-    </h:form>
-    <ui:include src="editOperator.xhtml"/>
-</ui:define>
+                    </p:panelGrid>
+                </p:outputPanel>
+            </p:dialog>
+        </h:form>
+        <ui:include src="editOperator.xhtml"/>
+    </ui:define>
 
 </ui:composition>

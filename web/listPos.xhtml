@@ -9,6 +9,7 @@
     <ui:define name="title">#{msg.pos}</ui:define>
 
     <ui:define name="content">
+        
         <h:form id="formPos">
             <p:dataTable var="pos" value="#{dtListPosController.posList}" widgetVar="posTable"
                          emptyMessage="#{msg.posNotFound}" filteredValue="#{dtListPosController.filteredPos}" paginator="true" rows="10" style="margin-bottom:20px"
@@ -26,24 +27,29 @@
                     <h:outputText value="#{pos.id}" />
                 </p:column>
 
-                <p:column filterBy="#{pos.posCode}" headerText="#{msg.posCode}"  filterMatchMode="contains" style="width:30px">
-                    <h:outputText value="#{pos.posCode}" />
-                </p:column>
-
                 <p:column filterBy="#{pos.store.name}" headerText="#{msg.store}"  filterMatchMode="contains" style="width:30px">
                     <h:outputText value="#{pos.store.name}" />
                 </p:column>
 
+                <p:column filterBy="#{pos.posCode}" headerText="#{msg.posCode}"  filterMatchMode="contains" style="width:30px">
+                    <h:outputText value="#{pos.posCode}" />
+                </p:column>
+
                 <p:column headerText="#{msg.posSchedule}"  filterMatchMode="contains" style="width:30px">
                     <h:outputText value="#{pos.openTimeString} #{msg.to} #{pos.closeTimeString}" />
+                </p:column>
+                
+                <p:column filterBy="#{pos.enabled}" headerText="#{msg.enable}"  filterMatchMode="contains" style="width:15px">
+                    <h:selectBooleanCheckbox value="#{pos.enabled}">
+                        <f:ajax event="change" listener="#{dtListPosController.changeEnable(pos)}" />
+                    </h:selectBooleanCheckbox>
                 </p:column>
 
                 <p:column style="width:10px;text-align: center">
                     <p:commandButton update=":formPos:posDetail" oncomplete="PF('posDialog').show()" icon="ui-icon-search" title="View">
                         <f:setPropertyActionListener value="#{pos}" target="#{dtListPosController.selectedPos}" />
                     </p:commandButton>
-                </p:column>
-                <p:column style="width:10px;text-align: center">
+
                     <p:commandButton id="editButton" update=":PosEditForm" oncomplete="PF('PosEditDialog').show()" icon="ui-icon-pencil" title="Edit">
                         <f:setPropertyActionListener value="#{pos}" target="#{dtListPosController.selectedPos}" />
                     </p:commandButton>

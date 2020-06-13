@@ -1,5 +1,6 @@
 package com.alodiga.primefaces.ultima.controller.pos;
 
+import com.alodiga.remittance.beans.LanguajeBean;
 import com.alodiga.remittance.beans.LoginBean;
 import com.portal.business.commons.data.PosData;
 import com.portal.business.commons.exceptions.GeneralException;
@@ -8,8 +9,11 @@ import com.portal.business.commons.models.Pos;
 import com.portal.business.commons.models.Store;
 import com.portal.business.commons.utils.AlodigaCryptographyUtils;
 import java.io.IOException;
+import java.time.Instant;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
+import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
@@ -29,29 +33,27 @@ public class PosController {
     private Long id;
     private String posCode;
     private Store store;
-    private Date openTime;
-    private Date closeTime;
+    private Date openTime = Date.from(Instant.ofEpochMilli(4 * 60 * 60 * 1000));
+    ;
+    private Date closeTime = Date.from(Instant.ofEpochMilli((((27 * 60) + 55) * 60) * 1000));
     private PosData posData = null;
 
-    private String messages = null;
-    
     @ManagedProperty(value = "#{loginBean}")
-    LoginBean loginBean;
+    private LoginBean loginBean;
+
+    private ResourceBundle msg;
+
+    @ManagedProperty(value = "#{languajeBean}")
+    private LanguajeBean lenguajeBean;
 
     @PostConstruct
     public void init() {
-        Calendar cal = Calendar.getInstance();
-        cal.set(Calendar.HOUR, 0);
-        cal.set(Calendar.MINUTE, 0);
-        cal.set(Calendar.SECOND, 0);
-        cal.set(Calendar.MILLISECOND, 0);
-        openTime = cal.getTime();
-        cal.set(Calendar.HOUR, 1);
-        cal.set(Calendar.MINUTE, 0);
-        cal.set(Calendar.SECOND, 0);
-        cal.set(Calendar.MILLISECOND, 0);
-        closeTime = cal.getTime();
         posData = new PosData();
+        if (lenguajeBean == null || lenguajeBean.getLanguaje() == null || lenguajeBean.getLanguaje().isEmpty()) {
+            msg = ResourceBundle.getBundle("com.alodiga.remittance.messages.message", Locale.forLanguageTag("es"));
+        } else {
+            msg = ResourceBundle.getBundle("com.alodiga.remittance.messages.message", Locale.forLanguageTag(lenguajeBean.getLanguaje()));
+        }
     }
 
     public Long getId() {
@@ -76,6 +78,8 @@ public class PosController {
 
     public void setStore(Store store) {
         this.store = store;
+        this.openTime = store.getOpenTime();
+        this.closeTime = store.getCloseTime();
     }
 
     public Date getOpenTime() {
@@ -98,6 +102,10 @@ public class PosController {
         this.loginBean = loginBean;
     }
 
+    public void setLenguajeBean(LanguajeBean lenguajeBean) {
+        this.lenguajeBean = lenguajeBean;
+    }
+
     public void save() {
         try {
             Pos pos = new Pos();
@@ -105,15 +113,19 @@ public class PosController {
             pos.setStore(store);
             pos.setCloseTime(closeTime);
             pos.setOpenTime(openTime);
+            pos.setEnabled(true);
             posData.savePos(pos);
-            messages = "La caja " + posCode + " ha sido guardado con exito";
-            FacesContext.getCurrentInstance().addMessage(null,
-                    new FacesMessage(messages));
+
+            FacesContext.getCurrentInstance().getExternalContext().getFlash().setKeepMessages(true);
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(msg.getString("posSaveSuccesfull")));
+            FacesContext.getCurrentInstance().getExternalContext().redirect("listPos.xhtml");
         } catch (NullParameterException ex) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!", "Faltan parametros"));
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!", msg.getString("error.missparameters")));
         } catch (GeneralException ex) {
             ex.printStackTrace();
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!", "Error General"));
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!", msg.getString("error.missparameters")));
+        } catch (IOException ex) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!", msg.getString("error.general")));
         }
     }
 
@@ -134,7 +146,7 @@ public class PosController {
             if (store == null) {
                 return "";
             }
-            String toEncrypt = store.getStoreCode() + ";" + posCode;
+            String toEncrypt = store.getCommerce().getCode() + ";" + store.getStoreCode() + ";" + posCode;
             String value = AlodigaCryptographyUtils.encrypt(toEncrypt, "1nt3r4xt3l3ph0ny");
             return value;
         } catch (Exception ex) {

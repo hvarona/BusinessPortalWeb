@@ -169,7 +169,7 @@ public class CardController {
     public void activateCard() {
         try {
             String cardEncrypted = AlodigaCryptographyUtils.aloDesencrypt(cardNumber);
-            ActivateCardResponses response = proxy.activateCard(userId, cardEncrypted, timezone, ACTIVE_STATUS);
+            ActivateCardResponses response = proxy.activateCardbyBusiness(loginBean.getCurrentBusiness().getId(), cardEncrypted, timezone);
             switch (response.getCodigoRespuesta()) {
                 case "00": {
                     if (response.getCredentialResponse() != null) {
@@ -188,7 +188,7 @@ public class CardController {
                 break;
                 default:
 
-                    messages = response.getMensajeRespuesta();
+                    messages = bundle.getString("error.general") + " : " + response.getCodigoRespuesta();
             }
 
         } catch (RemoteException ex) {
@@ -207,7 +207,7 @@ public class CardController {
         try {
 
             String cardEncrypted = AlodigaCryptographyUtils.aloDesencrypt(cardNumber);
-            DesactivateCardResponses response = proxy.desactivateCard(userId, cardEncrypted, timezone, DEACTIVE_STATUS);
+            DesactivateCardResponses response = proxy.desactivateCardByBusiness(loginBean.getCurrentBusiness().getId(), cardEncrypted, timezone);
             switch (response.getCodigoRespuesta()) {
                 case "00": {
                     if (response.getCredentialResponse() != null) {
@@ -226,7 +226,7 @@ public class CardController {
                 }
                 break;
                 default:
-                    messages = response.getMensajeRespuesta();
+                    messages = bundle.getString("error.general") + " : " + response.getCodigoRespuesta();
             }
         } catch (RemoteException ex) {
             Logger.getLogger(CardController.class.getName()).log(Level.SEVERE, null, ex);
@@ -243,7 +243,8 @@ public class CardController {
         try {
             hasError = false;
             String cardEncrypted = AlodigaCryptographyUtils.aloDesencrypt(cardNumber);
-            CheckStatusCardResponses statusCardResponse = proxy.checkStatusCard(userId, cardEncrypted, timezone);
+            System.out.println("cardEncrypted " + cardEncrypted);
+            CheckStatusCardResponses statusCardResponse = proxy.checkStatusCardByBusiness(cardEncrypted, timezone);
             switch (statusCardResponse.getCodigoRespuesta()) {
                 case "00": {
                     CheckStatusCredentialCard statusCard = statusCardResponse.getCheckStatusCredentialCard();
@@ -266,7 +267,7 @@ public class CardController {
                 default:
                     cardStatus = null;
                     hasError = true;
-                    errorMessage = statusCardResponse.getMensajeRespuesta();
+                    errorMessage = bundle.getString("error.general") + " : " + statusCardResponse.getCodigoRespuesta();
             }
         } catch (Exception ex) {
             Logger.getLogger(CardController.class.getName()).log(Level.SEVERE, null, ex);
@@ -283,7 +284,7 @@ public class CardController {
             cardInfo = new CardInfo();
             cardInfo.setCardNumber(cardNumber);
             String cardEncrypted = AlodigaCryptographyUtils.aloDesencrypt(cardNumber);
-            CheckStatusCardResponses statusCardResponse = proxy.checkStatusCard(userId, cardEncrypted, timezone);
+            CheckStatusCardResponses statusCardResponse = proxy.checkStatusCardByBusiness(cardEncrypted, timezone);
             switch (statusCardResponse.getCodigoRespuesta()) {
                 case "00": {
                     CheckStatusCredentialCard statusCard = statusCardResponse.getCheckStatusCredentialCard();
@@ -303,7 +304,7 @@ public class CardController {
                 default:
                     cardInfo = null;
                     hasError = true;
-                    errorMessage = statusCardResponse.getMensajeRespuesta();
+                    errorMessage = bundle.getString("error.general") + " : " + statusCardResponse.getCodigoRespuesta();
             }
         } catch (Exception ex) {
             Logger.getLogger(CardController.class.getName()).log(Level.SEVERE, null, ex);

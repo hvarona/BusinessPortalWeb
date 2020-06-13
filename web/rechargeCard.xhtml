@@ -45,7 +45,7 @@
                 </div>
             </div>
         </h:form>
-        <p:dialog header="#{msg.rechargeWalletRechargeConfirm}" id="confirmDialog" widgetVar="confirmDialog" modal="true" showEffect="fade" hideEffect="fade" resizable="false">
+        <p:dialog header="#{rechargeCardController.header}" id="confirmDialog" widgetVar="confirmDialog" modal="true" showEffect="fade" hideEffect="fade" resizable="false">
             <h:form id="dialogForm" >
                 <p:panel id="amountDetail" style="text-align:center;" rendered="#{not rechargeCardController.hasError and rechargeCardController.phase eq 1}">
                     <p:panelGrid columns="2">
@@ -61,7 +61,7 @@
                         <h:outputText value="#{msg.rechargeWalletRechargeAmount}" />
                         <p:inputNumber id="amountToRecharge" value="#{rechargeCardController.rechargeAmount}" />
 
-                        <p:commandButton  value="#{msg.accept}" process="dialogForm:amountToRecharge dialogForm:includeFee @this" update="@form" 
+                        <p:commandButton  value="#{msg.accept}" process="dialogForm:amountToRecharge dialogForm:includeFee @this" update="@form :confirmDialog" 
                                           oncomplete="PF('confirmDialog').show()" 
                                           id="btnAcceptRecharge" icon="ui-icon-send" 
                                           action="#{rechargeCardController.verifyRecharge()}" />
@@ -85,7 +85,7 @@
                         <h:outputText value="#{msg.rechargeWalletTotalCharge}" />
                         <h:outputText value="#{rechargeCardController.totalCharge}" />
 
-                        <p:commandButton  value="#{msg.confirm}" update="@form" oncomplete="PF('confirmDialog').show()" id="btnConfirm" icon="ui-icon-check" actionListener="#{rechargeCardController.recharge()}" />
+                        <p:commandButton  value="#{msg.confirm}" update="@form :confirmDialog" oncomplete="PF('confirmDialog').show()" id="btnConfirm" icon="ui-icon-check" actionListener="#{rechargeCardController.recharge()}" />
                         <p:commandButton  value="#{msg.cancel}" update=":confirmDialog :cardForm" oncomplete="PF('confirmDialog').hide()" id="btnCancelRecharge" icon="ui-icon-cancel" actionListener="#{rechargeCardController.reset()}"/>
                     </p:panelGrid>
                 </p:panel>
