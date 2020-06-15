@@ -6,12 +6,10 @@
                 xmlns:pe="http://primefaces.org/ui/extensions"
                 template="/WEB-INF/template.xhtml">
 
-    <ui:define name="title">#{msg.businessCloseDetail}</ui:define>
-
-    <ui:define name="content">
-        <h:form id="qrForm" >
+    <p:dialog id="closeDetailDlg" widgetVar="closeDetailDialog" modal="true" resizable="false" appendTo="@(body)" header="#{msg.businessCloseDetail}">
+        <h:form id="closeDetailForm" >
             <div align="center">
-                <h1>#{msg.businessCloseDetail}</h1>
+                <!--<h1>#{msg.businessCloseDetail}</h1>!-->
                 <p:panelGrid id="closeSummaryGrid" columns="1" >
                     <p:tabView>
                         <p:tab title="#{msg.closeSummaryTitle}">
@@ -216,11 +214,11 @@
                                     <p:column colspan="1">
                                         <h:outputText value="#{msg.sellAmount}" />
                                     </p:column>
-                                    
+
                                     <p:column colspan="1">
-                                        <h:outputText value="#{msg.sellAmount}" />
+                                        <h:outputText value="#{msg.settlementRate}" />
                                     </p:column>
-                                    
+
                                     <p:column colspan="1">
                                         <h:outputText value="#{msg.ingress}" />
                                     </p:column>
@@ -237,55 +235,57 @@
                                     <p:column colspan="1">
                                         <h:outputText value="#{businessCloseController.sellsAmount}" />
                                     </p:column>
-                                    
+
                                     <p:column colspan="1">
                                         <h:outputText value="100" />
                                     </p:column>
-                                    
+
                                     <p:column colspan="1">
                                         <h:outputText value="#{businessCloseController.sellsAmount}" />
                                     </p:column>
                                 </p:row>
-                                
+
                                 <p:row>
-                                    <p:column colspan="4">
-                                        <p:dataTable var="operator" value="#{businessCloseController.operators}" 
+                                    <p:column colspan="6">
+                                        <p:dataTable var="storeSell" value="#{businessCloseController.storePosReport}" 
                                                      paginator="true" rows="10" style="margin-bottom:20px"
                                                      paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}" 
                                                      rowsPerPageTemplate="5,10,15">
-                                            <p:column filterBy="#{operator.displayName}" headerText="#{msg.name}"  filterMatchMode="contains" style="width:15px">
-                                                <h:outputText value="#{operator.displayName}" />
+                                            <p:column filterBy="#{storeSell.storeName}" headerText="#{msg.store}"  filterMatchMode="contains" style="width:15px">
+                                                <h:outputText value="#{storeSell.storeName}" />
                                             </p:column>
 
-                                            <p:column filterBy="#{businessCloseController.getRechargeTotalByOperator(operator)}" headerText="#{msg.rechargeTotal}"  filterMatchMode="contains" style="width:15px">
-                                                <h:outputText value="#{businessCloseController.getRechargeTotalByOperator(operator)}" />
+                                            <p:column filterBy="#{storeSell.posName}" headerText="#{msg.pos}"  filterMatchMode="contains" style="width:15px">
+                                                <h:outputText value="#{storeSell.posName}" />
                                             </p:column>
 
-                                            <p:column filterBy="#{businessCloseController.getRechargeAmountByOperator(operator)}" headerText="#{msg.rechargeAmount}"  filterMatchMode="contains" style="width:15px">
-                                                <h:outputText value="#{businessCloseController.getRechargeAmountByOperator(operator)}" />
+                                            <p:column filterBy="#{storeSell.sellSize}" headerText="#{msg.noTotal}"  filterMatchMode="contains" style="width:15px">
+                                                <h:outputText value="#{storeSell.sellSize}" />
                                             </p:column>
 
-                                            <p:column filterBy="#{businessCloseController.getWithdrawTotalByOperator(operator)}" headerText="#{msg.withdrawTotal}"  filterMatchMode="contains" style="width:15px">
-                                                <h:outputText value="#{businessCloseController.getWithdrawTotalByOperator(operator)}" />
+                                            <p:column filterBy="#{storeSell.sellAmount}" headerText="#{msg.sellAmount}"  filterMatchMode="contains" style="width:15px">
+                                                <h:outputText value="#{storeSell.sellAmount}" />
                                             </p:column>
 
-                                            <p:column filterBy="#{businessCloseController.getWithdrawAmountByOperator(operator)}" headerText="#{msg.withdrawAmount}"  filterMatchMode="contains" style="width:15px">
-                                                <h:outputText value="#{businessCloseController.getWithdrawAmountByOperator(operator)}" />
+                                            <p:column filterBy="#{storeSell.settlement}" headerText="#{msg.settlementRate}"  filterMatchMode="contains" style="width:15px">
+                                                <h:outputText value="#{storeSell.settlement}" />
                                             </p:column>
 
-                                            <p:column filterBy="#{businessCloseController.getCashTotalByOperator(operator)}" headerText="#{msg.netCash}"  filterMatchMode="contains" style="width:15px">
-                                                <h:outputText value="#{businessCloseController.getCashTotalByOperator(operator)}" />
+                                            <p:column filterBy="#{storeSell.sellAmount}" headerText="#{msg.ingress}"  filterMatchMode="contains" style="width:15px">
+                                                <h:outputText value="#{storeSell.sellAmount}" />
                                             </p:column>
+
+
 
                                         </p:dataTable>
                                     </p:column>
                                 </p:row>
-                                
+
                             </p:panelGrid>
                         </p:tab>
                     </p:tabView>
                 </p:panelGrid>
             </div>
         </h:form>
-    </ui:define>
+    </p:dialog>
 </ui:composition>

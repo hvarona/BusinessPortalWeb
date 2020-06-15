@@ -2,6 +2,7 @@ package com.alodiga.primefaces.ultima.controller.businessclose;
 
 import com.alodiga.remittance.beans.LanguajeBean;
 import com.alodiga.remittance.beans.LoginBean;
+import com.portal.business.commons.data.BusinessCloseData;
 import com.portal.business.commons.data.OperatorData;
 import com.portal.business.commons.data.PosData;
 import com.portal.business.commons.data.StoreData;
@@ -18,8 +19,10 @@ import com.portal.business.commons.models.Store;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
@@ -62,7 +65,7 @@ public class BusinessCloseController {
         }
 
         // Business Close for testing
-        businessClose = new BusinessClose(loginBean.getCurrentBusiness(), new Date(), BusinessClose.CloseStatus.PROCESSED);
+        /*businessClose = new BusinessClose(loginBean.getCurrentBusiness(), new Date(), BusinessClose.CloseStatus.PROCESSED);
         businessClose.setId(1L);
         Calendar cal = Calendar.getInstance();
         cal.setTime(new Date());
@@ -94,42 +97,54 @@ public class BusinessCloseController {
         ++transactionId;
         sells.add(new BusinessSell(cal.getTime(), loginBean.getCurrentBusiness(), 12.63f, "AloWallet", transactionId, businessClose));
 
+        processSellsStorePos();*/
     }
 
     private void processSellsStorePos() {
         try {
             storePosReport = new ArrayList();
+            StorePosSellReport mainReport = new StorePosSellReport(null, null);
+            Map<Store, StorePosSellReport> storeReports = new HashMap();
+            Map<Pos, StorePosSellReport> posReports = new HashMap();
 
             StoreData storeData = new StoreData();
-            List<Store> stores = storeData.getStores(loginBean.getCurrentBusiness());
+            List<Store> stores = new ArrayList();
+            try {
+                stores = storeData.getStores(loginBean.getCurrentBusiness());
+            } catch (EmptyListException ex) {
+            }
 
             for (Store store : stores) {
                 StorePosSellReport report = new StorePosSellReport(store, null);
-                storePosReport.add(report);
+                storeReports.put(store, report);
             }
 
             PosData posData = new PosData();
-            List<Pos> posList = posData.getPosList(loginBean.getCurrentBusiness());
+            List<Pos> posList = new ArrayList();
+            try {
+                posList = posData.getPosList(loginBean.getCurrentBusiness());
+            } catch (EmptyListException ex) {
+            }
 
             for (Pos pos : posList) {
                 StorePosSellReport report = new StorePosSellReport(pos.getStore(), pos);
-                storePosReport.add(report);
+                posReports.put(pos, report);
             }
-
-            StorePosSellReport report = new StorePosSellReport(null, null);
-            storePosReport.add(report);
 
             for (BusinessSell sell : sells) {
                 if (sell.getPos() != null) {
-                    Pos pos = sell.getPos();
-                    report = new StorePosSellReport(pos.getStore(), pos);
+                    posReports.get(sell.getPos()).addAmount(sell.getAmount());
+                } else if (sell.getStore() != null) {
+                    storeReports.get(sell.getStore()).addAmount(sell.getAmount());
+                } else {
+                    mainReport.addAmount(sell.getAmount());
                 }
             }
-        } catch (EmptyListException ex) {
-            Logger.getLogger(BusinessCloseController.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (GeneralException ex) {
-            Logger.getLogger(BusinessCloseController.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (NullParameterException ex) {
+
+            storePosReport.add(mainReport);
+            storePosReport.addAll(storeReports.values());
+            storePosReport.addAll(posReports.values());
+        } catch (GeneralException | NullParameterException ex) {
             Logger.getLogger(BusinessCloseController.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
@@ -156,6 +171,25 @@ public class BusinessCloseController {
 
     public void setBusinessClose(BusinessClose businessClose) {
         this.businessClose = businessClose;
+        BusinessCloseData businessCloseData = new BusinessCloseData();
+        try {
+            transactions = businessCloseData.getBusinessCloseTransactions(businessClose);
+        } catch (EmptyListException ex) {
+            transactions = new ArrayList();
+        } catch (GeneralException ex) {
+            transactions = new ArrayList();
+            Logger.getLogger(BusinessCloseController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        try {
+            sells = businessCloseData.getBusinessCloseSells(businessClose);
+        } catch (EmptyListException ex) {
+            sells = new ArrayList();
+        } catch (GeneralException ex) {
+            sells = new ArrayList();
+            Logger.getLogger(BusinessCloseController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        this.processSellsStorePos();
     }
 
     public List<BusinessTransaction> getTransactions() {
@@ -330,6 +364,10 @@ public class BusinessCloseController {
         return answer;
     }
 
+    public List<StorePosSellReport> getStorePosReport() {
+        return storePosReport;
+    }
+
     public class StorePosSellReport implements Comparable {
 
         private final Store store;
@@ -342,6 +380,20 @@ public class BusinessCloseController {
             this.settlement = "100%";
             this.store = store;
             this.pos = pos;
+        }
+
+        public String getStoreName() {
+            if (store == null) {
+                return msg.getString("main");
+            }
+            return store.getName();
+        }
+
+        public String getPosName() {
+            if (pos == null) {
+                return "";
+            }
+            return pos.getPosCode();
         }
 
         public Store getStore() {
@@ -441,7 +493,7 @@ public class BusinessCloseController {
             if (other.getPos() == null) {
                 return -1;
             }
-            return (int) (this.pos.getId() - other.getPost().getId());
+            return (int) (this.pos.getId() - other.getPos().getId());
         }
 
     }

@@ -47,8 +47,6 @@ public class SellReportController {
 
     private Pos selectedPos = null;
 
-    private BusinessData businessData;
-
     private BusinessSellData businessSellData;
 
     @ManagedProperty(value = "#{loginBean}")
@@ -67,7 +65,6 @@ public class SellReportController {
             } else {
                 msg = ResourceBundle.getBundle("com.alodiga.remittance.messages.message", Locale.forLanguageTag(lenguajeBean.getLanguaje()));
             }
-            businessData = new BusinessData();
             businessSellData = new BusinessSellData();
 
             stores = new StoreData().getStores(loginBean.getCurrentBusiness());
