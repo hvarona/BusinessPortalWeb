@@ -9,13 +9,13 @@ import com.alodiga.ws.remittance.services.WsLoginResponse;
 import com.alodiga.ws.remittance.services.WsPaymentNetworkService;
 import com.alodiga.ws.remittance.services.WsRemittenceResponse;
 import com.alodiga.ws.remittance.services.WsSummaryPaymentNetworkAndRateResponse;
-import com.portal.business.commons.models.City;
-import com.portal.business.commons.models.Country;
-import com.portal.business.commons.models.DeliveryForm;
-import com.portal.business.commons.models.PaymentNetwork;
-import com.portal.business.commons.models.RemittancePaymentInfo;
-import com.portal.business.commons.models.RemittancePerson;
-import com.portal.business.commons.models.State;
+import com.portal.business.commons.remittance.RemittanceCity;
+import com.portal.business.commons.remittance.RemittanceCountry;
+import com.portal.business.commons.remittance.RemittanceDeliveryForm;
+import com.portal.business.commons.remittance.PaymentNetwork;
+import com.portal.business.commons.remittance.RemittancePaymentInfo;
+import com.portal.business.commons.remittance.RemittancePerson;
+import com.portal.business.commons.remittance.RemittanceState;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -38,20 +38,20 @@ public class RemittanceController {
     private RemittancePerson remittent;
     private RemittancePerson receiver;
 
-    private Country selectedRemittentCountry;
-    private Country selectedReceiverCountry;
-    private List<Country> countries;
+    private RemittanceCountry selectedRemittentCountry;
+    private RemittanceCountry selectedReceiverCountry;
+    private List<RemittanceCountry> countries;
 
-    private State selectedRemittentState;
-    private State selectedReceiverState;
-    private List<State> states;
+    private RemittanceState selectedRemittentState;
+    private RemittanceState selectedReceiverState;
+    private List<RemittanceState> states;
 
-    private City selectedRemittentCity;
-    private City selectedReceiverCity;
-    private List<City> cities;
+    private RemittanceCity selectedRemittentCity;
+    private RemittanceCity selectedReceiverCity;
+    private List<RemittanceCity> cities;
 
-    private DeliveryForm selectedDeliveryForm;
-    private List<DeliveryForm> deliveryForms;
+    private RemittanceDeliveryForm selectedDeliveryForm;
+    private List<RemittanceDeliveryForm> deliveryForms;
 
     private PaymentNetwork selectedPaymentNetwork;
     private List<PaymentNetwork> paymentNetworks;
@@ -128,7 +128,7 @@ public class RemittanceController {
                 case "0": {
 
                     for (com.alodiga.ws.remittance.services.Country wsCountry : response.getCountry()) {
-                        Country country = new Country();
+                        RemittanceCountry country = new RemittanceCountry();
                         country.setId(wsCountry.getId());
                         country.setIso(wsCountry.getIso());
                         country.setName(wsCountry.getName());
@@ -190,12 +190,12 @@ public class RemittanceController {
         this.receiver = receiver;
     }
 
-    public Country getSelectedRemittentCountry() {
+    public RemittanceCountry getSelectedRemittentCountry() {
         return selectedRemittentCountry;
     }
 
-    public void setSelectedRemittentCountry(Country selectedRemittentCountry) {
-        for (Country country : countries) {
+    public void setSelectedRemittentCountry(RemittanceCountry selectedRemittentCountry) {
+        for (RemittanceCountry country : countries) {
             if (country.equals(selectedRemittentCountry)) {
                 this.selectedRemittentCountry = country;
                 break;
@@ -206,13 +206,13 @@ public class RemittanceController {
 
     }
 
-    public Country getSelectedReceiverCountry() {
+    public RemittanceCountry getSelectedReceiverCountry() {
         return selectedReceiverCountry;
 
     }
 
-    public void setSelectedReceiverCountry(Country selectedReceiverCountry) {
-        for (Country country : countries) {
+    public void setSelectedReceiverCountry(RemittanceCountry selectedReceiverCountry) {
+        for (RemittanceCountry country : countries) {
             if (country.equals(selectedReceiverCountry)) {
                 this.selectedReceiverCountry = country;
                 break;
@@ -222,59 +222,59 @@ public class RemittanceController {
         this.receiver.getAddress().setCountryName(this.selectedReceiverCountry.getName());
     }
 
-    public List<Country> getCountries() {
+    public List<RemittanceCountry> getCountries() {
         return countries;
     }
 
-    public State getSelectedRemittentState() {
+    public RemittanceState getSelectedRemittentState() {
         return selectedRemittentState;
     }
 
-    public void setSelectedRemittentState(State selectedRemittentState) {
+    public void setSelectedRemittentState(RemittanceState selectedRemittentState) {
         this.selectedRemittentState = selectedRemittentState;
     }
 
-    public State getSelectedReceiverState() {
+    public RemittanceState getSelectedReceiverState() {
         return selectedReceiverState;
     }
 
-    public void setSelectedReceiverState(State selectedReceiverState) {
+    public void setSelectedReceiverState(RemittanceState selectedReceiverState) {
         this.selectedReceiverState = selectedReceiverState;
     }
 
-    public List<State> getStates() {
+    public List<RemittanceState> getStates() {
         return states;
     }
 
-    public City getSelectedRemittentCity() {
+    public RemittanceCity getSelectedRemittentCity() {
         return selectedRemittentCity;
     }
 
-    public void setSelectedRemittentCity(City selectedRemittentCity) {
+    public void setSelectedRemittentCity(RemittanceCity selectedRemittentCity) {
         this.selectedRemittentCity = selectedRemittentCity;
     }
 
-    public City getSelectedReceiverCity() {
+    public RemittanceCity getSelectedReceiverCity() {
         return selectedReceiverCity;
     }
 
-    public void setSelectedReceiverCity(City selectedReceiverCity) {
+    public void setSelectedReceiverCity(RemittanceCity selectedReceiverCity) {
         this.selectedReceiverCity = selectedReceiverCity;
     }
 
-    public List<City> getCities() {
+    public List<RemittanceCity> getCities() {
         return cities;
     }
 
-    public List<DeliveryForm> getDeliveryForms() {
+    public List<RemittanceDeliveryForm> getDeliveryForms() {
         return deliveryForms;
     }
 
-    public DeliveryForm getSelectedDeliveryForm() {
+    public RemittanceDeliveryForm getSelectedDeliveryForm() {
         return selectedDeliveryForm;
     }
 
-    public void setSelectedDeliveryForm(DeliveryForm selectedDeliveryForm) {
+    public void setSelectedDeliveryForm(RemittanceDeliveryForm selectedDeliveryForm) {
         this.selectedDeliveryForm = selectedDeliveryForm;
         this.paymentInfo.setDeliveryForm(selectedDeliveryForm);
     }
@@ -394,7 +394,7 @@ public class RemittanceController {
                     case "0": {
                         deliveryForms = new ArrayList();
                         for (com.alodiga.ws.remittance.services.DeliveryForm wsDelivery : response.getDeliveryForms()) {
-                            DeliveryForm delivery = new DeliveryForm();
+                            RemittanceDeliveryForm delivery = new RemittanceDeliveryForm();
                             delivery.setId(wsDelivery.getId());
                             delivery.setName(wsDelivery.getName());
                             deliveryForms.add(delivery);

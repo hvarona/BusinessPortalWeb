@@ -37,6 +37,7 @@
         <class>com.portal.business.commons.models.Register</class>
         <class>com.portal.business.commons.models.RegisterNaturalPerson</class>
         <class>com.portal.business.commons.models.RegisterLegalPerson</class>
+        <class>com.portal.business.commons.models.CardPreRequest</class>
         <exclude-unlisted-classes>true</exclude-unlisted-classes>
         <properties>
             <property name="eclipselink.logging.timestamp" value="true"/>
@@ -49,6 +50,23 @@
             <property name="eclipselink.ddl-generation" value="create-tables" />
             <property name="eclipselink.ddl-generation.output-mode" value="database" />
             <property name="eclipselink.deploy-on-startup" value="true"/>
+        </properties>
+    </persistence-unit>
+    <persistence-unit name="cmsPU" transaction-type="JTA">
+        <jta-data-source>jdbc/CMS</jta-data-source>
+        <class>com.portal.business.commons.cms.CmsCountry</class>
+        <class>com.portal.business.commons.cms.CmsState</class>
+        <class>com.portal.business.commons.cms.CmsCity</class>
+        <class>com.portal.business.commons.cms.CmsDocumentPersonType</class>
+        <class>com.portal.business.commons.cms.CmsPersonType</class>
+        <exclude-unlisted-classes>false</exclude-unlisted-classes>
+        <properties>
+            <property name="eclipselink.logging.level" value="ALL"/>
+            <property name="eclipselink.logging.parameters" value="true"/>
+            <property name="eclipselink.logging.exceptions" value="true"/>
+            <property name="eclipselink.logging.level.sql" value="ALL"/>
+            <property name="eclipselink.logging.file" value="jpa_output.log"/>
+            <property name="eclipselink.logging.logger" value="ServerLogger"/>
         </properties>
     </persistence-unit>
 </persistence>

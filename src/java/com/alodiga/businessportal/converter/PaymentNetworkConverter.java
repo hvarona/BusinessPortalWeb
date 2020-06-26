@@ -1,6 +1,6 @@
 package com.alodiga.businessportal.converter;
 
-import com.portal.business.commons.models.PaymentNetwork;
+import com.portal.business.commons.remittance.PaymentNetwork;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.faces.component.UIComponent;

@@ -1,6 +1,6 @@
 package com.alodiga.businessportal.converter;
 
-import com.portal.business.commons.remittance.RemittanceCountry;
+import com.portal.business.commons.cms.CmsCountry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.faces.component.UIComponent;
@@ -12,8 +12,8 @@ import javax.faces.convert.FacesConverter;
  *
  * @author hvarona
  */
-@FacesConverter("countryConverter")
-public class CountryConverter implements Converter {
+@FacesConverter("cmsCountryConverter")
+public class CmsCountryConverter implements Converter {
 
     @Override
     public Object getAsObject(FacesContext facesContext, UIComponent component, String submittedValue) {
@@ -21,8 +21,8 @@ public class CountryConverter implements Converter {
             return "";
         }
         try {
-            long idCountry = Long.parseLong(submittedValue);
-            RemittanceCountry country = new RemittanceCountry();
+            int idCountry = Integer.parseInt(submittedValue);
+            CmsCountry country = new CmsCountry();
             country.setId(idCountry);
             return country;
         } catch (NumberFormatException ex) {
@@ -37,8 +37,8 @@ public class CountryConverter implements Converter {
         if (value == null || value.equals("")) {
             return "";
         } else {
-            if (value instanceof RemittanceCountry) {
-                return Long.toString(((RemittanceCountry) value).getId());
+            if (value instanceof CmsCountry) {
+                return Integer.toString(((CmsCountry) value).getId());
             } else {
                 return value.toString();
             }

@@ -1,6 +1,6 @@
 package com.alodiga.businessportal.converter;
 
-import com.portal.business.commons.models.DeliveryForm;
+import com.portal.business.commons.remittance.RemittanceDeliveryForm;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.faces.component.UIComponent;
@@ -23,7 +23,7 @@ public class DeliveryFormConverter implements Converter {
         try {
 
             long idDelivery = Long.parseLong(submittedValue);
-            DeliveryForm deliveryForm = new DeliveryForm();
+            RemittanceDeliveryForm deliveryForm = new RemittanceDeliveryForm();
             deliveryForm.setId(idDelivery);
             return deliveryForm;
         } catch (NumberFormatException ex) {
@@ -38,8 +38,8 @@ public class DeliveryFormConverter implements Converter {
         if (value == null || value.equals("")) {
             return "";
         } else {
-            if (value instanceof DeliveryForm) {
-                return Long.toString(((DeliveryForm) value).getId());
+            if (value instanceof RemittanceDeliveryForm) {
+                return Long.toString(((RemittanceDeliveryForm) value).getId());
             } else {
                 return value.toString();
             }
