@@ -15,6 +15,9 @@
                 <p:commandButton value="#{msg.close}" oncomplete="PF('sidebar1').hide()"/>
             </p:sidebar>
             <h1>#{msg.generateRequest}</h1>
+            <p:messages id="notification" showDetail="true" closable="true">
+                <p:autoUpdate />
+            </p:messages>
             <p:panelGrid id="containerGrid" columns="1" layout="grid"  style="border:0px none; background-color:transparent;">
                 <p:panelGrid id="dataGrid" columns="6" layout="grid" styleClass="ui-panelgrid-blank form-group" style="border:0px none; background-color:transparent;">
 
