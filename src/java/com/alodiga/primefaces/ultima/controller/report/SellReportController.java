@@ -137,11 +137,11 @@ public class SellReportController {
     public void doReport() {
         try {
             if (selectedPos != null) {
-                resultList = businessSellData.getBusinessSells(selectedPos, startDate, endDate);
+                resultList = businessSellData.getBusinessSales(selectedPos, startDate, endDate);
             } else if (selectedStore != null) {
-                resultList = businessSellData.getBusinessSells(selectedStore, startDate, endDate);
+                resultList = businessSellData.getBusinessSales(selectedStore, startDate, endDate);
             } else {
-                resultList = businessSellData.getBusinessSells(loginBean.getCurrentBusiness(), startDate, endDate);
+                resultList = businessSellData.getBusinessSales(loginBean.getCurrentBusiness(), startDate, endDate);
             }
 
         } catch (GeneralException ex) {

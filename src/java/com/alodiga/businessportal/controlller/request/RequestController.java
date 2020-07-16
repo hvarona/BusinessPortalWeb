@@ -14,6 +14,8 @@ import com.portal.business.commons.exceptions.NullParameterException;
 import com.portal.business.commons.models.CardPreRequest;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
@@ -186,6 +188,12 @@ public class RequestController {
         this.lenguajeBean = lenguajeBean;
     }
 
+    public Date getMaxBirthdate() {
+        Calendar cal = Calendar.getInstance();
+        cal.roll(Calendar.YEAR, -18);
+        return cal.getTime();
+    }
+
     private void clearData() {
         documentTypes = new ArrayList();
         documentType = null;
@@ -205,6 +213,7 @@ public class RequestController {
         try {
 
             cardPreRequest.setStatus(CardPreRequest.CardPreRequestStatus.PREREQUEST);
+            cardPreRequest.setDateRequest(new Date());
 
             CardPreRequest preRequest = new CardPreRequestData().saveorUpdateCardPreReques(cardPreRequest);
             FacesContext.getCurrentInstance().addMessage("notification", new FacesMessage(FacesMessage.SEVERITY_INFO, "", msg.getString("cardrequest.savesuccesfull")));

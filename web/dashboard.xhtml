@@ -48,37 +48,38 @@
         <h1>#{msg.title}</h1>
         <div class="ui-g dashboard">
             <div class="ui-g-12 ui-md-4">
-                <div class="card overview">
+                <div class="card overview" style="height: 200px;width: 100%" >
                     <div class="overview-content clearfix">
                         <span class="overview-title">#{msg.sells}</span>
                         <span class="overview-badge">%0</span>
-                        <span class="overview-detail">0 / #{msg.week}</span>
+                        <span class="overview-detail" style="width: 100%">#{utilBean.weekSales} / #{msg.week}</span>
                     </div>
                     <div class="overview-footer">
+                        <p:chart id="salesChart" type="bar" model="#{utilBean.salesChart}" style="height: 150px;width: 100%" />
                     </div>
                 </div>
             </div>
 
             <div class="ui-g-12 ui-md-4">
-                <div class="card overview">
+                <div class="card overview" style="height: 200px;width: 100%" >
                     <div class="overview-content clearfix">
-                        <span class="overview-title">#{msg.remittances}</span>
-                        <span class="overview-badge">%0</span>
-                        <span class="overview-detail">0 / #{msg.week}</span>
+                        <span class="overview-title">#{msg.withdraws}</span>
+                        <span class="overview-detail">#{utilBean.weekWithdraws} / #{msg.week}</span>
                     </div>
                     <div class="overview-footer">
+                        <p:chart id="withdrawsChart" type="bar" model="#{utilBean.withdrawsChart}" style="height: 150px;width: 100%" />
                     </div>
                 </div>
             </div>
 
             <div class="ui-g-12 ui-md-4">
-                <div class="card overview">
+                <div class="card overview" style="height: 200px;width: 100%" >
                     <div class="overview-content clearfix">
                         <span class="overview-title">#{msg.recharges}</span>
-                        <span class="overview-badge">%0</span>
-                        <span class="overview-detail">0 / #{msg.week}</span>
+                        <span class="overview-detail">#{utilBean.weekRecharges} / #{msg.week}</span>
                     </div>
                     <div class="overview-footer">
+                        <p:chart id="rechargesChart" type="bar" model="#{utilBean.rechargesChart}" style="height: 150px;width: 100%" />
                     </div>
                 </div>
             </div>

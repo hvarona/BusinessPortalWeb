@@ -2,6 +2,16 @@
 <project-private xmlns="http://www.netbeans.org/ns/project-private/1">
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
-        <group/>
+        <group>
+            <file>file:/C:/Users/hamor/Documents/NetBeansProjects/BusinessPortalWeb/src/java/com/alodiga/remittance/beans/UtilBean.java</file>
+            <file>file:/C:/Users/hamor/Documents/NetBeansProjects/BusinessPortalWeb/web/consultRequest.xhtml</file>
+            <file>file:/C:/Users/hamor/Documents/NetBeansProjects/BusinessPortalWeb/src/java/com/alodiga/remittance/messages/message_es.properties</file>
+            <file>file:/C:/Users/hamor/Documents/NetBeansProjects/BusinessPortalWeb/src/java/com/alodiga/businessportal/controlller/request/RequestReportController.java</file>
+            <file>file:/C:/Users/hamor/Documents/NetBeansProjects/BusinessPortalWeb/src/java/com/alodiga/businessportal/controlller/request/RequestController.java</file>
+            <file>file:/C:/Users/hamor/Documents/NetBeansProjects/BusinessPortalWeb/src/java/com/alodiga/primefaces/ultima/controller/report/BusinessCloseReportController.java</file>
+            <file>file:/C:/Users/hamor/Documents/NetBeansProjects/BusinessPortalWeb/web/generateRequest.xhtml</file>
+            <file>file:/C:/Users/hamor/Documents/NetBeansProjects/BusinessPortalWeb/web/login.xhtml</file>
+            <file>file:/C:/Users/hamor/Documents/NetBeansProjects/BusinessPortalWeb/web/dashboard.xhtml</file>
+        </group>
     </open-files>
 </project-private>

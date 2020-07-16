@@ -8,18 +8,29 @@
 
     <ui:define name="title">#{msg.generateRequest}</ui:define>
 
+
     <ui:define name="content">
         <h:form id="GenerateRequestForm">
             <p:sidebar widgetVar="sidebar1" position="right" baseZIndex="10000">
                 <h1 style="font-weight:normal">#{msg.faq}</h1>
-                <p:commandButton value="#{msg.close}" oncomplete="PF('sidebar1').hide()"/>
+                <p:commandButton value="#{msg.close}" onclick="PF('sidebar1').hide();return false;"/>
             </p:sidebar>
             <h1>#{msg.generateRequest}</h1>
-            <p:messages id="notification" showDetail="true" closable="true">
+            <p:messages id="notification" showDetail="true" closable="true" showSummary="true" for="notification">
                 <p:autoUpdate />
             </p:messages>
             <p:panelGrid id="containerGrid" columns="1" layout="grid"  style="border:0px none; background-color:transparent;">
-                <p:panelGrid id="dataGrid" columns="6" layout="grid" styleClass="ui-panelgrid-blank form-group" style="border:0px none; background-color:transparent;">
+                <p:panelGrid id="dataGrid" columns="6" layout="grid" styleClass="ui-panelgrid-blank form-group" style="padding-top: 0px;border:0px none; background-color:transparent;">
+                    <h:panelGroup />
+                    <p:outputLabel value="#{msg.country}" for="country"/>
+                    <p:selectOneMenu id="country" value="#{requestController.country}" converter="cmsCountryConverter" required="true">
+                        <f:selectItem itemLabel="#{msg.SelectOne}" noSelectionOption="true"/>
+                        <f:selectItems value="#{requestController.countries}" var="obj" itemLabel="#{obj.name}"/>
+                        <p:ajax event="change" update="state city documentType"/>
+                    </p:selectOneMenu> 
+                    <p:message for="country"/>
+                    <h:panelGroup />
+                    <h:panelGroup />
 
                     <p:outputLabel value="#{msg.documentType}" for="documentType" />
                     <p:selectOneMenu id="documentType" value="#{requestController.documentType}" converter="cmsDocumentTypeConverter" required="true" disabled="#{empty requestController.documentTypes}">
@@ -34,11 +45,11 @@
                     <p:message for="identificationNumber"/>
 
                     <p:outputLabel value="#{msg.firstName}" for="firstName" />
-                    <p:inputText id="firstName" value="#{requestController.cardPreRequest.firstName}" required="true" />
+                    <p:inputText id="firstName" value="#{requestController.cardPreRequest.firstName}" required="true" maxlength="35"/>
                     <p:message for="firstName"/>
 
                     <p:outputLabel value="#{msg.lastName}" for="lastName" />
-                    <p:inputText id="lastName" value="#{requestController.cardPreRequest.lastName}" required="true" />
+                    <p:inputText id="lastName" value="#{requestController.cardPreRequest.lastName}" required="true" maxlength="35" />
                     <p:message for="lastName"/>
 
                     <p:outputLabel value="#{msg.sex}" for="sex" />
@@ -49,7 +60,7 @@
                     <p:message for="sex"/>
 
                     <p:outputLabel value="#{msg.birthdate}" for="birthdate" />
-                    <p:calendar id="birthdate" value="#{requestController.cardPreRequest.birthdate}" navigator="true" yearRange="c-100:c" required="true"/>
+                    <p:calendar id="birthdate" value="#{requestController.cardPreRequest.birthdate}" navigator="true" yearRange="c-100:c" required="true" maxdate="#{requestController.maxBirthdate}"/>
                     <p:message for="birthdate"/>
 
                     <p:outputLabel value="#{msg.maritalStatus}" for="maritalStatus" />
@@ -63,22 +74,18 @@
                     <p:message for="maritalStatus"/>
 
                     <p:outputLabel value="#{msg.email}" for="email" />
-                    <p:inputText id="email" value="#{requestController.cardPreRequest.email}" required="true" > 
+                    <p:inputText id="email" value="#{requestController.cardPreRequest.email}" required="true" maxlength="40" validatorMessage="#{msg.badEmail}"> 
                         <f:validateRegex pattern="[\w\.-]*[a-zA-Z0-9_]@[\w\.-]*[a-zA-Z0-9]\.(com|net|org|edu)"/>
                     </p:inputText>
-                    <p:message for="email"/>
+                    <p:message for="email" />
 
                     <p:outputLabel value="#{msg.phone}" for="phoneNumber" />
-                    <p:inputNumber id="phoneNumber" value="#{requestController.cardPreRequest.phoneNumber}" required="true" decimalPlaces="0" thousandSeparator="" leadingZero="keep" />
+                    <p:inputMask id="phoneNumber" value="#{requestController.cardPreRequest.phoneNumber}" mask="+(999) 999-999-9999"/>
                     <p:message for="phoneNumber"/>
 
-                    <p:outputLabel value="#{msg.country}" for="country" />
-                    <p:selectOneMenu id="country" value="#{requestController.country}" converter="cmsCountryConverter" required="true">
-                        <f:selectItem itemLabel="#{msg.SelectOne}" noSelectionOption="true"/>
-                        <f:selectItems value="#{requestController.countries}" var="obj" itemLabel="#{obj.name}"/>
-                        <p:ajax event="change" update="state city documentType"/>
-                    </p:selectOneMenu> 
-                    <p:message for="country"/>
+                    <h:panelGroup />
+                    <h:panelGroup />
+                    <h:panelGroup />
 
                     <p:outputLabel value="#{msg.state}" for="state" />
                     <p:selectOneMenu id="state" value="#{requestController.state}" converter="cmsStateConverter" required="true" disabled="#{empty requestController.states}">
@@ -136,7 +143,7 @@
             <div align="center">
                 <p:commandButton  value="#{msg.save}" id="btnSubmit" icon="ui-icon-save" actionListener="#{requestController.save()}" update="@form" />
                 <p:commandButton  value="#{msg.reset}" id="btnReset" icon="ui-icon-cancel" update="@form" actionListener="#{requestController.reset()}" immediate="true" process="@this"/>
-                <p:commandButton  value="#{msg.faq}" id="btnFaq"  icon="ui-icon-question-answer"  oncomplete="PF('sidebar1').show()"/>
+                <p:commandButton  value="#{msg.faq}" id="btnFaq"  icon="ui-icon-question-answer"  onclick="PF('sidebar1').show();return false;"/>
             </div>
         </h:form>
     </ui:define>
