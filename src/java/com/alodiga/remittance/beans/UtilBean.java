@@ -175,7 +175,7 @@ public class UtilBean {
         
 
         Axis yAxis = withdrawChart.getAxis(AxisType.Y);
-        yAxis.setLabel(msg.getString("sells"));
+        yAxis.setLabel(msg.getString("withdraws"));
     }
 
     public BarChartModel getSalesChart() {
