@@ -37,7 +37,7 @@ public class TransactionReportController {
 
     private OperationType selectedOperationType;
 
-    private List<BusinessTransaction> result;
+    private List<BusinessTransaction> resultList;
 
     private List<BusinessTransaction> filteredResult;
 
@@ -95,12 +95,12 @@ public class TransactionReportController {
         this.selectedOperationType = selectedOperationType;
     }
 
-    public List<BusinessTransaction> getResult() {
-        return result;
+    public List<BusinessTransaction> getResultList() {
+        return resultList;
     }
 
-    public void setResult(List<BusinessTransaction> result) {
-        this.result = result;
+    public void setResultList(List<BusinessTransaction> resultList) {
+        this.resultList = resultList;
     }
 
     public List<BusinessTransaction> getFilteredResult() {
@@ -110,8 +110,8 @@ public class TransactionReportController {
     public void setFilteredResult(List<BusinessTransaction> filteredResult) {
         this.filteredResult = filteredResult;
     }
-    
-    public Date getMaxDate(){
+
+    public Date getMaxDate() {
         return new Date();
     }
 
@@ -125,9 +125,9 @@ public class TransactionReportController {
 
     public void doReport() {
         try {
-            result = businessData.getBusinessTransactions(loginBean.getCurrentBusiness(), startDate, endDate, selectedOperationType);
+            resultList = businessData.getBusinessTransactions(loginBean.getCurrentBusiness(), startDate, endDate, selectedOperationType);
         } catch (EmptyListException ex) {
-            result = new ArrayList();
+            resultList = new ArrayList();
         } catch (GeneralException ex) {
             Logger.getLogger(TransactionReportController.class.getName()).log(Level.SEVERE, null, ex);
         }

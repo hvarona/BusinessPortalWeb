@@ -277,7 +277,7 @@ public class rechargeController {
                         break;
                         default:
                             hasError = true;
-                            errorMessage = response.getMensajeRespuesta();
+                            errorMessage = msg.getString("error.general") + " : " + response.getCodigoRespuesta();
                     }
                 } else {
                     hasError = true;
@@ -359,7 +359,7 @@ public class rechargeController {
                     break;
                     default:
                         hasError = true;
-                        errorMessage = response.getMensajeRespuesta();
+                        errorMessage = msg.getString("error.general") + " : " + response.getCodigoRespuesta();
                 }
             } else {
                 hasError = true;
@@ -402,7 +402,7 @@ public class rechargeController {
                     break;
                     default:
                         hasError = true;
-                        errorMessage = response.getMensajeRespuesta();
+                        errorMessage = msg.getString("error.general") + " : " + response.getCodigoRespuesta();
                 }
             } else {
                 hasError = true;

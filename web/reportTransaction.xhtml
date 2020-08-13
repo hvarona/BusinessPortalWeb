@@ -42,7 +42,7 @@
 
                             <div align="center">
                                 <p:panelGrid  columns="1" >
-                                    <p:commandButton  value="#{msg.reportTransactionGenerate}" update="@form,:resultList" id="btnSubmit" icon="ui-icon-search" actionListener="#{transactionReportController.doReport()}" />
+                                    <p:commandButton  value="#{msg.reportTransactionGenerate}" update="@form" id="btnSubmit" icon="ui-icon-search" actionListener="#{transactionReportController.doReport()}" />
                                 </p:panelGrid>
                             </div>
 
@@ -50,33 +50,34 @@
                     </div>
                 </div>
             </div>
+
+            <p:dataTable id="resultList" var="transaction" rendered="#{transactionReportController.resultList != null}" 
+                         value="#{transactionReportController.resultList}" emptyMessage="#{msg.reportTransactionEmptyResult}" 
+                         filteredValue="#{transactionReportController.filteredResult}" paginator="true" rows="10" style="margin-bottom:20px"
+                         paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}" 
+                         rowsPerPageTemplate="5,10,15" >
+                <p:column filterBy="#{transaction.id}" headerText="#{msg.id}"  filterMatchMode="contains" style="width:15px">
+                    <h:outputText value="#{transaction.id}" />
+                </p:column>
+
+                <p:column filterBy="#{transaction.type}" headerText="#{msg.reporTransactionOperationType}"  filterMatchMode="contains" style="width:15px">
+                    <h:outputText value="#{transaction.type}" />
+                </p:column>
+
+                <p:column filterBy="#{transaction.totalAmount}" headerText="#{msg.reportTransactionTotalAmount}"  filterMatchMode="contains" style="width:15px">
+                    <h:outputText value="#{transaction.totalAmount}" />
+                </p:column>
+
+                <p:column filterBy="#{transaction.businessFee}" headerText="#{msg.reportTransactionBusinessFee}"  filterMatchMode="contains" style="width:15px">
+                    <h:outputText value="#{transaction.businessFee}" />
+                </p:column>
+
+                <p:column filterBy="#{transaction.dateTransaction}" headerText="#{msg.date}"  filterMatchMode="contains" style="width:15px">
+                    <h:outputText value="#{transaction.dateTransaction}" />
+                </p:column>
+
+            </p:dataTable>
         </h:form>
-        <p:dataTable id="resultList" var="transaction" rendered="#{transactionReportController.result != null}" 
-                     value="#{transactionReportController.result}" emptyMessage="#{msg.reportTransactionEmptyResult}" 
-                     filteredValue="#{transactionReportController.filteredResult}" paginator="true" rows="10" style="margin-bottom:20px"
-                     paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}" 
-                     rowsPerPageTemplate="5,10,15" >
-            <p:column filterBy="#{transaction.id}" headerText="#{msg.id}"  filterMatchMode="contains" style="width:15px">
-                <h:outputText value="#{transaction.id}" />
-            </p:column>
-
-            <p:column filterBy="#{transaction.type}" headerText="#{msg.reporTransactionOperationType}"  filterMatchMode="contains" style="width:15px">
-                <h:outputText value="#{transaction.type}" />
-            </p:column>
-
-            <p:column filterBy="#{transaction.totalAmount}" headerText="#{msg.reportTransactionTotalAmount}"  filterMatchMode="contains" style="width:15px">
-                <h:outputText value="#{transaction.totalAmount}" />
-            </p:column>
-
-            <p:column filterBy="#{transaction.businessFee}" headerText="#{msg.reportTransactionBusinessFee}"  filterMatchMode="contains" style="width:15px">
-                <h:outputText value="#{transaction.businessFee}" />
-            </p:column>
-
-            <p:column filterBy="#{transaction.dateTransaction}" headerText="#{msg.date}"  filterMatchMode="contains" style="width:15px">
-                <h:outputText value="#{transaction.dateTransaction}" />
-            </p:column>
-
-        </p:dataTable>
     </ui:define>
 
 </ui:composition>

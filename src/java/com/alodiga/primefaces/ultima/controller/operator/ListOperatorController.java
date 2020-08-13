@@ -1,5 +1,6 @@
 package com.alodiga.primefaces.ultima.controller.operator;
 
+import com.alodiga.remittance.beans.LanguajeBean;
 import com.alodiga.remittance.beans.LoginBean;
 import com.portal.business.commons.data.OperatorData;
 import com.portal.business.commons.exceptions.EmptyListException;
@@ -10,11 +11,14 @@ import com.portal.business.commons.models.Operator;
 import com.portal.business.commons.models.Permission;
 import com.portal.business.commons.models.PermissionHasProfile;
 import com.portal.business.commons.models.Profile;
+import com.portal.business.commons.models.ProfileData;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.ResourceBundle;
 import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -48,13 +52,23 @@ public class ListOperatorController implements Serializable {
     private Profile profile = null;
 
     @ManagedProperty(value = "#{loginBean}")
-    LoginBean loginBean;
+    private LoginBean loginBean;
+
+    @ManagedProperty(value = "#{languajeBean}")
+    private LanguajeBean lenguajeBean;
+
+    private ResourceBundle msg;
 
     private List<Permission> availablePermissions;
     private List<Permission> includedPermissions;
 
     @PostConstruct
     public void init() {
+        if (lenguajeBean == null || lenguajeBean.getLanguaje() == null || lenguajeBean.getLanguaje().isEmpty()) {
+            msg = ResourceBundle.getBundle("com.alodiga.remittance.messages.message", Locale.forLanguageTag("es"));
+        } else {
+            msg = ResourceBundle.getBundle("com.alodiga.remittance.messages.message", Locale.forLanguageTag(lenguajeBean.getLanguaje()));
+        }
         try {
             operatorData = new OperatorData();
             operatorList = operatorData.getOperatorList(loginBean.getCurrentBusiness());
@@ -119,7 +133,13 @@ public class ListOperatorController implements Serializable {
             try {
                 List<Profile> profileList = operatorData.getProfileList();
                 for (Profile singleProfile : profileList) {
-                    profiles.put(singleProfile.getName(), singleProfile.getId().toString());
+                    String name = singleProfile.getName();
+                    for (ProfileData data : singleProfile.getProfileData()) {
+                        if (new Locale(data.getLanguage().getIso()).getLanguage().equals(msg.getLocale().getLanguage())) {
+                            name = data.getAlias();
+                        }
+                    }
+                    profiles.put(name, singleProfile.getId().toString());
                 }
 
             } catch (EmptyListException | GeneralException ex) {
@@ -155,18 +175,15 @@ public class ListOperatorController implements Serializable {
         if (selectedOperator == null || selectedOperator.getProfile() == null) {
             return;
         }
-
         List<PermissionHasProfile> phps = selectedOperator.getProfile().getPermissionHasProfiles();
         for (PermissionHasProfile php : phps) {
             availablePermissions.add(php.getPermission());
         }
-
         for (Permission perm : availablePermissions) {
             if (!selectedOperator.getExcludedPermission().contains(perm)) {
                 includedPermissions.add(perm);
             }
         }
-
     }
 
     public List<Permission> getAvailablePermissions() {
@@ -185,16 +202,20 @@ public class ListOperatorController implements Serializable {
         this.includedPermissions = includedPermissions;
     }
 
+    public void setLenguajeBean(LanguajeBean lenguajeBean) {
+        this.lenguajeBean = lenguajeBean;
+    }
+
     public void changeEnable(Operator operator) {
         try {
             operatorData.saveOperator(operator);
+            if(operator.getEnabled()){
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(msg.getString("operatorEnabled")));
+            }else{
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(msg.getString("operatorDisabled")));
+            }
         } catch (NullParameterException | GeneralException ex) {
             Logger.getLogger(ListOperatorController.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
-
-    public void handleReturnDialog(SelectEvent event) {
-        if (event != null && event.getObject() != null) {
         }
     }
 
@@ -222,12 +243,11 @@ public class ListOperatorController implements Serializable {
                     excludedPermission.add(perm);
                 }
             }
-
             operator.setExcludedPermission(excludedPermission);
-
             operatorData.saveOperator(operator);
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(msg.getString("operatorSaveSuccesfull")));
         } catch (GeneralException | NullParameterException ex) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!", "Error General"));
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!", msg.getString("errorGeneral")));
         }
     }
 

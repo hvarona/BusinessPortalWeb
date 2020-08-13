@@ -1,5 +1,6 @@
 package com.alodiga.primefaces.ultima.controller.store;
 
+import com.alodiga.remittance.beans.LanguajeBean;
 import com.alodiga.remittance.beans.LoginBean;
 import com.portal.business.commons.data.StoreData;
 import com.portal.business.commons.exceptions.EmptyListException;
@@ -10,6 +11,8 @@ import com.portal.business.commons.models.Store;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.List;
+import java.util.Locale;
+import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
@@ -32,8 +35,18 @@ public class ListStoreController implements Serializable {
     @ManagedProperty(value = "#{loginBean}")
     LoginBean loginBean;
 
+    @ManagedProperty(value = "#{languajeBean}")
+    private LanguajeBean lenguajeBean;
+
+    private ResourceBundle msg;
+
     @PostConstruct
     public void init() {
+        if (lenguajeBean == null || lenguajeBean.getLanguaje() == null || lenguajeBean.getLanguaje().isEmpty()) {
+            msg = ResourceBundle.getBundle("com.alodiga.remittance.messages.message", Locale.forLanguageTag("es"));
+        } else {
+            msg = ResourceBundle.getBundle("com.alodiga.remittance.messages.message", Locale.forLanguageTag(lenguajeBean.getLanguaje()));
+        }
         storeData = new StoreData();
         try {
             stores = storeData.getStores(loginBean.getCurrentBusiness());
@@ -72,6 +85,23 @@ public class ListStoreController implements Serializable {
         this.loginBean = loginBean;
     }
 
+    public void setLenguajeBean(LanguajeBean lenguajeBean) {
+        this.lenguajeBean = lenguajeBean;
+    }
+
+    public void changeEnable(Store store) {
+        try {
+            storeData.saveStore(store);
+            if (store.getEnabled()) {
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(msg.getString("storeEnabled")));
+            } else {
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(msg.getString("storeDisabled")));
+            }
+        } catch (NullParameterException | GeneralException ex) {
+            Logger.getLogger(ListStoreController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
     public void save() {
         try {
             Store store = null;
@@ -79,12 +109,13 @@ public class ListStoreController implements Serializable {
                 store = selectedStore;
             }
             storeData.saveStore(store);
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(msg.getString("storeModified")));
         } catch (NullParameterException ex) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!", "Faltan parametros"));
         } catch (GeneralException ex) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!", "Error General"));
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!", msg.getString("errorGeneral")));
         } catch (Exception ex) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!", "Error General"));
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!", msg.getString("errorGeneral")));
         }
     }
 

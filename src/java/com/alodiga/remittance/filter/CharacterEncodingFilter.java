@@ -32,7 +32,6 @@ public class CharacterEncodingFilter implements Filter {
 
     @Override
     public void doFilter(ServletRequest req, ServletResponse resp, FilterChain chain) throws IOException, ServletException {
-        System.out.println("En do Filter");
         HttpServletRequest request = (HttpServletRequest) req;
         HttpServletResponse response = (HttpServletResponse) resp;
         HttpSession session = request.getSession(false);
@@ -56,7 +55,7 @@ public class CharacterEncodingFilter implements Filter {
                 response.setDateHeader("Expires", 0); // Proxies.
 
                 if (request.getRequestURI().compareTo("/businessPortal/login.xhtml") == 0) {
-                    System.out.println("si son iguales esta entrando a login pero esta logeado");
+                    //System.out.println("si son iguales esta entrando a login pero esta logeado");
 
 //                return;
                 }

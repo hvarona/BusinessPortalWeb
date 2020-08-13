@@ -56,7 +56,7 @@
                         <h:outputText value="${msg.excludedPermission}"/>
                         <p:selectManyCheckbox id="excludedList" value="#{operatorController.includedPermissions}" converter="permissionConverter" layout="responsive" columns="1">
                             <f:converter converterId="permissionConverter"/>
-                            <f:selectItems value="#{operatorPermission.availablePermissions}" var="perm" itemValue="#{perm}" itemLabel="#{perm.name}"/>
+                            <f:selectItems value="#{operatorPermission.availablePermissions}" var="perm" itemValue="#{perm}" itemLabel="#{operatorPermission.getPermissionLabel(perm)}"/>
                         </p:selectManyCheckbox>
                     </p:panelGrid>
                 </p:panelGrid>
