@@ -12,3 +12,14 @@
 hs_err_pid*
 /dist/
 /build/
+!/lib/all-themes-1.0.8.jar
+!/lib/primefaces-6.0.jar
+!/lib/remittanceWS.jar
+!/lib/ApiRegistroUnificado.jar
+!/lib/primefaces-6.2.jar
+!/lib/primefaces-6.0-sources.jar
+!/lib/primefaces-extensions-6.0.0.jar
+!/lib/commons-lang3-3.9.jar
+!/lib/ultima-theme-1.0.6.jar
+!/lib/WS.jar
+!/lib/gson-2.4.jar
