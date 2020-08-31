@@ -13,8 +13,13 @@ import com.alodiga.wallet.ws.TransactionResponse;
 import com.ericsson.alodiga.ws.APIRegistroUnificadoProxy;
 import com.portal.business.commons.data.BusinessData;
 import com.portal.business.commons.enumeration.OperationType;
+import com.portal.business.commons.exceptions.GeneralException;
+import com.portal.business.commons.exceptions.NullParameterException;
 import com.portal.business.commons.models.BusinessBalanceIncoming;
+import com.portal.business.commons.models.LimitedsTransactionsResponse;
+import com.portal.business.commons.models.ResponseCode;
 import com.portal.business.commons.utils.AlodigaCryptographyUtils;
+import java.rmi.RemoteException;
 import java.util.Date;
 import java.util.Locale;
 import java.util.ResourceBundle;
@@ -266,36 +271,42 @@ public class RechargeCardController {
             cardInfo = new CardInfo();
             cardInfo.setCardNumber(cardNumber);
             String cardEncrypted = AlodigaCryptographyUtils.aloDesencrypt(cardNumber);
-            CheckStatusCardResponses statusCardResponse = allodigaWS.checkStatusCardByBusiness(cardEncrypted, timezone);
-            switch (statusCardResponse.getCodigoRespuesta()) {
-                case "00": {
-                    CheckStatusCredentialCard statusCard = statusCardResponse.getCheckStatusCredentialCard();
-                    if (statusCard != null) {
-                        String accountNumber = statusCard.getAccountNumber();
-                        cardInfo.setAccountNumber(accountNumber);
-                        String accountEncrypted = AlodigaCryptographyUtils.aloDesencrypt(accountNumber);
-                        CheckStatusCredentialAccount statusAccount = allodigaWS.checkStatusAccount(userId, accountEncrypted, timezone).getCheckStatusCredentialAccount();
-                        cardInfo.setAccountBalance(statusAccount.getAvailablePurchases());
-                        cardInfo.setAccountDollarBalance(statusAccount.getDollarBalance());
-                        switch (statusCard.getCode()) {
-                            case ACTIVE_STATUS:
-                                cardStatus = "active";
-                                break;
-                            case DEACTIVE_STATUS:
-                                cardStatus = "deactive";
-                                break;
-                            default:
-                                cardStatus = statusCard.getDescription();
+            BusinessData businessData = new BusinessData();
+            LimitedsTransactionsResponse  limitedsTransactionsResponse = businessData.validTransacionalLimit(loginBean.getCurrentBusiness(),OperationType.RECHARGE);
+            if (limitedsTransactionsResponse.getCode()==ResponseCode.SUCESS.getCodigo()){
+                CheckStatusCardResponses statusCardResponse = allodigaWS.checkStatusCardByBusiness(cardEncrypted, timezone);
+                switch (statusCardResponse.getCodigoRespuesta()) {
+                    case "00": {
+                        CheckStatusCredentialCard statusCard = statusCardResponse.getCheckStatusCredentialCard();
+                        if (statusCard != null) {
+                            String accountNumber = statusCard.getAccountNumber();
+                            cardInfo.setAccountNumber(accountNumber);
+                            String accountEncrypted = AlodigaCryptographyUtils.aloDesencrypt(accountNumber);
+                            CheckStatusCredentialAccount statusAccount = allodigaWS.checkStatusAccount(userId, accountEncrypted, timezone).getCheckStatusCredentialAccount();
+                            cardInfo.setAccountBalance(statusAccount.getAvailablePurchases());
+                            cardInfo.setAccountDollarBalance(statusAccount.getDollarBalance());
+                            switch (statusCard.getCode()) {
+                                case ACTIVE_STATUS:
+                                    cardStatus = "active";
+                                    break;
+                                case DEACTIVE_STATUS:
+                                    cardStatus = "deactive";
+                                    break;
+                                default:
+                                    cardStatus = statusCard.getDescription();
+                            }
+                        } else {
                         }
-                    } else {
                     }
+                    break;
+                    default:
+                        cardInfo = null;
+                        hasError = true;
+                        //errorMessage = statusCardResponse.getMensajeRespuesta();
+                        errorMessage = msg.getString("error.general") + " : " + statusCardResponse.getCodigoRespuesta();
                 }
-                break;
-                default:
-                    cardInfo = null;
-                    hasError = true;
-                    //errorMessage = statusCardResponse.getMensajeRespuesta();
-                    errorMessage = msg.getString("error.general") + " : " + statusCardResponse.getCodigoRespuesta();
+            }else{
+                errorMessage = msg.getString(limitedsTransactionsResponse.getMessage());
             }
         } catch (Exception ex) {
             Logger.getLogger(CardController.class.getName()).log(Level.SEVERE, null, ex);
@@ -344,42 +355,47 @@ public class RechargeCardController {
     }
 
     public void recharge() {
-
         try {
-            String cardEncrypted = AlodigaCryptographyUtils.aloDesencrypt(cardNumber);
-            TransactionResponse response = allodigaWS.rechargeCard(loginBean.getCurrentBusiness().getId(), cardEncrypted, rechargeAmount, includeFees);
-            if (response != null) {
-                switch (response.getCodigoRespuesta()) {
-                    case "00": {
-                        hasError = false;
-                        transactionId = response.getResponse().getId();
-                        phase = 3;
+            BusinessData businessData = new BusinessData();
+            LimitedsTransactionsResponse  limitedsTransactionsResponse = businessData.validTransacionalLimit(loginBean.getCurrentBusiness(),OperationType.RECHARGE);
+            if (limitedsTransactionsResponse.getCode()==ResponseCode.SUCESS.getCodigo()){
+                String cardEncrypted = AlodigaCryptographyUtils.aloDesencrypt(cardNumber);
+                TransactionResponse response = allodigaWS.rechargeCard(loginBean.getCurrentBusiness().getId(), cardEncrypted, rechargeAmount, includeFees);
+                if (response != null) {
+                    switch (response.getCodigoRespuesta()) {
+                        case "00": {
+                            hasError = false;
+                            transactionId = response.getResponse().getId();
+                            phase = 3;
 
-                        BusinessBalanceIncoming log = new BusinessBalanceIncoming();
-                        log.setBusiness(loginBean.getCurrentBusiness());
-                        log.setUser(loginBean.getUserSession());
-                        log.setBusinessFee(businessFee);
-                        log.setAmountWithoutFee(totalCharge - businessFee);
-                        log.setTotalAmount(totalCharge);
-                        log.setDateTransaction(new Date());
-                        log.setTransactionId(transactionId);
-                        log.setType(OperationType.RECHARGE);
-                        BusinessData businessData = new BusinessData();
-                        businessData.saveIncomingBalance(log);
+                            BusinessBalanceIncoming log = new BusinessBalanceIncoming();
+                            log.setBusiness(loginBean.getCurrentBusiness());
+                            log.setUser(loginBean.getUserSession());
+                            log.setBusinessFee(businessFee);
+                            log.setAmountWithoutFee(totalCharge - businessFee);
+                            log.setTotalAmount(totalCharge);
+                            log.setDateTransaction(new Date());
+                            log.setTransactionId(transactionId);
+                            log.setType(OperationType.RECHARGE);                       
+                            businessData.saveIncomingBalance(log);
 
-                        FacesContext.getCurrentInstance().addMessage(null,
-                                new FacesMessage("Recarga realizada con exito"));
+                            FacesContext.getCurrentInstance().addMessage(null,
+                                    new FacesMessage("Recarga realizada con exito"));
+                        }
+                        break;
+                        default:
+                            hasError = true;
+                            errorMessage = msg.getString("error.general") + " : " + response.getCodigoRespuesta();
                     }
-                    break;
-                    default:
-                        hasError = true;
-                        errorMessage = msg.getString("error.general") + " : " + response.getCodigoRespuesta();
+                } else {
+                    hasError = true;
+                    errorMessage = msg.getString("error.registerwsconnection");
                 }
-            } else {
+            }else {
                 hasError = true;
                 errorMessage = msg.getString("error.registerwsconnection");
-            }
-        } catch (Exception ex) {
+            }           
+        } catch (GeneralException | NullParameterException | RemoteException ex) {
             Logger.getLogger(rechargeController.class.getName()).log(Level.SEVERE, null, ex);
             hasError = true;
             errorMessage = msg.getString("error.registerwsconnection");
