@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:pe="http://primefaces.org/ui/extensions">
+
+    <ui:composition>
+
+        <p:dialog id="AccountBankEditDlg" widgetVar="AccountBankEditDialog" modal="true" resizable="false" appendTo="@(body)" header="#{msg.editAccountBank}">
+            <h:form id="AccountBankEditForm">
+                <p:growl id="messages" autoUpdate="true" sticky="true" />
+                <h:panelGroup id="display">
+                    <p:panelGrid columns="2" rendered="#{dtListAccountBankController.selectedAccountBank != null}">
+                        <p:panelGrid columns="2">
+                            <p:outputLabel value="Id" for="id" />
+                            <p:inputText id="id" value="#{dtListAccountBankController.selectedAccountBank.id}" title="Id" disabled="true"/>
+                            <p:outputLabel value="#{msg.accountNumber}" for="accountNumber" />
+                            <p:inputText id="accountNumber" value="#{dtListAccountBankController.selectedAccountBank.accountNumber}" title="Code" required="true">
+                            </p:inputText>
+                            <p:outputLabel value="#{msg.bank}" for="bank" />
+                            <p:selectOneMenu id="bank" value="#{dtListAccountBankController.selectedAccountBank.bankId}" converter="bankConverter" >
+                                <f:selectItem itemLabel="#{dtListAccountBankController.selectedAccountBank.bankId.name}" itemValue="#{dtListAccountBankController.selectedAccountBank.bankId.id}" />
+                                <f:selectItems value="#{dtListAccountBankController.banks}"/>
+                            </p:selectOneMenu> 
+                            <p:outputLabel value="#{msg.accountType}" for="accountType" />
+                            <p:selectOneMenu id="accountType" value="#{dtListAccountBankController.selectedAccountBank.accountTypeBankId}" converter="accountTypeBankConverter" >
+                                <f:selectItem itemLabel="#{dtListAccountBankController.selectedAccountBank.accountTypeBankId.description}" itemValue="#{dtListAccountBankController.selectedAccountBank.accountTypeBankId.id}" />
+                                <f:selectItems value="#{dtListAccountBankController.accountTypeBanks}"/>
+                            </p:selectOneMenu> 
+                            <p:outputLabel value="#{msg.status}" for="status" />
+                            <p:selectOneMenu id="status" value="#{dtListAccountBankController.selectedAccountBank.statusAccountBankId}" converter="statusAccountBankConverter" >
+                                <f:selectItem itemLabel="#{dtListAccountBankController.selectedAccountBank.statusAccountBankId.description}" itemValue="#{dtListAccountBankController.selectedAccountBank.statusAccountBankId.id}" />
+                                <f:selectItems value="#{dtListAccountBankController.statusAccountBanks}"/>
+                            </p:selectOneMenu> 
+                        </p:panelGrid>
+                    </p:panelGrid>
+                    <p:commandButton value="#{msg.save}" title="#{msg.save}" 
+                                     update="AccountBankEditDlg :formAccountBank:accountBankTable"
+                                     actionListener="#{dtListAccountBankController.save}"
+                                     styleClass="icon-insert icon"/>
+                    <p:commandButton value="#{msg.cancel}" onclick="AccountBankEditDialog.hide()"/>
+                </h:panelGroup>              
+            </h:form>
+        </p:dialog>
+
+    </ui:composition>
+</html>
