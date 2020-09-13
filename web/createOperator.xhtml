@@ -40,15 +40,28 @@
 
                         <p:outputLabel value="#{msg.language}" for="language" />
                         <p:selectOneMenu id="language" value="#{operatorController.language}" converter="languageConverter" >
-                            <f:selectItem itemLabel="Selecione Uno" />
+                            <f:selectItem itemLabel="#{msg.SelectOne}" />
                             <f:selectItems value="#{bpListOperatorController.languages}"/>
                         </p:selectOneMenu> 
 
                         <p:outputLabel value="#{msg.profile}" for="profile" />
                         <p:selectOneMenu id="profile" value="#{operatorController.profile}" converter="profileConverter" >
-                            <f:selectItem itemLabel="Selecione Uno" />
+                            <f:selectItem itemLabel="#{msg.SelectOne}" />
                             <f:selectItems value="#{bpListOperatorController.profiles}"/>
                             <f:ajax event="change" listener="#{operatorController.reloadPermission()}" render="excludedList" execute="@this"/>
+                        </p:selectOneMenu> 
+                        
+                        <p:outputLabel value="#{msg.store}" for="store"  rendered="#{not empty bpListOperatorController.stores}"/>
+                        <p:selectOneMenu id="store" value="#{operatorController.selectedStore}" converter="storeConverter" rendered="#{not empty bpListOperatorController.stores}" >
+                            <f:selectItem itemLabel="#{msg.unasignedStore}" itemValue="#{null}" />
+                            <f:selectItems value="#{bpListOperatorController.stores}"/>
+                            <f:ajax event="change" render="@form"/>
+                        </p:selectOneMenu> 
+                        
+                        <p:outputLabel value="#{msg.pos}" for="pos" rendered="#{not empty operatorController.posList}" />
+                        <p:selectOneMenu id="pos" value="#{operatorController.selectPos}" converter="posConverter" rendered="#{not empty operatorController.posList}" >
+                            <f:selectItem itemLabel="#{msg.unasignedPos}" itemValue="#{null}" />
+                            <f:selectItems value="#{operatorController.posList}" var="pos" itemLabel="#{pos.posCode}"/>
                         </p:selectOneMenu> 
 
                     </p:panelGrid>

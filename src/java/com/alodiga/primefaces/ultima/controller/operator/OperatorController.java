@@ -3,12 +3,16 @@ package com.alodiga.primefaces.ultima.controller.operator;
 import com.alodiga.remittance.beans.LanguajeBean;
 import com.alodiga.remittance.beans.LoginBean;
 import com.portal.business.commons.data.OperatorData;
+import com.portal.business.commons.data.PosData;
+import com.portal.business.commons.exceptions.EmptyListException;
 import com.portal.business.commons.exceptions.GeneralException;
 import com.portal.business.commons.exceptions.NullParameterException;
 import com.portal.business.commons.models.Language;
 import com.portal.business.commons.models.Operator;
 import com.portal.business.commons.models.Permission;
+import com.portal.business.commons.models.Pos;
 import com.portal.business.commons.models.Profile;
+import com.portal.business.commons.models.Store;
 import com.portal.business.commons.utils.Encoder;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -18,6 +22,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
@@ -48,6 +54,10 @@ public class OperatorController {
 
     private OperatorData operatorData = null;
 
+    private Store selectedStore = null;
+
+    private Pos selectPos = null;
+
     @ManagedProperty(value = "#{loginBean}")
     LoginBean loginBean;
 
@@ -59,6 +69,8 @@ public class OperatorController {
     private String messages = null;
 
     private ResourceBundle msg;
+
+    private List<Pos> posList = new ArrayList();
 
     @ManagedProperty(value = "#{languajeBean}")
     private LanguajeBean lenguajeBean;
@@ -187,6 +199,39 @@ public class OperatorController {
         this.lenguajeBean = lenguajeBean;
     }
 
+    public Store getSelectedStore() {
+        return selectedStore;
+    }
+
+    public void setSelectedStore(Store selectedStore) {
+        this.posList = new ArrayList();
+        this.selectedStore = selectedStore;
+        this.selectPos = null;
+        try {
+            this.posList = new PosData().getPosByStore(selectedStore);
+        } catch (EmptyListException ex) {
+            Logger.getLogger(OperatorController.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (GeneralException ex) {
+            Logger.getLogger(OperatorController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    public Pos getSelectPos() {
+        return selectPos;
+    }
+
+    public void setSelectPos(Pos selectPos) {
+        this.selectPos = selectPos;
+    }
+
+    public List<Pos> getPosList() {
+        return posList;
+    }
+
+    public void setPosList(List<Pos> posList) {
+        this.posList = posList;
+    }
+
     public void save() {
         try {
             Operator operator = new Operator();
@@ -216,6 +261,14 @@ public class OperatorController {
                 }
             }
             operator.setExcludedPermission(excludedPermission);
+
+            if (selectPos != null) {
+                operator.setPos(selectPos);
+            }
+
+            if (selectedStore != null) {
+                operator.setStore(selectedStore);
+            }
             operatorData.saveOperator(operator);
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(msg.getString("operatorSaveSuccesfull")));
         } catch (NullParameterException ex) {

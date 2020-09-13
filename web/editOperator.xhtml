@@ -52,16 +52,29 @@
                                 <f:ajax event="change" listener="#{bpListOperatorController.getPermissions()}" render="excludedList" execute="@this"/>
                             </p:selectOneMenu> 
 
+                            <p:outputLabel value="#{msg.store}" for="store"  rendered="#{not empty bpListOperatorController.stores}"/>
+                            <p:selectOneMenu id="store" value="#{bpListOperatorController.selectedStore}" converter="storeConverter" rendered="#{not empty bpListOperatorController.stores}" >
+                                <f:selectItem itemLabel="#{msg.unasignedStore}" itemValue="#{null}" />
+                                <f:selectItems value="#{bpListOperatorController.stores}"/>
+                                <f:ajax event="change" render="@form"/>
+                            </p:selectOneMenu> 
+
+                            <p:outputLabel value="#{msg.pos}" for="pos" rendered="#{not empty bpListOperatorController.posList}" />
+                            <p:selectOneMenu id="pos" value="#{bpListOperatorController.selectPos}" converter="posConverter" rendered="#{not empty bpListOperatorController.posList}" >
+                                <f:selectItem itemLabel="#{msg.unasignedPos}" itemValue="#{null}" />
+                                <f:selectItems value="#{bpListOperatorController.posList}" var="pos" itemLabel="#{pos.posCode}"/>
+                            </p:selectOneMenu> 
+
                         </p:panelGrid>
-                        
+
                         <p:panelGrid layout="grid" id="excludedGrid" columns="1">
-                            
+
                             <h:outputText value="${msg.excludedPermission}"/>
-                            
+
                             <p:selectManyCheckbox id="excludedList" value="#{bpListOperatorController.includedPermissions}" converter="permissionConverter" layout="pageDirection" columns="1">
                                 <f:selectItems value="#{bpListOperatorController.availablePermissions}" var="perm" itemValue="#{perm}" itemLabel="#{operatorPermission.getPermissionLabel(perm)}"/>
                             </p:selectManyCheckbox>
-                            
+
                         </p:panelGrid>
                     </p:panelGrid>
                     <p:commandButton value="#{msg.save}" title="#{msg.save}" 
