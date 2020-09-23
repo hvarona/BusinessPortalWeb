@@ -1,0 +1,90 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:pe="http://primefaces.org/ui/extensions"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="title">#{msg.accountBank}</ui:define>
+
+    <ui:define name="content">
+        
+        <h:form id="formAccountBank">
+            <p:dataTable var="accountBank" value="#{dtListAccountBankController.accountBanks}" widgetVar="accountBankTable"
+                         emptyMessage="#{msg.posNotFound}" filteredValue="#{dtListAccountBankController.filteredAccountBank}" paginator="true" rows="10" style="margin-bottom:20px"
+                         paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}" 
+                         rowsPerPageTemplate="5,10,15" id="accountBankTable">
+
+                <f:facet name="header">
+                    <p:outputPanel>
+                        <h:outputText value="#{msg.searchAllFields}:" />
+                        <p:inputText id="globalFilter" onkeyup="PF('accountBankTable').filter()" style="width:150px" placeholder="#{msg.tag}"/>
+                    </p:outputPanel>
+                </f:facet>
+
+                <p:column filterBy="#{accountBank.id}" headerText="Id"  filterMatchMode="contains" style="width:15px">
+                    <h:outputText value="#{accountBank.id}" />
+                </p:column>
+
+                <p:column filterBy="#{accountBank.bankId.name}" headerText="#{msg.store}"  filterMatchMode="contains" style="width:30px">
+                    <h:outputText value="#{accountBank.bankId.name}" />
+                </p:column>
+                
+                <p:column filterBy="#{accountBank.accountNumber}" headerText="#{msg.accountNumber}"  filterMatchMode="contains" style="width:30px">
+                    <h:outputText value="#{accountBank.accountNumber}" />
+                </p:column>
+
+                <p:column filterBy="#{accountBank.accountTypeBankId.description}" headerText="#{msg.accountType}"  filterMatchMode="contains" style="width:30px">
+                    <h:outputText value="#{accountBank.accountTypeBankId.description}" />
+                </p:column>
+
+                <p:column filterBy="#{accountBank.statusAccountBankId.description}" headerText="#{msg.status}"  filterMatchMode="contains" style="width:30px">
+                     <h:outputText value="#{accountBank.statusAccountBankId.description}" />
+                </p:column>
+                           
+
+                <p:column style="width:10px;text-align: center">
+                    <p:commandButton update=":formAccountBank:accountBankDetail" oncomplete="PF('accountBankDialog').show()" icon="ui-icon-search" title="View">
+                        <f:setPropertyActionListener value="#{accountBank}" target="#{dtListAccountBankController.selectedAccountBank}" />
+                    </p:commandButton>
+
+                    <p:commandButton id="editButton" update=":AccountBankEditForm" oncomplete="PF('AccountBankEditDialog').show()" icon="ui-icon-pencil" title="Edit">
+                        <f:setPropertyActionListener value="#{accountBank}" target="#{dtListAccountBankController.selectedAccountBank}" />
+                    </p:commandButton>
+                </p:column>
+            </p:dataTable>
+            <p:commandButton id="btnAdd" rendered="#{not empty dtListAccountBankController.accountBanks}" value="#{msg.add}" icon="ui-icon-add" ajax="true" action="createAccountBank.xhtml?faces-redirect=true" />
+            <p:dialog header="#{msg.accountBank}" widgetVar="accountBankDialog" modal="true" showEffect="fade" hideEffect="fade" resizable="false">
+                <p:outputPanel id="accountBankDetail" style="text-align:center;">
+                    <p:panelGrid columns="2" rendered="#{not empty dtListAccountBankController.selectedAccountBank}" columnClasses="info,qr">
+                        <p:panelGrid  columns="2" columnClasses="label,value">
+                            <h:outputText value="Id:" />
+
+                            <h:outputText value="#{dtListAccountBankController.selectedAccountBank.id}" />
+
+                            <h:outputText value="#{msg.bank}" />
+
+                            <h:outputText value="#{dtListAccountBankController.selectedAccountBank.bankId.name}" />
+
+                            <h:outputText value="#{msg.accountNumber}" />
+
+                            <h:outputText value="#{dtListAccountBankController.selectedAccountBank.accountNumber}"/>
+
+                            <h:outputText value="#{msg.accountType}" />
+
+                            <h:outputText value="#{dtListAccountBankController.selectedAccountBank.accountTypeBankId.description}"/>
+
+                            <h:outputText value="#{msg.status}" />
+
+                            <h:outputText value="#{dtListAccountBankController.selectedAccountBank.statusAccountBankId.description}"/>
+
+                        </p:panelGrid>                 
+                    </p:panelGrid>
+                </p:outputPanel>
+            </p:dialog>
+        </h:form>
+        <ui:include src="editAccountBank.xhtml"/>
+    </ui:define>
+
+</ui:composition>
