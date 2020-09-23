@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.alodiga.primefaces.ultima.data.model;
+package com.alodiga.businessportal.data.model;
 
 import com.alodiga.primefaces.ultima.sorter.LazyUserSorter;
 import com.portal.business.commons.models.User;

@@ -1,4 +1,4 @@
-package com.alodiga.primefaces.ultima.data.model;
+package com.alodiga.businessportal.data.model;
 
 /**
  * Class that holds all the info of the Status of a card for checking balance

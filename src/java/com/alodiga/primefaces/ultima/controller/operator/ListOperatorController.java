@@ -3,6 +3,8 @@ package com.alodiga.primefaces.ultima.controller.operator;
 import com.alodiga.remittance.beans.LanguajeBean;
 import com.alodiga.remittance.beans.LoginBean;
 import com.portal.business.commons.data.OperatorData;
+import com.portal.business.commons.data.PosData;
+import com.portal.business.commons.data.StoreData;
 import com.portal.business.commons.exceptions.EmptyListException;
 import com.portal.business.commons.exceptions.GeneralException;
 import com.portal.business.commons.exceptions.NullParameterException;
@@ -10,8 +12,10 @@ import com.portal.business.commons.models.Language;
 import com.portal.business.commons.models.Operator;
 import com.portal.business.commons.models.Permission;
 import com.portal.business.commons.models.PermissionHasProfile;
+import com.portal.business.commons.models.Pos;
 import com.portal.business.commons.models.Profile;
 import com.portal.business.commons.models.ProfileData;
+import com.portal.business.commons.models.Store;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -28,7 +32,6 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
-import org.primefaces.event.SelectEvent;
 
 /**
  *
@@ -51,6 +54,14 @@ public class ListOperatorController implements Serializable {
     private Language language = null;
     private Profile profile = null;
 
+    private List<Store> stores;
+
+    private List<Pos> posList = new ArrayList();
+
+    private Store selectedStore = null;
+
+    private Pos selectPos = null;
+
     @ManagedProperty(value = "#{loginBean}")
     private LoginBean loginBean;
 
@@ -72,10 +83,13 @@ public class ListOperatorController implements Serializable {
         try {
             operatorData = new OperatorData();
             operatorList = operatorData.getOperatorList(loginBean.getCurrentBusiness());
+            stores = new StoreData().getStores(loginBean.getCurrentBusiness());
         } catch (GeneralException ex) {
             Logger.getLogger(ListOperatorController.class.getName()).log(Level.SEVERE, null, ex);
         } catch (EmptyListException ignored) {
 
+        } catch (NullParameterException ex) {
+            Logger.getLogger(ListOperatorController.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -86,6 +100,8 @@ public class ListOperatorController implements Serializable {
     public void setSelectedOperator(Operator selectedOperator) {
         this.selectedOperator = selectedOperator;
         getPermissions();
+        this.selectedStore = selectedOperator.getStore();
+        this.selectPos = selectedOperator.getPos();
     }
 
     public List<Operator> getOperatorList() {
@@ -206,12 +222,53 @@ public class ListOperatorController implements Serializable {
         this.lenguajeBean = lenguajeBean;
     }
 
+    public List<Store> getStores() {
+        return stores;
+    }
+
+    public void setStores(List<Store> stores) {
+        this.stores = stores;
+    }
+
+    public List<Pos> getPosList() {
+        return posList;
+    }
+
+    public void setPosList(List<Pos> posList) {
+        this.posList = posList;
+    }
+
+    public Store getSelectedStore() {
+        return selectedStore;
+    }
+
+    public void setSelectedStore(Store selectedStore) {
+        this.posList = new ArrayList();
+        this.selectedStore = selectedStore;
+        this.selectPos = null;
+        try {
+            this.posList = new PosData().getPosByStore(selectedStore);
+        } catch (EmptyListException ex) {
+            Logger.getLogger(OperatorController.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (GeneralException ex) {
+            Logger.getLogger(OperatorController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    public Pos getSelectPos() {
+        return selectPos;
+    }
+
+    public void setSelectPos(Pos selectPos) {
+        this.selectPos = selectPos;
+    }
+
     public void changeEnable(Operator operator) {
         try {
             operatorData.saveOperator(operator);
-            if(operator.getEnabled()){
+            if (operator.getEnabled()) {
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(msg.getString("operatorEnabled")));
-            }else{
+            } else {
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(msg.getString("operatorDisabled")));
             }
         } catch (NullParameterException | GeneralException ex) {
@@ -244,6 +301,9 @@ public class ListOperatorController implements Serializable {
                 }
             }
             operator.setExcludedPermission(excludedPermission);
+            operator.setStore(selectedStore);
+            operator.setPos(selectPos);
+
             operatorData.saveOperator(operator);
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(msg.getString("operatorSaveSuccesfull")));
         } catch (GeneralException | NullParameterException ex) {

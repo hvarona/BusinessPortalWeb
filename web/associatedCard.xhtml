@@ -1,0 +1,224 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:pe="http://primefaces.org/ui/extensions"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="title">#{msg.associatedCardTitle}</ui:define>
+
+    <ui:define name="content">
+        <h:form id="cardForm" >
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12">
+                        <div class="card card-w-title">
+                            <div align="center">
+                                <h1>#{msg.associatedCardTitle}</h1>
+                                <f:facet name="header">
+                                    <p:messages id="messages"  autoUpdate="true" closable="true" />
+                                </f:facet>
+                                <p:panelGrid id="cardInfoGrid" columns="2" >
+                                    <h:outputText value="#{msg.enterCardNumber}" />
+                                    <p:inputText value="#{associatedCardController.parentCardNumber}" >
+                                        <p:ajax event="change" update="@form"/>
+                                    </p:inputText>
+
+                                </p:panelGrid>
+                                <h:inputHidden id="timezone" value="#{associatedCardController.timezone}"/>
+                                <script>
+                                    $(function () {
+                                        $("#cardForm\\:timezone").val(Intl.DateTimeFormat().resolvedOptions().timeZone);
+                                    });
+                                </script>
+                            </div>
+
+                            <div align="center">
+                                <p:panelGrid  columns="1" >
+                                    <p:commandButton  value="#{msg.checkStatusCard}" update="@form" id="btnSubmit" icon="ui-icon-search" actionListener="#{associatedCardController.searchAssociated()}" />
+                                </p:panelGrid>
+                            </div>
+
+                            <p:dataTable var="card" value="#{associatedCardController.associatedCards}" 
+                                         emptyMessage="#{msg.operatorNotFound}" filteredValue="#{associatedCardController.filteredAssociatedCards}" paginator="true" rows="10" style="margin-bottom:20px"
+                                         paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}" 
+                                         rowsPerPageTemplate="5,10,15" id="cardTable" rendered="#{ associatedCardController.associatedCards != null}">
+
+                                <f:facet name="header">
+                                    <p:outputPanel>
+                                        <h:outputText value="#{msg.searchAllFields}:" />
+                                        <p:inputText id="globalFilter" onkeyup="PF('cardTable').filter()" style="width:150px" placeholder="#{msg.tag}"/>
+                                    </p:outputPanel>
+                                </f:facet>
+
+                                <p:column filterBy="#{card.cardNumber}" headerText="#{msg.cardNumber}"  filterMatchMode="contains" style="width:15px">
+                                    <h:outputText value="#{card.cardNumber}" />
+                                </p:column>
+
+                                <p:column filterBy="#{card.cardStatus.description}" headerText="#{msg.cardStatus}"  filterMatchMode="contains" style="width:15px">
+                                    <h:outputText value="#{card.cardStatus.description}" />
+                                </p:column>
+
+                                <p:column filterBy="#{card.naturalCustomer.firstNames}" headerText="#{msg.firstName}"  filterMatchMode="contains" style="width:15px">
+                                    <h:outputText value="#{card.naturalCustomer.firstNames}" />
+                                </p:column>
+                                <p:column filterBy="#{card.naturalCustomer.lastNames}" headerText="#{msg.lastName}"  filterMatchMode="contains" style="width:15px">
+                                    <h:outputText value="#{card.naturalCustomer.lastNames}" />
+                                </p:column>
+
+                                <p:column style="width:10px;text-align: center">
+
+                                    <p:commandButton update="activatedCardForm" oncomplete="PF('activatedCardDialog').show()" actionListener="#{associatedCardController.checkStatusCard()}" icon="ui-icon-search" title="#{msg.activateDeactivateCard}">
+                                        <f:setPropertyActionListener value="#{card}" target="#{associatedCardController.selectedCard}" />
+                                    </p:commandButton>
+
+                                    <p:commandButton update="consultCardForm" oncomplete="PF('consultCardDialog').show()" actionListener="#{associatedCardController.checkBalanceCard()}" icon="ui-icon-search" title="#{msg.consultCard}">
+                                        <f:setPropertyActionListener value="#{card}" target="#{associatedCardController.selectedCard}" />
+                                    </p:commandButton>
+
+                                    <p:commandButton update="rechargeCardForm" oncomplete="PF('rechargeCardDialog').show()" actionListener="#{associatedCardController.rechargeCard()}" icon="ui-icon-search" title="#{msg.rechargeCard}">
+                                        <f:setPropertyActionListener value="#{card}" target="#{associatedCardController.selectedCard}" />
+                                    </p:commandButton>
+
+                                </p:column>
+                            </p:dataTable>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </h:form>
+        <p:dialog header="#{msg.checkCardDetail}" widgetVar="consultCardDialog" modal="true" showEffect="fade" hideEffect="fade" resizable="false">
+            <h:form id="consultCardForm" >
+                <p:outputPanel id="cardDetail" style="text-align:center;" rendered="#{associatedCardController.isConsult and associatedCardController.cardInfo != null}">
+                    <h:outputText value="#{msg.cardInfo}" />
+                    <p:panelGrid  columns="2" columnClasses="label,value">
+                        <h:outputText value="#{msg.cardNumber}:" />
+                        <h:outputText value="#{associatedCardController.cardInfo.cardNumber}" />
+
+                        <h:outputText value="#{msg.accountNumber}:" />
+                        <h:outputText value="#{associatedCardController.cardInfo.accountNumber}" />
+
+                        <h:outputText value="#{msg.balance}:" />
+                        <h:outputText value="#{associatedCardController.cardInfo.accountBalance}" />
+
+                        <h:outputText value="#{msg.dollarBalance}:" />
+                        <h:outputText value="#{associatedCardController.cardInfo.accountDollarBalance}" />
+                    </p:panelGrid>
+                </p:outputPanel>
+                <p:outputPanel id="errorPanel" style="text-align:center;" rendered="#{associatedCardController.isConsult and associatedCardController.hasError}">
+                    <h:outputText value="#{associatedCardController.errorMessage}" />
+                </p:outputPanel>
+            </h:form>
+        </p:dialog>
+
+        <p:dialog header="#{msg.checkCardDetail}" widgetVar="activatedCardDialog" modal="true" showEffect="fade" hideEffect="fade" resizable="false">
+            <h:form id="activatedCardForm" >
+                <p:outputPanel id="activatedCardDetail" style="text-align:center;" rendered="#{associatedCardController.isActivate and associatedCardController.cardStatus != null}" >
+                    <p:panelGrid columns ="1" >
+                        <div align="center">
+                            <p:panelGrid id="cardActiveGrid" columns="2" >
+                                <h:outputText value="#{msg.cardNumber}" />
+                                <h:outputText value="#{associatedCardController.selectedCard.cardNumber}" />
+
+                                <h:outputText value="#{msg.cardActivateStatus}" />
+                                <h:outputText value="#{associatedCardController.cardStatusData}" />
+                            </p:panelGrid>
+                        </div>
+                        <div align="center">
+                            <p:panelGrid  columns="1" rendered="#{associatedCardController.cardStatus eq 'deactive'}">
+                                <p:commandButton  value="#{msg.activateCard}" update="messages" oncomplete="PF('activatedCardDialog').hide()" id="btnActivate" icon="ui-icon-search" actionListener="#{associatedCardController.activateCard()}" />
+                            </p:panelGrid>
+                            <p:panelGrid  columns="1" rendered="#{associatedCardController.cardStatus eq 'active'}">
+                                <p:commandButton  value="#{msg.deactivateCard}" update="messages" oncomplete="PF('activatedCardDialog').hide()" id="btnDeactivate" icon="ui-icon-search" actionListener="#{associatedCardController.deactivateCard()}" />
+                            </p:panelGrid>
+                        </div>
+                    </p:panelGrid>
+                </p:outputPanel>
+                <p:outputPanel id="errorPanel" style="text-align:center;" rendered="#{associatedCardController.isActivate and associatedCardController.hasError}" >
+                    <h:outputText value="#{associatedCardController.errorMessage}" />
+                </p:outputPanel>
+            </h:form>
+        </p:dialog>
+
+        <p:dialog header="#{associatedCardController.header}" id="rechargeCardDialog" widgetVar="rechargeCardDialog" modal="true" showEffect="fade" hideEffect="fade" resizable="false">
+            <h:form id="rechargeCardForm" >
+                <p:panel id="amountDetail" style="text-align:center;" rendered="#{associatedCardController.isRecharge and not associatedCardController.hasError and associatedCardController.phase eq 1}">
+                    <p:panelGrid columns="2">
+                        <h:outputText value="#{msg.cardNumber}" />
+                        <h:outputText value="#{associatedCardController.selectedCard.cardNumber}" />
+
+                        <h:outputText value="#{msg.accountNumber}:" />
+                        <h:outputText value="#{associatedCardController.cardInfo.accountNumber}" />
+
+                        <h:outputText value="#{msg.rechargeWalletIncludeFee}" />
+                        <p:selectBooleanCheckbox  id="includeFee" value="#{associatedCardController.includeFees}" />
+
+                        <h:outputText value="#{msg.rechargeWalletRechargeAmount}" />
+                        <p:inputNumber id="amountToRecharge" value="#{associatedCardController.rechargeAmount}" />
+
+                        <p:commandButton  value="#{msg.accept}" process="rechargeCardForm:amountToRecharge rechargeCardForm:includeFee @this" update="@form :rechargeCardDialog" 
+                                          oncomplete="PF('rechargeCardDialog').show()" 
+                                          id="btnAcceptRecharge" icon="ui-icon-send" 
+                                          action="#{associatedCardController.verifyRecharge()}" />
+                        <p:commandButton  value="#{msg.cancel}" update=":rechargeCardDialog :rechargeCardForm" oncomplete="PF('rechargeCardDialog').hide()" id="btnCancel" icon="ui-icon-cancel" actionListener="#{associatedCardController.reset()}"/>
+                    </p:panelGrid>
+                </p:panel>
+                <p:panel id="confirmDetail" style="text-align:center;" rendered="#{associatedCardController.isRecharge and not associatedCardController.hasError and associatedCardController.phase eq 2}">
+                    <p:panelGrid columns="2">
+                        <h:outputText value="#{msg.cardNumber}" />
+                        <h:outputText value="#{associatedCardController.selectedCard.cardNumber}" />
+
+                        <h:outputText value="#{msg.accountNumber}:" />
+                        <h:outputText value="#{associatedCardController.cardInfo.accountNumber}" />
+
+                        <h:outputText value="#{msg.rechargeWalletRechargeAmount}" />
+                        <h:outputText value="#{associatedCardController.rechargeAmount}" />
+
+                        <h:outputText value="#{msg.rechargeWalletRate}" />
+                        <h:outputText value="#{associatedCardController.totalFee}" />
+
+                        <h:outputText value="#{msg.rechargeWalletTotalCharge}" />
+                        <h:outputText value="#{associatedCardController.totalCharge}" />
+
+                        <p:commandButton  value="#{msg.confirm}" update="@form :rechargeCardDialog" oncomplete="PF('rechargeCardDialog').show()" id="btnConfirm" icon="ui-icon-check" actionListener="#{associatedCardController.recharge()}" />
+                        <p:commandButton  value="#{msg.cancel}" update=":rechargeCardDialog :rechargeCardForm" oncomplete="PF('rechargeCardDialog').hide()" id="btnCancelRecharge" icon="ui-icon-cancel" actionListener="#{associatedCardController.reset()}"/>
+                    </p:panelGrid>
+                </p:panel>
+                <p:panel id="finalDetail" style="text-align:center;" rendered="#{associatedCardController.isRecharge and not associatedCardController.hasError and associatedCardController.phase eq 3}">
+                    <p:panelGrid columns="2">
+                        <f:facet name="header">
+                            <p:messages id="messages"  autoUpdate="false" closable="false" />
+                        </f:facet>
+                        <h:outputText value="#{msg.cardNumber}" />
+                        <h:outputText value="#{associatedCardController.selectedCard.cardNumber}" />
+
+                        <h:outputText value="#{msg.accountNumber}:" />
+                        <h:outputText value="#{associatedCardController.cardInfo.accountNumber}" />
+
+                        <h:outputText value="#{msg.rechargeWalletRechargeAmount}" />
+                        <h:outputText value="#{associatedCardController.rechargeAmount}" />
+
+                        <h:outputText value="#{msg.rechargeWalletRate}" />
+                        <h:outputText value="#{associatedCardController.totalFee}" />
+
+                        <h:outputText value="#{msg.rechargeWalletTotalCharge}" />
+                        <h:outputText value="#{associatedCardController.totalCharge}" />
+
+                        <h:outputText value="#{msg.rechargeWalletTransaction}" />
+                        <h:outputText value="#{associatedCardController.transactionId}" />
+
+                        <p:commandButton  value="#{msg.accept}" update=":rechargeCardDialog :rechargeCardForm" oncomplete="PF('rechargeCardDialog').hide()" id="btnAccepLast" icon="ui-icon-check" actionListener="#{associatedCardController.reset()}"/>
+                        <p:commandButton  value="#{msg.print}" update=":rechargeCardDialog :rechargeCardForm" oncomplete="PF('rechargeCardDialog').hide()" id="btnPrint" icon="ui-icon-print" actionListener="#{associatedCardController.reset()}" />
+                    </p:panelGrid>
+                </p:panel>
+                <p:panel id="errorDetail" style="text-align:center;" rendered="#{associatedCardController.isRecharge and associatedCardController.hasError}">
+                    <h:outputText value="#{associatedCardController.errorMessage}" />
+                </p:panel>
+            </h:form>
+        </p:dialog>
+        
+    </ui:define>
+
+</ui:composition>
+

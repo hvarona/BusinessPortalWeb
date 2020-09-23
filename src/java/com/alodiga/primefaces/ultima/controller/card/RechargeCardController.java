@@ -1,7 +1,7 @@
 package com.alodiga.primefaces.ultima.controller.card;
 
 import com.alodiga.primefaces.ultima.controller.wallet.rechargeController;
-import com.alodiga.primefaces.ultima.data.model.CardInfo;
+import com.alodiga.businessportal.data.model.CardInfo;
 import com.alodiga.remittance.beans.LanguajeBean;
 import com.alodiga.remittance.beans.LoginBean;
 import com.alodiga.wallet.ws.APIAlodigaWalletProxy;

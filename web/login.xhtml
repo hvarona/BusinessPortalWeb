@@ -42,6 +42,9 @@
                             <p:button outcome="/recover"    value="#{msg.forgot}"   icon="ui-icon-help" styleClass="secondary"/>
                         </div>
                         <div class="ui-g-12">
+                            <h:outputLink value="/BusinessPortalRegister/register.xhtml" > #{msg.register}</h:outputLink>
+                        </div>
+                        <div class="ui-g-12">
                             <p:selectOneMenu value="#{languajeBean.languaje}" onchange="submit()" valueChangeListener="#{languajeBean.localityChanged}">
                                 <f:selectItem itemLabel="Español" itemValue="es"/>
                                 <f:selectItem itemLabel="English" itemValue="en"/>

@@ -15,7 +15,7 @@
  */
 package com.alodiga.primefaces.ultima.controller.user;
 
-import com.alodiga.primefaces.ultima.data.model.LazyUserDataModel;
+import com.alodiga.businessportal.data.model.LazyUserDataModel;
 import com.portal.business.commons.data.AccessControlData;
 import com.portal.business.commons.data.UserData;
 import com.portal.business.commons.exceptions.EmptyListException;
