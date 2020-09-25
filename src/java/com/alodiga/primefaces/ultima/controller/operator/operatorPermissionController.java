@@ -1,9 +1,9 @@
 package com.alodiga.primefaces.ultima.controller.operator;
 
 import com.alodiga.remittance.beans.LanguajeBean;
-import com.portal.business.commons.models.Permission;
-import com.portal.business.commons.models.PermissionHasProfile;
-import com.portal.business.commons.models.Profile;
+import com.portal.business.commons.models.BPPermission;
+import com.portal.business.commons.models.BPPermissionHasProfile;
+import com.portal.business.commons.models.BPProfile;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -21,9 +21,9 @@ import javax.faces.bean.ViewScoped;
 @ViewScoped
 public class operatorPermissionController {
 
-    List<Permission> availablePermissions;
+    List<BPPermission> availablePermissions;
 
-    Profile profile;
+    BPProfile profile;
 
     private ResourceBundle msg;
 
@@ -40,19 +40,19 @@ public class operatorPermissionController {
 
     }
 
-    public List<Permission> getAvailablePermissions() {
+    public List<BPPermission> getAvailablePermissions() {
         return availablePermissions;
     }
 
-    public void setAvailablePermissions(List<Permission> availablePermissions) {
+    public void setAvailablePermissions(List<BPPermission> availablePermissions) {
         this.availablePermissions = availablePermissions;
     }
 
-    public Profile getProfile() {
+    public BPProfile getProfile() {
         return profile;
     }
 
-    public void setProfile(Profile profile) {
+    public void setProfile(BPProfile profile) {
         this.profile = profile;
     }
 
@@ -62,13 +62,13 @@ public class operatorPermissionController {
 
     public void reloadPermission() {
         availablePermissions = new ArrayList();
-        List<PermissionHasProfile> phps = profile.getPermissionHasProfiles();
-        for (PermissionHasProfile php : phps) {
+        List<BPPermissionHasProfile> phps = profile.getPermissionHasProfiles();
+        for (BPPermissionHasProfile php : phps) {
             availablePermissions.add(php.getPermission());
         }
     }
 
-    public String getPermissionLabel(Permission permission) {
+    public String getPermissionLabel(BPPermission permission) {
         return permission.getPermissionDataByLanguageId(lenguajeBean.getLanguage().getId()).getAlias();
     }
 

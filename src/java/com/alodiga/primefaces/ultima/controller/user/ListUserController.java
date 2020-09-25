@@ -22,8 +22,8 @@ import com.portal.business.commons.exceptions.EmptyListException;
 import com.portal.business.commons.exceptions.GeneralException;
 import com.portal.business.commons.exceptions.NullParameterException;
 import com.portal.business.commons.generic.WsRequest;
-import com.portal.business.commons.models.Profile;
-import com.portal.business.commons.models.User;
+import com.portal.business.commons.models.BPProfile;
+import com.portal.business.commons.models.BPUser;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -43,11 +43,11 @@ import org.primefaces.model.LazyDataModel;
 @ViewScoped
 public class ListUserController implements Serializable {
 
-    private LazyDataModel<User> lazyModel;
+    private LazyDataModel<BPUser> lazyModel;
 
-    private User selectedUser;
+    private BPUser selectedUser;
     private UserData userData = null;
-    private DualListModel<Profile> profiles;
+    private DualListModel<BPProfile> profiles;
     private AccessControlData accessControlData;
     private String icon;
 
@@ -80,31 +80,31 @@ public class ListUserController implements Serializable {
         this.accessControlData = accessControlData;
     }
 
-    public LazyDataModel<User> getLazyModel() {
+    public LazyDataModel<BPUser> getLazyModel() {
         return lazyModel;
     }
 
-    public User getSelectedUser() {
+    public BPUser getSelectedUser() {
         return selectedUser;
     }
 
-    public void setSelectedUser(User selectedUser) {
+    public void setSelectedUser(BPUser selectedUser) {
         this.selectedUser = selectedUser;
     }
 
-    public DualListModel<Profile> getProfiles() {
+    public DualListModel<BPProfile> getProfiles() {
         try {
             accessControlData = new AccessControlData();
             userData = new UserData();
             WsRequest request = new WsRequest();
-            List<Profile> list = accessControlData.getProfiles(request);
-            List<Profile> profilesSource = new ArrayList<Profile>();
-            List<Profile> profilesTarget = new ArrayList<Profile>();
+            List<BPProfile> list = accessControlData.getProfiles(request);
+            List<BPProfile> profilesSource = new ArrayList<BPProfile>();
+            List<BPProfile> profilesTarget = new ArrayList<BPProfile>();
             if (selectedUser != null) {
 
                 profilesSource.add(selectedUser.getProfile());
 
-                for (Profile profile : list) {
+                for (BPProfile profile : list) {
                     if (!profilesSource.contains(profile)) {
                         profilesTarget.add(profile);
                     }
@@ -114,7 +114,7 @@ public class ListUserController implements Serializable {
                 profilesSource = list;
             }
 
-            profiles = new DualListModel<Profile>(profilesSource, profilesTarget);
+            profiles = new DualListModel<BPProfile>(profilesSource, profilesTarget);
         } catch (EmptyListException ex) {
         } catch (GeneralException ex) {
         } catch (NullParameterException ex) {
@@ -122,7 +122,7 @@ public class ListUserController implements Serializable {
         return profiles;
     }
 
-    public void setProfiles(DualListModel<Profile> profiles) {
+    public void setProfiles(DualListModel<BPProfile> profiles) {
         this.profiles = profiles;
     }
 
@@ -193,7 +193,7 @@ public class ListUserController implements Serializable {
         this.icon = icon;
     }
 
-    public String icon(User user) {
+    public String icon(BPUser user) {
         if (user.getEnabled()) {
             return "ui-icon-check";
         } else {

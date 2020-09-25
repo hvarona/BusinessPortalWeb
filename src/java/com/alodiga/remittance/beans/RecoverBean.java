@@ -10,7 +10,7 @@ import com.portal.business.commons.data.UserData;
 import com.portal.business.commons.exceptions.GeneralException;
 import com.portal.business.commons.exceptions.NullParameterException;
 import com.portal.business.commons.exceptions.RegisterNotFoundException;
-import com.portal.business.commons.models.User;
+import com.portal.business.commons.models.BPUser;
 import javax.naming.directory.Attribute;
 import javax.naming.directory.Attributes;
 import javax.naming.directory.DirContext;
@@ -90,7 +90,7 @@ public class RecoverBean extends GenericController implements Serializable {
     }
     
     public String recover() {
-        User user = null;
+        BPUser user = null;
         UserData userData = new UserData();
         AccessControlData accessControlData = new AccessControlData();
         try {

@@ -5,7 +5,7 @@ import com.portal.business.commons.exceptions.GeneralException;
 import com.portal.business.commons.exceptions.NullParameterException;
 import com.portal.business.commons.exceptions.RegisterNotFoundException;
 import com.portal.business.commons.generic.WsRequest;
-import com.portal.business.commons.models.Language;
+import com.portal.business.commons.models.BPLanguage;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.faces.component.UIComponent;
@@ -17,7 +17,7 @@ import javax.faces.convert.FacesConverter;
 public class LanguageConverter implements Converter {
 
     public Object getAsObject(FacesContext facesContext, UIComponent component, String submittedValue) {
-        Language language = null;
+        BPLanguage language = null;
         try {
             UtilsData utilsData = new UtilsData();
             WsRequest request = new WsRequest();
@@ -39,8 +39,8 @@ public class LanguageConverter implements Converter {
         if (value == null || value.equals("")) {
             return "";
         } else {
-            if (value instanceof Language) {
-                return ((Language) value).getDescription();
+            if (value instanceof BPLanguage) {
+                return ((BPLanguage) value).getDescription();
             }
             return String.valueOf(value);
         }

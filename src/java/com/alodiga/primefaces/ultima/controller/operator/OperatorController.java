@@ -7,11 +7,11 @@ import com.portal.business.commons.data.PosData;
 import com.portal.business.commons.exceptions.EmptyListException;
 import com.portal.business.commons.exceptions.GeneralException;
 import com.portal.business.commons.exceptions.NullParameterException;
-import com.portal.business.commons.models.Language;
+import com.portal.business.commons.models.BPLanguage;
 import com.portal.business.commons.models.Operator;
-import com.portal.business.commons.models.Permission;
+import com.portal.business.commons.models.BPPermission;
 import com.portal.business.commons.models.Pos;
-import com.portal.business.commons.models.Profile;
+import com.portal.business.commons.models.BPProfile;
 import com.portal.business.commons.models.Store;
 import com.portal.business.commons.utils.Encoder;
 import java.io.IOException;
@@ -49,8 +49,8 @@ public class OperatorController {
     private String login;
     private String password;
     private String phoneNumber;
-    private Profile profile;
-    private Language language;
+    private BPProfile profile;
+    private BPLanguage language;
 
     private OperatorData operatorData = null;
 
@@ -64,7 +64,7 @@ public class OperatorController {
     @ManagedProperty(value = "#{operatorPermission}")
     operatorPermissionController operatorPermissionController;
 
-    List<Permission> includedPermissions;
+    List<BPPermission> includedPermissions;
 
     private String messages = null;
 
@@ -149,19 +149,19 @@ public class OperatorController {
         this.phoneNumber = phoneNumber;
     }
 
-    public Profile getProfile() {
+    public BPProfile getProfile() {
         return profile;
     }
 
-    public void setProfile(Profile profile) {
+    public void setProfile(BPProfile profile) {
         this.profile = profile;
     }
 
-    public Language getLanguage() {
+    public BPLanguage getLanguage() {
         return language;
     }
 
-    public void setLanguage(Language language) {
+    public void setLanguage(BPLanguage language) {
         this.language = language;
     }
 
@@ -177,11 +177,11 @@ public class OperatorController {
         this.loginBean = loginBean;
     }
 
-    public List<Permission> getIncludedPermissions() {
+    public List<BPPermission> getIncludedPermissions() {
         return includedPermissions;
     }
 
-    public void setIncludedPermissions(List<Permission> includedPermissions) {
+    public void setIncludedPermissions(List<BPPermission> includedPermissions) {
         this.includedPermissions = includedPermissions;
     }
 
@@ -252,10 +252,10 @@ public class OperatorController {
             } catch (NoSuchAlgorithmException | UnsupportedEncodingException ignore) {
             }
 
-            List<Permission> excludedPermission = new ArrayList();
-            List<Permission> availablePermissions = operatorPermissionController.getAvailablePermissions();
+            List<BPPermission> excludedPermission = new ArrayList();
+            List<BPPermission> availablePermissions = operatorPermissionController.getAvailablePermissions();
 
-            for (Permission perm : availablePermissions) {
+            for (BPPermission perm : availablePermissions) {
                 if (!includedPermissions.contains(perm)) {
                     excludedPermission.add(perm);
                 }

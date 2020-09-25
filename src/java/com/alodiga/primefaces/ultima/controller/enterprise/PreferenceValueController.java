@@ -8,9 +8,9 @@ import com.portal.business.commons.exceptions.GeneralException;
 import com.portal.business.commons.exceptions.NullParameterException;
 import com.portal.business.commons.exceptions.RegisterNotFoundException;
 import com.portal.business.commons.managers.PreferenceManager;
-import com.portal.business.commons.models.Preference;
-import com.portal.business.commons.models.PreferenceField;
-import com.portal.business.commons.models.PreferenceValue;
+import com.portal.business.commons.models.BPPreference;
+import com.portal.business.commons.models.BPPreferenceField;
+import com.portal.business.commons.models.BPPreferenceValue;
 import java.util.ArrayList;
 import java.util.Date;
 import javax.annotation.PostConstruct;
@@ -29,10 +29,10 @@ import javax.faces.bean.ViewScoped;
 @ViewScoped
 public class PreferenceValueController {
 
-    private List<Preference> preferences;
+    private List<BPPreference> preferences;
 
-    private Preference selectedPreference;
-    private List<PreferenceField> selectedFields;
+    private BPPreference selectedPreference;
+    private List<BPPreferenceField> selectedFields;
 
     @ManagedProperty(value = "#{languajeBean}")
     private LanguajeBean languageBean;
@@ -79,19 +79,19 @@ public class PreferenceValueController {
         this.loginBean = loginBean;
     }
 
-    public List<Preference> getPreferences() {
+    public List<BPPreference> getPreferences() {
         return preferences;
     }
 
-    public void setPreferences(List<Preference> preferences) {
+    public void setPreferences(List<BPPreference> preferences) {
         this.preferences = preferences;
     }
 
-    public Preference getSelectedPreference() {
+    public BPPreference getSelectedPreference() {
         return selectedPreference;
     }
 
-    public void setSelectedPreference(Preference selectedPreference) {
+    public void setSelectedPreference(BPPreference selectedPreference) {
         this.selectedPreference = selectedPreference;
     }
 
@@ -99,7 +99,7 @@ public class PreferenceValueController {
         try {
             if (selectedPreference != null) {
                 this.selectedFields = selectedPreference.getPreferenceFields();
-                for (PreferenceField field : selectedFields) {
+                for (BPPreferenceField field : selectedFields) {
                     field.setCurrentLanguage(languageBean.getLanguage());
                     try {
                         field.setCurrentValue(preferenceData.loadActivePreferenceValuesByBusinessAndField(field, loginBean.getCurrentBusiness()).getValue());
@@ -115,11 +115,11 @@ public class PreferenceValueController {
         }
     }
 
-    public List<PreferenceField> getSelectedFields() {
+    public List<BPPreferenceField> getSelectedFields() {
         return selectedFields;
     }
 
-    public void setSelectedFields(List<PreferenceField> selectedFields) {
+    public void setSelectedFields(List<BPPreferenceField> selectedFields) {
         this.selectedFields = selectedFields;
     }
 
@@ -127,10 +127,10 @@ public class PreferenceValueController {
         ResourceBundle bundle = ResourceBundle.getBundle("com.alodiga.remittance.messages.message", Locale.forLanguageTag(languageBean.getLanguaje()));
         try {
 
-            List<PreferenceValue> values = new ArrayList();
-            for (PreferenceField field : selectedFields) {
+            List<BPPreferenceValue> values = new ArrayList();
+            for (BPPreferenceField field : selectedFields) {
                 if (field.getCurrentValue() != null && !field.getCurrentValue().isEmpty()) {
-                    PreferenceValue value = new PreferenceValue();
+                    BPPreferenceValue value = new BPPreferenceValue();
                     value.setBeginningDate(new Date());
                     value.setBusiness(loginBean.getCurrentBusiness());
                     value.setPreferenceField(field);

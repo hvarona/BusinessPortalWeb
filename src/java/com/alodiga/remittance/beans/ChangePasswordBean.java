@@ -3,7 +3,7 @@ package com.alodiga.remittance.beans;
 import com.portal.business.commons.data.UserData;
 import com.portal.business.commons.exceptions.GeneralException;
 import com.portal.business.commons.exceptions.NullParameterException;
-import com.portal.business.commons.models.User;
+import com.portal.business.commons.models.BPUser;
 import com.portal.business.commons.utils.Encoder;
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
@@ -146,7 +146,7 @@ public class ChangePasswordBean {
             if (!validate()) {
                 return;
             }
-            User user = loginBean.getUserSession();
+            BPUser user = loginBean.getUserSession();
             if (!user.getPassword().equals(Encoder.MD5(oldPassword))) {
                 FacesContext.getCurrentInstance().addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_ERROR,

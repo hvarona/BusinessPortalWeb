@@ -20,7 +20,7 @@ import com.portal.business.commons.exceptions.EmptyListException;
 import com.portal.business.commons.exceptions.GeneralException;
 import com.portal.business.commons.exceptions.NullParameterException;
 import com.portal.business.commons.generic.WsRequest;
-import com.portal.business.commons.models.Profile;
+import com.portal.business.commons.models.BPProfile;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -33,8 +33,8 @@ import org.primefaces.component.datatable.DataTable;
 @ManagedBean
 public class SelectProfileView {
     
-    private List<Profile> profiles;
-    private Profile profile;
+    private List<BPProfile> profiles;
+    private BPProfile profile;
     private DataTable dataTable;
     
 
@@ -57,19 +57,19 @@ public class SelectProfileView {
     
     
     
-    public List<Profile> getProfiles() {
+    public List<BPProfile> getProfiles() {
         return profiles;
     }
 
-    public void setProfiles(List<Profile> profiles) {
+    public void setProfiles(List<BPProfile> profiles) {
         this.profiles = profiles;
     }
 
-    public Profile getProfile() {
+    public BPProfile getProfile() {
         return profile;
     }
 
-    public void setProfile(Profile profile) {
+    public void setProfile(BPProfile profile) {
         this.profile = profile;
     }
     

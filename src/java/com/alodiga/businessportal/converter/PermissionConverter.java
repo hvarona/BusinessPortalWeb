@@ -5,7 +5,7 @@ import com.portal.business.commons.data.UserData;
 import com.portal.business.commons.exceptions.GeneralException;
 import com.portal.business.commons.exceptions.NullParameterException;
 import com.portal.business.commons.exceptions.RegisterNotFoundException;
-import com.portal.business.commons.models.Permission;
+import com.portal.business.commons.models.BPPermission;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.faces.component.UIComponent;
@@ -33,8 +33,8 @@ public class PermissionConverter implements Converter {
         if (value == null || value.equals("")) {
             return "";
         } else {
-            if (value instanceof Permission) {
-                return ((Permission) value).getId().toString();
+            if (value instanceof BPPermission) {
+                return ((BPPermission) value).getId().toString();
             }
             return String.valueOf(value);
         }

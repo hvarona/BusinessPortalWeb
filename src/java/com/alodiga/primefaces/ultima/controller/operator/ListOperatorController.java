@@ -8,13 +8,13 @@ import com.portal.business.commons.data.StoreData;
 import com.portal.business.commons.exceptions.EmptyListException;
 import com.portal.business.commons.exceptions.GeneralException;
 import com.portal.business.commons.exceptions.NullParameterException;
-import com.portal.business.commons.models.Language;
+import com.portal.business.commons.models.BPLanguage;
 import com.portal.business.commons.models.Operator;
-import com.portal.business.commons.models.Permission;
-import com.portal.business.commons.models.PermissionHasProfile;
+import com.portal.business.commons.models.BPPermission;
+import com.portal.business.commons.models.BPPermissionHasProfile;
 import com.portal.business.commons.models.Pos;
-import com.portal.business.commons.models.Profile;
-import com.portal.business.commons.models.ProfileData;
+import com.portal.business.commons.models.BPProfile;
+import com.portal.business.commons.models.BPProfileData;
 import com.portal.business.commons.models.Store;
 import java.io.IOException;
 import java.io.Serializable;
@@ -51,8 +51,8 @@ public class ListOperatorController implements Serializable {
     private Map<String, String> languages = new TreeMap();
     private Map<String, String> profiles = new TreeMap();
 
-    private Language language = null;
-    private Profile profile = null;
+    private BPLanguage language = null;
+    private BPProfile profile = null;
 
     private List<Store> stores;
 
@@ -70,8 +70,8 @@ public class ListOperatorController implements Serializable {
 
     private ResourceBundle msg;
 
-    private List<Permission> availablePermissions;
-    private List<Permission> includedPermissions;
+    private List<BPPermission> availablePermissions;
+    private List<BPPermission> includedPermissions;
 
     @PostConstruct
     public void init() {
@@ -128,8 +128,8 @@ public class ListOperatorController implements Serializable {
         if (languages == null || languages.isEmpty()) {
             languages = new TreeMap();
             try {
-                List<Language> languageList = operatorData.getLanguageList();
-                for (Language singleLangugage : languageList) {
+                List<BPLanguage> languageList = operatorData.getLanguageList();
+                for (BPLanguage singleLangugage : languageList) {
                     languages.put(singleLangugage.getDescription(), singleLangugage.getId().toString());
                 }
             } catch (EmptyListException | GeneralException ex) {
@@ -147,10 +147,10 @@ public class ListOperatorController implements Serializable {
         if (profiles == null || profiles.isEmpty()) {
             profiles = new TreeMap();
             try {
-                List<Profile> profileList = operatorData.getProfileList();
-                for (Profile singleProfile : profileList) {
+                List<BPProfile> profileList = operatorData.getProfileList();
+                for (BPProfile singleProfile : profileList) {
                     String name = singleProfile.getName();
-                    for (ProfileData data : singleProfile.getProfileData()) {
+                    for (BPProfileData data : singleProfile.getProfileData()) {
                         if (new Locale(data.getLanguage().getIso()).getLanguage().equals(msg.getLocale().getLanguage())) {
                             name = data.getAlias();
                         }
@@ -169,19 +169,19 @@ public class ListOperatorController implements Serializable {
         this.profiles = profiles;
     }
 
-    public Profile getProfile() {
+    public BPProfile getProfile() {
         return profile;
     }
 
-    public void setProfile(Profile profile) {
+    public void setProfile(BPProfile profile) {
         this.profile = profile;
     }
 
-    public Language getLanguage() {
+    public BPLanguage getLanguage() {
         return language;
     }
 
-    public void setLanguage(Language language) {
+    public void setLanguage(BPLanguage language) {
         this.language = language;
     }
 
@@ -191,30 +191,30 @@ public class ListOperatorController implements Serializable {
         if (selectedOperator == null || selectedOperator.getProfile() == null) {
             return;
         }
-        List<PermissionHasProfile> phps = selectedOperator.getProfile().getPermissionHasProfiles();
-        for (PermissionHasProfile php : phps) {
+        List<BPPermissionHasProfile> phps = selectedOperator.getProfile().getPermissionHasProfiles();
+        for (BPPermissionHasProfile php : phps) {
             availablePermissions.add(php.getPermission());
         }
-        for (Permission perm : availablePermissions) {
+        for (BPPermission perm : availablePermissions) {
             if (!selectedOperator.getExcludedPermission().contains(perm)) {
                 includedPermissions.add(perm);
             }
         }
     }
 
-    public List<Permission> getAvailablePermissions() {
+    public List<BPPermission> getAvailablePermissions() {
         return availablePermissions;
     }
 
-    public void setAvailablePermissions(List<Permission> availablePermissions) {
+    public void setAvailablePermissions(List<BPPermission> availablePermissions) {
         this.availablePermissions = availablePermissions;
     }
 
-    public List<Permission> getIncludedPermissions() {
+    public List<BPPermission> getIncludedPermissions() {
         return includedPermissions;
     }
 
-    public void setIncludedPermissions(List<Permission> includedPermissions) {
+    public void setIncludedPermissions(List<BPPermission> includedPermissions) {
         this.includedPermissions = includedPermissions;
     }
 
@@ -293,9 +293,9 @@ public class ListOperatorController implements Serializable {
                 throw new NullParameterException("ID null");
             }
 
-            List<Permission> excludedPermission = new ArrayList();
+            List<BPPermission> excludedPermission = new ArrayList();
 
-            for (Permission perm : availablePermissions) {
+            for (BPPermission perm : availablePermissions) {
                 if (!includedPermissions.contains(perm)) {
                     excludedPermission.add(perm);
                 }
