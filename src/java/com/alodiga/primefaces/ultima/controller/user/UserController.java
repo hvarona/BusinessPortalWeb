@@ -21,7 +21,7 @@ import com.portal.business.commons.exceptions.EmptyListException;
 import com.portal.business.commons.exceptions.GeneralException;
 import com.portal.business.commons.exceptions.NullParameterException;
 import com.portal.business.commons.generic.WsRequest;
-import com.portal.business.commons.models.Profile;
+import com.portal.business.commons.models.BPProfile;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,7 +29,7 @@ import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import org.primefaces.model.DualListModel;
-import com.portal.business.commons.models.User;
+import com.portal.business.commons.models.BPUser;
 import com.portal.business.commons.utils.Encoder;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -53,23 +53,23 @@ public class UserController {
     private String password;
     private String password2;
     private String phoneNumber;
-    private DualListModel<Profile> profiles;
+    private DualListModel<BPProfile> profiles;
     private AccessControlData accessControlData = null;
     private UserData userData = null;
     private String messages = null;
-    private User user;
+    private BPUser user;
     
     @PostConstruct
     public void init(){
         try {
             HttpServletRequest req= (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
-            user = (User) req.getAttribute("user");
+            user = (BPUser) req.getAttribute("user");
             accessControlData = new AccessControlData();
             userData = new UserData();
             WsRequest request = new WsRequest();
-            List<Profile>  profilesSource = accessControlData.getProfiles(request);
-            List<Profile> profilesTarget =  new ArrayList<Profile>();
-            profiles = new DualListModel<Profile>(profilesSource, profilesTarget);
+            List<BPProfile>  profilesSource = accessControlData.getProfiles(request);
+            List<BPProfile> profilesTarget =  new ArrayList<BPProfile>();
+            profiles = new DualListModel<BPProfile>(profilesSource, profilesTarget);
         } catch (EmptyListException ex) {
         } catch (GeneralException ex) {
         } catch (NullParameterException ex) {
@@ -157,17 +157,17 @@ public class UserController {
         this.phoneNumber = phoneNumber;
     }
 
-    public DualListModel<Profile> getProfiles() {
+    public DualListModel<BPProfile> getProfiles() {
         return profiles;
     }
 
-    public void setProfiles(DualListModel<Profile> profiles) {
+    public void setProfiles(DualListModel<BPProfile> profiles) {
         this.profiles = profiles;
     }
 
     public void save() {
         try {
-            user = new User();
+            user = new BPUser();
             user.setLogin(login);
 
             user.setPhoneNumber(phoneNumber);
@@ -202,11 +202,11 @@ public class UserController {
         return valid;
     }
 
-    public User getUser() {
+    public BPUser getUser() {
         return user;
     }
 
-    public void setUser(User user) {
+    public void setUser(BPUser user) {
         this.user = user;
     }
     

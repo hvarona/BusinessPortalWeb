@@ -19,7 +19,7 @@ import com.portal.business.commons.data.AccountBankData;
 import com.portal.business.commons.exceptions.GeneralException;
 import com.portal.business.commons.exceptions.NullParameterException;
 import com.portal.business.commons.exceptions.RegisterNotFoundException;
-import com.portal.business.commons.models.Bank;
+import com.portal.business.commons.models.BPBank;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.faces.component.UIComponent;
@@ -32,7 +32,7 @@ public class BankConverter implements Converter {
 
     @Override
     public Object getAsObject(FacesContext facesContext, UIComponent component, String submittedValue) {
-        Bank bank = null;
+        BPBank bank = null;
         try {
             AccountBankData accountBankData = new AccountBankData();
             Long bankId = Long.parseLong(submittedValue);
@@ -49,8 +49,8 @@ public class BankConverter implements Converter {
         if (value == null || value.equals("")) {
             return "";
         } else {
-            if (value instanceof Bank) {
-                  return Long.toString(((Bank) value).getId());
+            if (value instanceof BPBank) {
+                  return Long.toString(((BPBank) value).getId());
             } else {
                 return value.toString();
             }

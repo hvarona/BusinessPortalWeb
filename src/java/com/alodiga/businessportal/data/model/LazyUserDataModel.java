@@ -16,7 +16,7 @@
 package com.alodiga.businessportal.data.model;
 
 import com.alodiga.primefaces.ultima.sorter.LazyUserSorter;
-import com.portal.business.commons.models.User;
+import com.portal.business.commons.models.BPUser;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -28,17 +28,17 @@ import org.primefaces.model.SortOrder;
 /**
  * Dummy implementation of LazyDataModel that uses a list to mimic a real datasource like a database.
  */
-public class LazyUserDataModel extends LazyDataModel<User> {
+public class LazyUserDataModel extends LazyDataModel<BPUser> {
     
-    private List<User> datasource;
+    private List<BPUser> datasource;
     
-    public LazyUserDataModel(List<User> datasource) {
+    public LazyUserDataModel(List<BPUser> datasource) {
         this.datasource = datasource;
     }
     
     @Override
-    public User getRowData(String rowKey) {
-        for(User user : datasource) {
+    public BPUser getRowData(String rowKey) {
+        for(BPUser user : datasource) {
             if(user.getId().toString().equals(rowKey))
                 return user;
         }
@@ -47,16 +47,16 @@ public class LazyUserDataModel extends LazyDataModel<User> {
     }
 
     @Override
-    public Object getRowKey(User user) {
+    public Object getRowKey(BPUser user) {
         return user.getId().toString();
     }
 
     @Override
-    public List<User> load(int first, int pageSize, String sortField, SortOrder sortOrder, Map<String,Object> filters) {
-        List<User> data = new ArrayList<User>();
+    public List<BPUser> load(int first, int pageSize, String sortField, SortOrder sortOrder, Map<String,Object> filters) {
+        List<BPUser> data = new ArrayList<BPUser>();
 
         //filter
-            for (User user : datasource) {
+            for (BPUser user : datasource) {
                 boolean match = true;
 
                 if (filters != null) {

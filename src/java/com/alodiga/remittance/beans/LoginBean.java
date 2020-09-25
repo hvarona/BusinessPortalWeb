@@ -8,8 +8,8 @@ import com.portal.business.commons.exceptions.NullParameterException;
 import com.portal.business.commons.exceptions.RegisterNotFoundException;
 import com.portal.business.commons.models.Business;
 import com.portal.business.commons.models.Operator;
-import com.portal.business.commons.models.Profile;
-import com.portal.business.commons.models.User;
+import com.portal.business.commons.models.BPProfile;
+import com.portal.business.commons.models.BPUser;
 import com.portal.business.commons.utils.Encoder;
 import java.io.IOException;
 import java.io.Serializable;
@@ -38,9 +38,9 @@ public class LoginBean extends GenericController implements Serializable {
     private static final long serialVersionUID = 1L;
     private String uname;
     private String password;
-    private User userSession;
+    private BPUser userSession;
     private Map<String, String> profiles = null;
-    private Profile profile;
+    private BPProfile profile;
     private UserData userData = null;
 
     private String locale;
@@ -69,11 +69,11 @@ public class LoginBean extends GenericController implements Serializable {
         this.uname = uname;
     }
 
-    public User getUserSession() {
+    public BPUser getUserSession() {
         return userSession;
     }
 
-    public void setUserSession(User userSession) {
+    public void setUserSession(BPUser userSession) {
         this.userSession = userSession;
     }
 
@@ -100,8 +100,8 @@ public class LoginBean extends GenericController implements Serializable {
         }
         profiles = new TreeMap<String, String>();
         try {
-            List<Profile> profile1 = userData.getProfiles();
-            for (Profile prof : profile1) {
+            List<BPProfile> profile1 = userData.getProfiles();
+            for (BPProfile prof : profile1) {
                 profiles.put(prof.getProfileDataByLanguageId(languageId).getAlias(), prof.getId().toString());
             }
         } catch (EmptyListException | GeneralException ex) {
@@ -114,11 +114,11 @@ public class LoginBean extends GenericController implements Serializable {
         this.profiles = profiles;
     }
 
-    public Profile getProfile() {
+    public BPProfile getProfile() {
         return profile;
     }
 
-    public void setProfile(Profile profile) {
+    public void setProfile(BPProfile profile) {
         this.profile = profile;
     }
 
@@ -148,7 +148,7 @@ public class LoginBean extends GenericController implements Serializable {
         } else {
             UserData ud = new UserData();
 
-            User user;
+            BPUser user;
             try {
                 user = ud.loadUserByLogin(uname, Encoder.MD5(password));
                 HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
@@ -194,7 +194,7 @@ public class LoginBean extends GenericController implements Serializable {
     }
 
     public void rechargeDashboard(AjaxBehaviorEvent event) {
-        Profile p = (Profile) ((UIOutput) event.getSource()).getValue();
+        BPProfile p = (BPProfile) ((UIOutput) event.getSource()).getValue();
         HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
         HttpSession session = request.getSession(false);
         session.setAttribute("profile", p);

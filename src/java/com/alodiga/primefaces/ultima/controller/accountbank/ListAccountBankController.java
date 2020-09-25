@@ -9,7 +9,7 @@ import com.portal.business.commons.exceptions.NullParameterException;
 import com.portal.business.commons.generic.WsRequest;
 import com.portal.business.commons.models.AccountBank;
 import com.portal.business.commons.models.AccountTypeBank;
-import com.portal.business.commons.models.Bank;
+import com.portal.business.commons.models.BPBank;
 import com.portal.business.commons.models.StatusAccountBank;
 import com.portal.business.commons.models.Store;
 import java.io.IOException;
@@ -45,7 +45,7 @@ public class ListAccountBankController implements Serializable {
     private List<AccountBank> filteredAccountBank;
 
     private Map<String, String> banks = null;
-    private Bank bank = null;
+    private BPBank bank = null;
     private Map<String, String> accountTypeBanks = null;
     private AccountTypeBank accountTypeBank = null;
     private Map<String, String> statusAccountBanks = null;
@@ -102,11 +102,11 @@ public class ListAccountBankController implements Serializable {
         this.filteredAccountBank = filteredAccountBank;
     }
 
-    public Bank getBank() {
+    public BPBank getBank() {
         return bank;
     }
 
-    public void setBank(Bank bank) {
+    public void setBank(BPBank bank) {
         this.bank = bank;
     }
 
@@ -131,8 +131,8 @@ public class ListAccountBankController implements Serializable {
             banks = new TreeMap();
             try {
                 WsRequest request = new WsRequest();
-                List<Bank> list = accountBankData.getBanks(request);
-                for (Bank b : list) {
+                List<BPBank> list = accountBankData.getBanks(request);
+                for (BPBank b : list) {
                     banks.put(b.getName(), String.valueOf(b.getId()));
                 }
             } catch (GeneralException ex) {

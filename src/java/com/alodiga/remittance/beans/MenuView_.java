@@ -2,10 +2,10 @@ package com.alodiga.remittance.beans;
 
 import com.alodiga.remittance.parent.GenericController;
 import com.portal.business.commons.managers.PermissionManager;
-import com.portal.business.commons.models.Permission;
-import com.portal.business.commons.models.PermissionGroup;
-import com.portal.business.commons.models.Profile;
-import com.portal.business.commons.models.User;
+import com.portal.business.commons.models.BPPermission;
+import com.portal.business.commons.models.BPPermissionGroup;
+import com.portal.business.commons.models.BPProfile;
+import com.portal.business.commons.models.BPUser;
 import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
@@ -26,15 +26,15 @@ public class MenuView_ extends GenericController {
 
     private MenuModel model;
     private Long languageId = 2L;
-    private Profile profile;
+    private BPProfile profile;
 
     @PostConstruct
     public void init() {
         HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
         HttpSession session = request.getSession(false);
-        User user = new User();
-        user = (User) session.getAttribute("user");
-        profile = (Profile) session.getAttribute("profile");
+        BPUser user = new BPUser();
+        user = (BPUser) session.getAttribute("user");
+        profile = (BPProfile) session.getAttribute("profile");
         String locale = (String) session.getAttribute("languaje");
         if (locale == null) {
             locale = FacesContext.getCurrentInstance().getViewRoot().getLocale().getLanguage();
@@ -53,12 +53,12 @@ public class MenuView_ extends GenericController {
         try {
             PermissionManager pm = new PermissionManager(profile);
 
-            List<PermissionGroup> permissionsGroups = pm.getPermissionGroups();
-            for (PermissionGroup pg : permissionsGroups) {
+            List<BPPermissionGroup> permissionsGroups = pm.getPermissionGroups();
+            for (BPPermissionGroup pg : permissionsGroups) {
                 DefaultSubMenu dm = new DefaultSubMenu(pg.getPermissionGroupDataByLanguageId(languageId).getAlias());
-                List<Permission> permissions = pm.getPermissionByGroupId(pg.getId());
+                List<BPPermission> permissions = pm.getPermissionByGroupId(pg.getId());
                 if (permissions != null) {
-                    for (Permission p : permissions) {
+                    for (BPPermission p : permissions) {
                         DefaultMenuItem menuItem_ = new DefaultMenuItem(p.getPermissionDataByLanguageId(languageId).getAlias());
                         menuItem_.setUrl(p.getAction());
                         menuItem_.setAjax(false);
@@ -77,11 +77,11 @@ public class MenuView_ extends GenericController {
         return model;
     }
 
-    public Profile getProfile() {
+    public BPProfile getProfile() {
         return profile;
     }
 
-    public void setProfile(Profile profile) {
+    public void setProfile(BPProfile profile) {
         this.profile = profile;
     }
 

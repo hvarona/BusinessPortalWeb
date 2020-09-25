@@ -9,7 +9,7 @@ import com.portal.business.commons.data.UtilsData;
 import com.portal.business.commons.exceptions.GeneralException;
 import com.portal.business.commons.exceptions.NullParameterException;
 import com.portal.business.commons.exceptions.RegisterNotFoundException;
-import com.portal.business.commons.models.Language;
+import com.portal.business.commons.models.BPLanguage;
 import java.io.Serializable;
 import java.util.Locale;
 import java.util.logging.Level;
@@ -32,7 +32,7 @@ public class LanguajeBean implements Serializable {
 
     private String languaje;
 
-    private Language language;
+    private BPLanguage language;
     
     @PostConstruct
     public void init(){
@@ -56,11 +56,11 @@ public class LanguajeBean implements Serializable {
         this.languaje = languaje;
     }
 
-    public Language getLanguage() {
+    public BPLanguage getLanguage() {
         return language;
     }
 
-    public void setLanguage(Language language) {
+    public void setLanguage(BPLanguage language) {
         this.language = language;
     }
 

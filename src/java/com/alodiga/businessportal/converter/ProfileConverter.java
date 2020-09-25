@@ -20,7 +20,7 @@ import com.portal.business.commons.data.UtilsData;
 import com.portal.business.commons.exceptions.GeneralException;
 import com.portal.business.commons.exceptions.NullParameterException;
 import com.portal.business.commons.exceptions.RegisterNotFoundException;
-import com.portal.business.commons.models.Profile;
+import com.portal.business.commons.models.BPProfile;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.faces.component.UIComponent;
@@ -49,8 +49,8 @@ public class ProfileConverter implements Converter {
         if (value == null || value.equals("")) {
             return "";
         } else {
-            if (value instanceof Profile) {
-                return ((Profile) value).getName();
+            if (value instanceof BPProfile) {
+                return ((BPProfile) value).getName();
             }
             return String.valueOf(value);
         }

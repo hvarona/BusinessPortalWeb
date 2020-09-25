@@ -7,7 +7,7 @@ import com.portal.business.commons.exceptions.GeneralException;
 import com.portal.business.commons.exceptions.NullParameterException;
 import com.portal.business.commons.models.AccountBank;
 import com.portal.business.commons.models.AccountTypeBank;
-import com.portal.business.commons.models.Bank;
+import com.portal.business.commons.models.BPBank;
 import com.portal.business.commons.models.Pos;
 import com.portal.business.commons.models.StatusAccountBank;
 import com.portal.business.commons.models.Store;
@@ -36,7 +36,7 @@ public class AccountBankController {
 
     private Long id;
     private String accountBankNumber;
-    private Bank bank;
+    private BPBank bank;
     private AccountTypeBank accountTypeBank;
     private StatusAccountBank statusAccountBank;
 
@@ -76,11 +76,11 @@ public class AccountBankController {
         this.accountBankNumber = accountBankNumber;
     }
 
-    public Bank getBank() {
+    public BPBank getBank() {
         return bank;
     }
 
-    public void setBank(Bank bank) {
+    public void setBank(BPBank bank) {
         this.bank = bank;
     }
 

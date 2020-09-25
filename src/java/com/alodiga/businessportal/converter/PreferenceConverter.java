@@ -4,7 +4,7 @@ import com.portal.business.commons.data.PreferenceData;
 import com.portal.business.commons.exceptions.GeneralException;
 import com.portal.business.commons.exceptions.NullParameterException;
 import com.portal.business.commons.exceptions.RegisterNotFoundException;
-import com.portal.business.commons.models.Preference;
+import com.portal.business.commons.models.BPPreference;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.faces.component.UIComponent;
@@ -21,7 +21,7 @@ public class PreferenceConverter implements Converter {
         try {
             PreferenceData preferenceData = new PreferenceData();
             Long preferenceId = Long.parseLong(submittedValue);
-            return (Preference) preferenceData.getPreference(preferenceId);
+            return (BPPreference) preferenceData.getPreference(preferenceId);
         } catch (RegisterNotFoundException | NullParameterException | GeneralException ex) {
             Logger.getLogger(PreferenceConverter.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -34,8 +34,8 @@ public class PreferenceConverter implements Converter {
             return "";
         } else {
             
-            if (value instanceof Preference) {
-                return ((Preference) value).getId().toString();
+            if (value instanceof BPPreference) {
+                return ((BPPreference) value).getId().toString();
             }
             return String.valueOf(value);
         }

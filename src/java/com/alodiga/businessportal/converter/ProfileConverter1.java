@@ -21,7 +21,7 @@ import com.portal.business.commons.exceptions.GeneralException;
 import com.portal.business.commons.exceptions.NullParameterException;
 import com.portal.business.commons.exceptions.RegisterNotFoundException;
 import com.portal.business.commons.generic.WsRequest;
-import com.portal.business.commons.models.Profile;
+import com.portal.business.commons.models.BPProfile;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.faces.component.UIComponent;
@@ -33,7 +33,7 @@ import javax.faces.convert.FacesConverter;
 public class ProfileConverter1 implements Converter {
 
     public Object getAsObject(FacesContext facesContext, UIComponent component, String submittedValue) {
-        Profile profile = null;
+        BPProfile profile = null;
         try {
             UserData userData = new UserData();
             WsRequest request = new WsRequest();
