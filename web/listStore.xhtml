@@ -3,6 +3,7 @@
                 xmlns:h="http://java.sun.com/jsf/html"
                 xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:p="http://primefaces.org/ui"
+                xmlns:pe="http://primefaces.org/ui/extensions"
                 template="/WEB-INF/template.xhtml">
 
     <ui:define name="title">#{msg.store}</ui:define>
@@ -18,6 +19,7 @@
                     <p:outputPanel>
                         <h:outputText value="#{msg.searchAllFields}" />
                         <p:inputText id="globalFilter" onkeyup="PF('storesTable').filter()" style="width:150px" placeholder="Inserte palabra clave"/>
+                        <p:button value="#{msg.clearList}" onclick="PF('storesTable').clearFilters()"/>
                     </p:outputPanel>
                 </f:facet>
 
@@ -36,7 +38,7 @@
                 <p:column filterBy="#{store.address}" headerText="#{msg.address}"  filterMatchMode="contains" style="width:30px">
                     <h:outputText value="#{store.address}" />
                 </p:column>                
-                
+
                 <p:column filterBy="#{store.enabled}" headerText="#{msg.enable}"  filterMatchMode="contains" style="width:15px">
                     <h:selectBooleanCheckbox value="#{store.enabled}">
                         <f:ajax event="change" listener="#{dtListStoreController.changeEnable(store)}" />
@@ -44,10 +46,12 @@
                 </p:column>
 
                 <p:column style="width:10px;text-align: center">
-                    <p:commandButton update=":formStore:storeDetail" oncomplete="PF('storeDialog').show()" icon="ui-icon-search" title="View">
+                    <p:commandButton update=":formStore:storeDetail" oncomplete="PF('storeDialog').show()" icon="ui-icon-search" title="#{msg.view}">
                         <f:setPropertyActionListener value="#{store}" target="#{dtListStoreController.selectedStore}" />
                     </p:commandButton>
-                    <p:commandButton id="editButton" update=":StoreEditForm" oncomplete="PF('StoreEditDialog').show()" icon="ui-icon-pencil" title="Edit">
+                </p:column>
+                <p:column style="width:10px;text-align: center">
+                    <p:commandButton id="editButton" update=":StoreEditForm" oncomplete="PF('StoreEditDialog').show()" icon="ui-icon-pencil" title="#{msg.edit  }">
                         <f:setPropertyActionListener value="#{store}" target="#{dtListStoreController.selectedStore}" />
                     </p:commandButton>
                 </p:column>
@@ -55,29 +59,36 @@
             <p:commandButton id="btnAdd" value="#{msg.add}" icon="ui-icon-add" ajax="true" action="storeView.xhtml?faces-redirect=true"/>
             <p:dialog header="#{msg.store}" widgetVar="storeDialog" modal="true" showEffect="fade" hideEffect="fade" resizable="false">
                 <p:outputPanel id="storeDetail" style="text-align:center;">
-                    <p:panelGrid  columns="4" rendered="#{not empty dtListStoreController.selectedStore}" columnClasses="label,value">
-                        <h:outputText value="#{msg.id}:" />
-                        <h:outputText value="#{dtListStoreController.selectedStore.id}" />
+                    <p:panelGrid  columns="2" rendered="#{not empty dtListStoreController.selectedStore}" columnClasses="label,value">
+                        <pe:qrCode id="viewQrCode" 
+                                   renderMethod="image" 
+                                   rendererType="normal" 
+                                   size="200" 
+                                   text="#{dtListStoreController.QRCode}"/>
+                        <p:panelGrid  columns="2" columnClasses="label,value">
+                            <h:outputText value="#{msg.id}:" />
+                            <h:outputText value="#{dtListStoreController.selectedStore.id}" />
 
-                        <h:outputText value="#{msg.storeCode}:" />
-                        <h:outputText value="#{dtListStoreController.selectedStore.storeCode}" />
+                            <h:outputText value="#{msg.storeCode}:" />
+                            <h:outputText value="#{dtListStoreController.selectedStore.storeCode}" />
 
-                        <h:outputText value="#{msg.name}" />
-                        <h:outputText value="#{dtListStoreController.selectedStore.name}" />
+                            <h:outputText value="#{msg.name}" />
+                            <h:outputText value="#{dtListStoreController.selectedStore.name}" />
 
-                        <h:outputText value="#{msg.address}" />
-                        <h:outputText value="#{dtListStoreController.selectedStore.address}" />
+                            <h:outputText value="#{msg.address}" />
+                            <h:outputText value="#{dtListStoreController.selectedStore.address}" />
 
-                        <h:outputText value="#{msg.openTime}" />
-                        <h:outputText value="#{dtListStoreController.selectedStore.openTime}" >
-                            <f:convertDateTime pattern="hh:mm aa" />
-                        </h:outputText>
+                            <h:outputText value="#{msg.openTime}" />
+                            <h:outputText value="#{dtListStoreController.selectedStore.openTime}" >
+                                <f:convertDateTime pattern="hh:mm aa" />
+                            </h:outputText>
 
-                        <h:outputText value="#{msg.closeTime}" />
-                        <h:outputText value="#{dtListStoreController.selectedStore.closeTime}" >
-                            <f:convertDateTime pattern="hh:mm aa" />
-                        </h:outputText>
+                            <h:outputText value="#{msg.closeTime}" />
+                            <h:outputText value="#{dtListStoreController.selectedStore.closeTime}" >
+                                <f:convertDateTime pattern="hh:mm aa" />
+                            </h:outputText>
 
+                        </p:panelGrid>
                     </p:panelGrid>
                 </p:outputPanel>
             </p:dialog>

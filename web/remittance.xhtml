@@ -23,10 +23,10 @@
                                     <h:outputText value="#{msg.country}" />
                                     <p:selectOneMenu value="#{remittanceController.selectedReceiverCountry}" converter="countryConverter">
                                         <f:selectItem itemLabel="#{msg.SelectOne}" itemValue="" noSelectionOption="true" />
-                                        <f:selectItems value="#{remittanceController.countries}" var="country" itemLabel="#{country.name}"/>
+                                        <f:selectItems value="#{remittanceController.remittancesCountries}" var="country" itemLabel="#{country.name}"/>
                                         <p:ajax update="@this paymentSelect deliveryFormSelect" process="@form" listener="#{remittanceController.handleReceiverCountryChange()}" />
                                     </p:selectOneMenu>
-                                    <h:outputText  id="paymentText" value="#{msg.paymentNetwork}"/>
+                                    <h:outputText  id="paymentText" value="#{msg.paymentNetwork}" />
                                     <p:selectOneMenu id="paymentSelect" value="#{remittanceController.selectedPaymentNetwork}" converter="paymentNetworkConverter" disabled="#{empty remittanceController.paymentNetworks}" >
                                         <f:selectItem itemLabel="#{msg.SelectOne}" itemValue="" noSelectionOption="true" />
                                         <f:selectItems value="#{remittanceController.paymentNetworks}" var="payment" itemLabel="#{payment.name}"/>
@@ -36,7 +36,7 @@
                                     <h:outputText id="deliveryFormText" value="#{msg.deliveryForm}" />
                                     <p:selectOneMenu id="deliveryFormSelect" value="#{remittanceController.selectedDeliveryForm}" converter="deliveryFormConverter" disabled="#{empty remittanceController.deliveryForms}" >
                                         <f:selectItem itemLabel="#{msg.SelectOne}" itemValue="" noSelectionOption="true" />
-                                        <f:selectItems value="#{remittanceController.deliveryForms}" var="delivery" itemLabel="#{delivery.name}"/>
+                                        <f:selectItems value="#{remittanceController.deliveryForms}" var="delivery" itemLabel="#{delivery.name}" />
                                         <p:ajax update="@this btnSubmit" />
                                     </p:selectOneMenu>
 
@@ -73,40 +73,40 @@
                             </p:row>
                         </f:facet>
                         <h:outputText value="#{msg.firstName}" />
-                        <h:inputText id="remFirstName" value="#{remittanceController.remittent.firstName}" />
+                        <h:inputText id="remFirstName" required="true" value="#{remittanceController.remittent.firstName}" />
 
                         <h:outputText value="#{msg.middleName}" />
-                        <h:inputText id="remMiddleName" value="#{remittanceController.remittent.middleName}" />
+                        <h:inputText id="remMiddleName" required="true" value="#{remittanceController.remittent.middleName}" />
 
                         <h:outputText value="#{msg.lastName}" />
-                        <h:inputText id="remLastName" value="#{remittanceController.remittent.lastName}" />
+                        <h:inputText id="remLastName" required="true" value="#{remittanceController.remittent.lastName}" />
 
                         <h:outputText value="#{msg.secondSurName}" />
-                        <h:inputText id="remSecondSurname" value="#{remittanceController.remittent.secondSurname}" />
+                        <h:inputText id="remSecondSurname" required="true" value="#{remittanceController.remittent.secondSurname}" />
 
                         <h:outputText value="#{msg.email}" />
-                        <h:inputText id="remEmail" value="#{remittanceController.remittent.email}" />
+                        <h:inputText id="remEmail" required="true" value="#{remittanceController.remittent.email}" />
 
                         <h:outputText value="#{msg.phone}" />
-                        <h:inputText id="remPhone" value="#{remittanceController.remittent.phoneNumber}" />
+                        <h:inputText id="remPhone" required="true" value="#{remittanceController.remittent.phoneNumber}" />
 
                         <h:outputText value="#{msg.country}" />
-                        <p:selectOneMenu value="#{remittanceController.selectedRemittentCountry}" converter="countryConverter">
+                        <p:selectOneMenu value="#{remittanceController.selectedRemittentCountry}" required="true" converter="countryConverter">
                             <f:selectItem itemLabel="#{msg.SelectOne}" itemValue="" noSelectionOption="true" />
                             <f:selectItems value="#{remittanceController.countries}" var="country" itemLabel="#{country.name}"/>
                         </p:selectOneMenu>
 
                         <h:outputText value="#{msg.state}" />
-                        <h:inputText id="remState" value="#{remittanceController.remittent.address.stateName}" />
+                        <h:inputText id="remState" value="#{remittanceController.remittent.address.stateName}" required="true" />
 
                         <h:outputText value="#{msg.city}" />
-                        <h:inputText id="remCity" value="#{remittanceController.remittent.address.cityName}" />
+                        <h:inputText id="remCity" value="#{remittanceController.remittent.address.cityName}" required="true" />
 
                         <h:outputText value="#{msg.address}" />
-                        <h:inputText id="remAddress" value="#{remittanceController.remittent.address.address}" />
+                        <h:inputText id="remAddress" value="#{remittanceController.remittent.address.address}" required="true" />
 
                         <h:outputText value="#{msg.zipcode}" />
-                        <h:inputText id="remZipcode" value="#{remittanceController.remittent.address.zipCode}" />
+                        <h:inputText id="remZipcode" value="#{remittanceController.remittent.address.zipCode}" required="true" />
 
                         <p:commandButton  value="#{msg.next}" process="dialogForm:remittanceRemittentInfo " update="dialogForm :confirmDialog" 
                                           oncomplete="PF('confirmDialog').show()" 
@@ -125,37 +125,37 @@
                             </p:row>
                         </f:facet>
                         <h:outputText value="#{msg.firstName}" />
-                        <h:inputText id="recFirstName" value="#{remittanceController.receiver.firstName}" />
+                        <h:inputText id="recFirstName" value="#{remittanceController.receiver.firstName}" required="true" />
 
                         <h:outputText value="#{msg.middleName}" />
-                        <h:inputText id="recMiddleName" value="#{remittanceController.receiver.middleName}" />
+                        <h:inputText id="recMiddleName" value="#{remittanceController.receiver.middleName}" required="true" />
 
                         <h:outputText value="#{msg.lastName}" />
-                        <h:inputText id="recLastName" value="#{remittanceController.receiver.lastName}" />
+                        <h:inputText id="recLastName" value="#{remittanceController.receiver.lastName}" required="true" />
 
                         <h:outputText value="#{msg.secondSurName}" />
-                        <h:inputText id="recSecondSurname" value="#{remittanceController.receiver.secondSurname}" />
+                        <h:inputText id="recSecondSurname" value="#{remittanceController.receiver.secondSurname}" required="true" />
 
                         <h:outputText value="#{msg.email}" />
-                        <h:inputText id="recEmail" value="#{remittanceController.receiver.email}" />
+                        <h:inputText id="recEmail" value="#{remittanceController.receiver.email}" required="true" />
 
                         <h:outputText value="#{msg.phone}" />
-                        <h:inputText id="recPhone" value="#{remittanceController.receiver.phoneNumber}" />
+                        <h:inputText id="recPhone" value="#{remittanceController.receiver.phoneNumber}" required="true" />
 
                         <h:outputText value="#{msg.country}" />
                         <h:outputText id="recCountry" value="#{remittanceController.selectedReceiverCountry.name}" />
 
                         <h:outputText value="#{msg.state}" />
-                        <h:inputText id="recState" value="#{remittanceController.receiver.address.stateName}" />
+                        <h:inputText id="recState" value="#{remittanceController.receiver.address.stateName}" required="true" />
 
                         <h:outputText value="#{msg.city}" />
-                        <h:inputText id="recCity" value="#{remittanceController.receiver.address.cityName}" />
+                        <h:inputText id="recCity" value="#{remittanceController.receiver.address.cityName}" required="true" />
 
                         <h:outputText value="#{msg.address}" />
-                        <h:inputText id="recAddress" value="#{remittanceController.receiver.address.address}" />
+                        <h:inputText id="recAddress" value="#{remittanceController.receiver.address.address}" required="true" />
 
                         <h:outputText value="#{msg.zipcode}" />
-                        <h:inputText id="recZipcode" value="#{remittanceController.receiver.address.zipCode}" />
+                        <h:inputText id="recZipcode" value="#{remittanceController.receiver.address.zipCode}" required="true" />
 
                         <p:commandButton  value="#{msg.next}" process="dialogForm:remittanceReceiverInfo " update="dialogForm :confirmDialog" 
                                           oncomplete="PF('confirmDialog').show()" 

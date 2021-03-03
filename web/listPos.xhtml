@@ -9,7 +9,7 @@
     <ui:define name="title">#{msg.pos}</ui:define>
 
     <ui:define name="content">
-        
+
         <h:form id="formPos">
             <p:dataTable var="pos" value="#{dtListPosController.posList}" widgetVar="posTable"
                          emptyMessage="#{msg.posNotFound}" filteredValue="#{dtListPosController.filteredPos}" paginator="true" rows="10" style="margin-bottom:20px"
@@ -20,6 +20,7 @@
                     <p:outputPanel>
                         <h:outputText value="#{msg.searchAllFields}:" />
                         <p:inputText id="globalFilter" onkeyup="PF('posTable').filter()" style="width:150px" placeholder="#{msg.tag}"/>
+                        <p:button value="#{msg.clearList}" onclick="PF('posTable').clearFilters()"/>
                     </p:outputPanel>
                 </f:facet>
 
@@ -38,7 +39,7 @@
                 <p:column headerText="#{msg.posSchedule}"  filterMatchMode="contains" style="width:30px">
                     <h:outputText value="#{pos.openTimeString} #{msg.to} #{pos.closeTimeString}" />
                 </p:column>
-                
+
                 <p:column filterBy="#{pos.enabled}" headerText="#{msg.enable}"  filterMatchMode="contains" style="width:15px">
                     <h:selectBooleanCheckbox value="#{pos.enabled}">
                         <f:ajax event="change" listener="#{dtListPosController.changeEnable(pos)}" />
@@ -46,11 +47,12 @@
                 </p:column>
 
                 <p:column style="width:10px;text-align: center">
-                    <p:commandButton update=":formPos:posDetail" oncomplete="PF('posDialog').show()" icon="ui-icon-search" title="View">
+                    <p:commandButton update=":formPos:posDetail" oncomplete="PF('posDialog').show()" icon="ui-icon-search" title="#{msg.view}">
                         <f:setPropertyActionListener value="#{pos}" target="#{dtListPosController.selectedPos}" />
                     </p:commandButton>
-
-                    <p:commandButton id="editButton" update=":PosEditForm" oncomplete="PF('PosEditDialog').show()" icon="ui-icon-pencil" title="Edit">
+                </p:column>
+                <p:column style="width:10px;text-align: center">
+                    <p:commandButton id="editButton" update=":PosEditForm" oncomplete="PF('PosEditDialog').show()" icon="ui-icon-pencil" title="#{msg.edit}">
                         <f:setPropertyActionListener value="#{pos}" target="#{dtListPosController.selectedPos}" />
                     </p:commandButton>
                 </p:column>
@@ -59,6 +61,11 @@
             <p:dialog header="#{msg.pos}" widgetVar="posDialog" modal="true" showEffect="fade" hideEffect="fade" resizable="false">
                 <p:outputPanel id="posDetail" style="text-align:center;">
                     <p:panelGrid columns="2" rendered="#{not empty dtListPosController.selectedPos}" columnClasses="info,qr">
+                        <pe:qrCode id="viewQrCode" 
+                                   renderMethod="image" 
+                                   rendererType="normal" 
+                                   size="200" 
+                                   text="#{dtListPosController.selectedPos.qrText}"/>
                         <p:panelGrid  columns="2" columnClasses="label,value">
                             <h:outputText value="Id:" />
 
@@ -81,11 +88,6 @@
                             <h:outputText value="#{dtListPosController.selectedPos.closeTimeString}"/>
 
                         </p:panelGrid>
-                        <pe:qrCode id="qrCode" 
-                                   renderMethod="image" 
-                                   rendererType="normal" 
-                                   size="200" 
-                                   text="#{dtListPosController.selectedPos.qrText}"/>
                     </p:panelGrid>
                 </p:outputPanel>
             </p:dialog>

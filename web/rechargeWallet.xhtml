@@ -17,7 +17,7 @@
                             <div align="center">
                                 <h1>#{msg.rechargeWalletTitle}</h1>
                                 <f:facet name="header">
-                                    <p:messages id="messages"  autoUpdate="true" closable="true" />
+                                    <p:messages id="messages"  closable="true" />
                                 </f:facet>
                                 <p:panelGrid id="cardInfoGrid" columns="2" >
                                     <h:outputText value="#{msg.rechargeWalletUserEmailOrPhone}" />
@@ -64,12 +64,7 @@
                         <h:outputText value="#{msg.rechargeWalletRechargeAmount}" />
                         <p:inputNumber id="amountToRecharge" value="#{rechargeController.rechargeAmount}" />
 
-                        <h:outputText value="#{msg.rechargeWalletProduct}" />
-                        <p:selectOneMenu id="productSelection" value="#{rechargeController.selectedProduct}" converter="productConverter" >
-                            <f:selectItems value="#{rechargeController.activateProducts}" var="prod" itemLabel="#{prod.name}" />
-                        </p:selectOneMenu>
-
-                        <p:commandButton  value="#{msg.accept}" process="dialogForm:productSelection dialogForm:amountToRecharge dialogForm:includeFee @this" update="@form" 
+                        <p:commandButton  value="#{msg.accept}" process="dialogForm:amountToRecharge dialogForm:includeFee @this" update=":confirmDialog :dialogForm" 
                                           oncomplete="PF('confirmDialog').show()" 
                                           id="btnAcceptRecharge" icon="ui-icon-send" 
                                           action="#{rechargeController.verifyRecharge()}" />
@@ -93,9 +88,6 @@
                         <h:outputText value="#{msg.accountNumber}" />
                         <h:outputText value="#{rechargeController.accountNumber}" />
 
-                        <h:outputText value="#{msg.rechargeWalletProduct}" />
-                        <h:outputText value="#{rechargeController.selectedProduct.name}" />
-
                         <h:outputText value="#{msg.rechargeWalletRechargeAmount}" />
                         <h:outputText value="#{rechargeController.rechargeAmount}" />
 
@@ -110,10 +102,10 @@
                     </p:panelGrid>
                 </p:panel>
                 <p:panel id="finalDetail" style="text-align:center;" rendered="#{not rechargeController.hasError and rechargeController.phase eq 3}">
-                    <p:panelGrid columns="2">
-                        <f:facet name="header">
-                            <p:messages id="messages"  autoUpdate="false" closable="false" />
-                        </f:facet>
+                    <f:facet name="header">
+                        <p:messages id="messages"  autoUpdate="false" closable="false" />
+                    </f:facet>
+                    <p:panelGrid columns="2" id="pageToPrint">
                         <h:outputText value="#{msg.firstName}" />
                         <h:outputText value="#{rechargeController.firstName}" />
 
@@ -129,9 +121,6 @@
                         <h:outputText value="#{msg.accountNumber}" />
                         <h:outputText value="#{rechargeController.accountNumber}" />
 
-                        <h:outputText value="#{msg.rechargeWalletProduct}" />
-                        <h:outputText value="#{rechargeController.selectedProduct.name}" />
-
                         <h:outputText value="#{msg.rechargeWalletRechargeAmount}" />
                         <h:outputText value="#{rechargeController.rechargeAmount}" />
 
@@ -143,9 +132,12 @@
 
                         <h:outputText value="#{msg.rechargeWalletTransaction}" />
                         <h:outputText value="#{rechargeController.transactionId}" />
-
+                    </p:panelGrid>
+                    <p:panelGrid columns="2">
                         <p:commandButton  value="#{msg.accept}" update=":confirmDialog :cardForm" oncomplete="PF('confirmDialog').hide()" id="btnAccepLast" icon="ui-icon-check" actionListener="#{rechargeController.reset()}"/>
-                        <p:commandButton  value="#{msg.print}" update=":confirmDialog :cardForm" oncomplete="PF('confirmDialog').hide()" id="btnPrint" icon="ui-icon-print" actionListener="#{rechargeController.reset()}" />
+                        <p:commandButton  value="#{msg.print}" id="btnPrint" icon="ui-icon-print" >
+                            <p:printer target="pageToPrint" />
+                        </p:commandButton>
                     </p:panelGrid>
                 </p:panel>
                 <p:panel id="errorDetail" style="text-align:center;" rendered="#{rechargeController.hasError}">

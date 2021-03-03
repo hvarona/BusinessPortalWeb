@@ -3,13 +3,12 @@ package com.alodiga.primefaces.ultima.controller.report;
 import com.alodiga.remittance.beans.LanguajeBean;
 import com.alodiga.remittance.beans.LoginBean;
 import com.portal.business.commons.data.BusinessData;
+import com.portal.business.commons.enumeration.BPTransactionStatus;
 import com.portal.business.commons.enumeration.OperationType;
 import com.portal.business.commons.exceptions.EmptyListException;
 import com.portal.business.commons.exceptions.GeneralException;
 import com.portal.business.commons.models.BusinessTransaction;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -43,6 +42,10 @@ public class TransactionReportController {
 
     private BusinessData businessData;
 
+    private BusinessTransaction selectedTransaction;
+
+    private String reportSingleId;
+
     @ManagedProperty(value = "#{loginBean}")
     private LoginBean loginBean;
 
@@ -59,8 +62,12 @@ public class TransactionReportController {
             msg = ResourceBundle.getBundle("com.alodiga.remittance.messages.message", Locale.forLanguageTag(lenguajeBean.getLanguaje()));
         }
         businessData = new BusinessData();
-        operationTypes = Arrays.asList(OperationType.values());
-
+        operationTypes = new ArrayList();
+        for (OperationType operationType : OperationType.values()) {
+            if (!operationType.equals(OperationType.WITHDRAW)) {
+                operationTypes.add(operationType);
+            }
+        }
     }
 
     public Date getStartDate() {
@@ -123,6 +130,31 @@ public class TransactionReportController {
         this.lenguajeBean = lenguajeBean;
     }
 
+    public String getOperationTypeName(OperationType operationType) {
+        return msg.getString("OperationType." + operationType.toString());
+
+    }
+
+    public String getOperationStatus(BPTransactionStatus status) {
+        return msg.getString("TransactionStatus." + status.getCode());
+    }
+
+    public BusinessTransaction getSelectedTransaction() {
+        return selectedTransaction;
+    }
+
+    public void setSelectedTransaction(BusinessTransaction selectedTransaction) {
+        this.selectedTransaction = selectedTransaction;
+    }
+
+    public String getReportSingleId() {
+        return reportSingleId;
+    }
+
+    public void setReportSingleId(String reportSingleId) {
+        this.reportSingleId = reportSingleId;
+    }
+
     public void doReport() {
         try {
             resultList = businessData.getBusinessTransactions(loginBean.getCurrentBusiness(), startDate, endDate, selectedOperationType);
@@ -130,6 +162,16 @@ public class TransactionReportController {
             resultList = new ArrayList();
         } catch (GeneralException ex) {
             Logger.getLogger(TransactionReportController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    public void doSingleReport() {
+        try {
+            resultList = new ArrayList();
+            resultList.add(businessData.getBusinessTranasction(loginBean.getCurrentBusiness(), reportSingleId));
+
+        } catch (GeneralException ex) {
+            Logger.getLogger(SellReportController.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 

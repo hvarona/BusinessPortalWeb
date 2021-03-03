@@ -18,6 +18,7 @@
                     <p:outputPanel>
                         <h:outputText value="#{msg.searchAllFields}:" />
                         <p:inputText id="globalFilter" onkeyup="PF('operatorTable').filter()" style="width:150px" placeholder="#{msg.tag}"/>
+                        <p:button value="#{msg.clearList}" onclick="PF('operatorTable').clearFilters()"/>
                     </p:outputPanel>
                 </f:facet>
 
@@ -50,6 +51,8 @@
                     <p:commandButton update=":formOperator:operatorDetail" oncomplete="PF('operatorDialog').show()" icon="ui-icon-search" title="#{msg.view}">
                         <f:setPropertyActionListener value="#{operator}" target="#{bpListOperatorController.selectedOperator}" />
                     </p:commandButton>
+                </p:column>
+                <p:column style="width:10px;text-align: center">
                     <p:commandButton id="editButton" update=":OperatorEditForm" oncomplete="PF('OperatorEditDialog').show()" icon="ui-icon-pencil" title="#{msg.edit}">
                         <f:setPropertyActionListener value="#{operator}" target="#{bpListOperatorController.selectedOperator}" />
                     </p:commandButton>
@@ -90,6 +93,14 @@
                         <h:outputText value="#{msg.profile}" />
 
                         <h:outputText value="#{bpListOperatorController.selectedOperator.profile.name}"/>
+
+                        <h:outputText value="#{msg.store}" rendered="#{bpListOperatorController.selectedOperator.store != null}"/>
+
+                        <h:outputText value="#{bpListOperatorController.selectedOperator.store.name}" rendered="#{bpListOperatorController.selectedOperator.store != null}"/>
+
+                        <h:outputText value="#{msg.pos}" rendered="#{bpListOperatorController.selectedOperator.pos != null}" />
+
+                        <h:outputText value="#{bpListOperatorController.selectedOperator.pos.posCode}" rendered="#{bpListOperatorController.selectedOperator.pos != null}"/>
 
                     </p:panelGrid>
                 </p:outputPanel>

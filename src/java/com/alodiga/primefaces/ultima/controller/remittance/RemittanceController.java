@@ -42,6 +42,8 @@ public class RemittanceController {
     private RemittanceCountry selectedReceiverCountry;
     private List<RemittanceCountry> countries;
 
+    private List<RemittanceCountry> remittancesCountries;
+
     private RemittanceState selectedRemittentState;
     private RemittanceState selectedReceiverState;
     private List<RemittanceState> states;
@@ -113,6 +115,7 @@ public class RemittanceController {
             }
             phase = 0;
             countries = new ArrayList();
+            remittancesCountries = new ArrayList();
             states = new ArrayList();
             cities = new ArrayList();
             deliveryForms = new ArrayList();
@@ -134,6 +137,32 @@ public class RemittanceController {
                         country.setName(wsCountry.getName());
                         country.setShortName(wsCountry.getShortName());
                         countries.add(country);
+                        try {
+                            WsPaymentNetworkService pnResponse = remittenceProxy.getPaymentNetworkByCountryId(token, Long.toString(wsCountry.getId()));
+
+                            switch (pnResponse.getCode()) {
+                                case "0": {
+                                    if (pnResponse.getPaymentNetworks().length > 0) {
+                                        for (com.alodiga.ws.remittance.services.PaymentNetwork pn : pnResponse.getPaymentNetworks()) {
+                                            WsDeliveryFormsReponse dfResponse = remittenceProxy.getDeliveryFormByPamentNetwork(token, Long.toString(pn.getId()));
+                                            switch (dfResponse.getCode()) {
+                                                case "0": {
+                                                    remittancesCountries.add(country);
+                                                }
+                                                break;
+                                                default:
+                                                    System.out.println("pnResponse " + pnResponse.getCode());
+                                            }
+                                        }
+                                    }
+                                }
+                                break;
+                                default:
+                                    System.out.println("pnResponse " + pnResponse.getCode());
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
                     }
                 }
                 break;
@@ -152,7 +181,10 @@ public class RemittanceController {
             WsLoginResponse loginResponse = remittenceProxy.loginWS("alodiga", "d6f80e647631bb4522392aff53370502");
             if (loginResponse.getCode().equals("0")) {
                 token = loginResponse.getToken();
-            }
+                System.out.println("Remittance Token " + token);
+            } 
+                
+            
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -224,6 +256,14 @@ public class RemittanceController {
 
     public List<RemittanceCountry> getCountries() {
         return countries;
+    }
+
+    public List<RemittanceCountry> getRemittancesCountries() {
+        return remittancesCountries;
+    }
+
+    public void setRemittancesCountries(List<RemittanceCountry> remittancesCountries) {
+        this.remittancesCountries = remittancesCountries;
     }
 
     public RemittanceState getSelectedRemittentState() {

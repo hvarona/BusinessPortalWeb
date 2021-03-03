@@ -39,13 +39,13 @@ public class UtilBean {
     private ChartSeries salesSeries;
     long lastWeeksSales = 0;
 
-    private BarChartModel rechargesChart = null;
-    private ChartSeries rechargesSeries;
-    long lastWeeksRecharges = 0;
+    private BarChartModel walletRechargesChart = null;
+    private ChartSeries walletRechargesSeries;
+    long lastWeeksWalletRecharges = 0;
 
-    private BarChartModel withdrawChart = null;
-    private ChartSeries withdrawSeries;
-    long lastWeeksWithdraws = 0;
+    private BarChartModel cardRechargesChart = null;
+    private ChartSeries cardRechargesSeries;
+    long lastWeeksCardRecharges = 0;
 
     private final BusinessSellData sellData = new BusinessSellData();
     private final BusinessData businessData = new BusinessData();
@@ -103,17 +103,16 @@ public class UtilBean {
 
         Axis xAxis = salesChart.getAxis(AxisType.X);
         xAxis.setLabel(msg.getString("week"));
-        
 
         Axis yAxis = salesChart.getAxis(AxisType.Y);
         yAxis.setLabel(msg.getString("sells"));
     }
 
-    private void loadRechargeChart() {
-        rechargesChart = new BarChartModel();
+    private void loadWalletRechargeChart() {
+        walletRechargesChart = new BarChartModel();
 
-        rechargesSeries = new ChartSeries();
-        rechargesSeries.setLabel(msg.getString("recharges"));
+        walletRechargesSeries = new ChartSeries();
+        walletRechargesSeries.setLabel(msg.getString("walletRecharges"));
         Calendar cal = Calendar.getInstance();
         Date endDate = cal.getTime();
         cal.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
@@ -123,31 +122,31 @@ public class UtilBean {
         cal.set(Calendar.MILLISECOND, 0);
         Date startDate = cal.getTime();
 
-        rechargesSeries.set(1, getWeekRecharges(startDate, endDate));
+        walletRechargesSeries.set(1, getWeekWalletRecharges(startDate, endDate));
 
         for (int i = 1; i < MAX_WEEEKS + 1; i++) {
             endDate = cal.getTime();
             cal.setTimeInMillis(cal.getTimeInMillis() - (7 * 24 * 60 * 60000));
             startDate = cal.getTime();
-            rechargesSeries.set(i, getWeekRecharges(startDate, endDate));
+            walletRechargesSeries.set(i, getWeekWalletRecharges(startDate, endDate));
         }
 
-        rechargesChart.addSeries(rechargesSeries);
-        rechargesChart.setTitle("Bar Chart");
-        rechargesChart.setLegendPosition("ne");
+        walletRechargesChart.addSeries(walletRechargesSeries);
+        walletRechargesChart.setTitle("Bar Chart");
+        walletRechargesChart.setLegendPosition("ne");
 
-        Axis xAxis = rechargesChart.getAxis(AxisType.X);
+        Axis xAxis = walletRechargesChart.getAxis(AxisType.X);
         xAxis.setLabel(msg.getString("week"));
 
-        Axis yAxis = rechargesChart.getAxis(AxisType.Y);
-        yAxis.setLabel(msg.getString("recharges"));
+        Axis yAxis = walletRechargesChart.getAxis(AxisType.Y);
+        yAxis.setLabel(msg.getString("walletRecharges"));
     }
 
-    private void loadWithdrawChart() {
-        withdrawChart = new BarChartModel();
+    private void loadCardRechargesChart() {
+        cardRechargesChart = new BarChartModel();
 
-        withdrawSeries = new ChartSeries();
-        withdrawSeries.setLabel(msg.getString("withdraws"));
+        cardRechargesSeries = new ChartSeries();
+        cardRechargesSeries.setLabel(msg.getString("cardRecharges"));
         Calendar cal = Calendar.getInstance();
         Date endDate = cal.getTime();
         cal.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
@@ -157,80 +156,51 @@ public class UtilBean {
         cal.set(Calendar.MILLISECOND, 0);
         Date startDate = cal.getTime();
 
-        withdrawSeries.set(1, getWeekWithdraws(startDate, endDate));
+        cardRechargesSeries.set(1, getWeekCardRecharges(startDate, endDate));
 
         for (int i = 1; i < MAX_WEEEKS + 1; i++) {
             endDate = cal.getTime();
             cal.setTimeInMillis(cal.getTimeInMillis() - (7 * 24 * 60 * 60000));
             startDate = cal.getTime();
-            withdrawSeries.set(i, getWeekWithdraws(startDate, endDate));
+            cardRechargesSeries.set(i, getWeekCardRecharges(startDate, endDate));
         }
 
-        withdrawChart.addSeries(withdrawSeries);
-        withdrawChart.setTitle("Bar Chart");
-        withdrawChart.setLegendPosition("ne");
+        cardRechargesChart.addSeries(cardRechargesSeries);
+        cardRechargesChart.setTitle("Bar Chart");
+        cardRechargesChart.setLegendPosition("ne");
 
-        Axis xAxis = withdrawChart.getAxis(AxisType.X);
+        Axis xAxis = cardRechargesChart.getAxis(AxisType.X);
         xAxis.setLabel(msg.getString("week"));
         
 
-        Axis yAxis = withdrawChart.getAxis(AxisType.Y);
-        yAxis.setLabel(msg.getString("withdraws"));
+        Axis yAxis = cardRechargesChart.getAxis(AxisType.Y);
+        yAxis.setLabel(msg.getString("cardRecharges"));
     }
 
     public BarChartModel getSalesChart() {
         if (salesChart == null) {
             loadSellChart();
         }
-
-        /*Calendar cal = Calendar.getInstance();
-        cal.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
-        cal.set(Calendar.HOUR, 0);
-        cal.set(Calendar.MINUTE, 0);
-        cal.set(Calendar.SECOND, 0);
-        cal.set(Calendar.MILLISECOND, 1);
-        Date startDate = cal.getTime();
-
-        salesSeries.set(1, getWeekSales(startDate, new Date()));*/
         salesSeries.set(1, lastWeeksSales);
 
         return salesChart;
     }
 
-    public BarChartModel getRechargesChart() {
-        if (rechargesChart == null) {
-            loadRechargeChart();
+    public BarChartModel getWalletRechargesChart() {
+        if (walletRechargesChart == null) {
+            loadWalletRechargeChart();
         }
-        /*Calendar cal = Calendar.getInstance();
-        cal.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
-        cal.set(Calendar.HOUR, 0);
-        cal.set(Calendar.MINUTE, 0);
-        cal.set(Calendar.SECOND, 0);
-        cal.set(Calendar.MILLISECOND, 1);
-        Date startDate = cal.getTime();
+        walletRechargesSeries.set(1, lastWeeksWalletRecharges);
 
-        rechargesSeries.set(1, getWeekRecharges(startDate, new Date()));*/
-        rechargesSeries.set(1, lastWeeksRecharges);
-
-        return rechargesChart;
+        return walletRechargesChart;
     }
 
-    public BarChartModel getWithdrawsChart() {
-        if (withdrawChart == null) {
-            loadWithdrawChart();
+    public BarChartModel getCardRechargesChart() {
+        if (cardRechargesChart == null) {
+            loadCardRechargesChart();
         }
-        /*Calendar cal = Calendar.getInstance();
-        cal.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
-        cal.set(Calendar.HOUR, 0);
-        cal.set(Calendar.MINUTE, 0);
-        cal.set(Calendar.SECOND, 0);
-        cal.set(Calendar.MILLISECOND, 1);
-        Date startDate = cal.getTime();
-
-        withdrawSeries.set(1, getWeekWithdraws(startDate, new Date()));*/
-        withdrawSeries.set(1, lastWeeksWithdraws);
-
-        return withdrawChart;
+        cardRechargesSeries.set(1, lastWeeksCardRecharges);
+        return cardRechargesChart;
     }
 
     public long getWeekSales() {
@@ -246,7 +216,7 @@ public class UtilBean {
         return lastWeeksSales;
     }
 
-    public long getWeekRecharges() {
+    public long getWeekWalletRecharges() {
         Calendar cal = Calendar.getInstance();
         cal.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
         cal.set(Calendar.HOUR, 0);
@@ -255,11 +225,11 @@ public class UtilBean {
         cal.set(Calendar.MILLISECOND, 1);
         Date startDate = cal.getTime();
 
-        lastWeeksRecharges = getWeekRecharges(startDate, new Date());
-        return lastWeeksRecharges;
+        lastWeeksWalletRecharges = getWeekWalletRecharges(startDate, new Date());
+        return lastWeeksWalletRecharges;
     }
 
-    public long getWeekWithdraws() {
+    public long getWeekCardRecharges() {
         Calendar cal = Calendar.getInstance();
         cal.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
         cal.set(Calendar.HOUR, 0);
@@ -268,8 +238,8 @@ public class UtilBean {
         cal.set(Calendar.MILLISECOND, 1);
         Date startDate = cal.getTime();
 
-        lastWeeksWithdraws = getWeekWithdraws(startDate, new Date());
-        return lastWeeksWithdraws;
+        lastWeeksCardRecharges = getWeekCardRecharges(startDate, new Date());
+        return lastWeeksCardRecharges;
     }
 
     private long getWeekSales(Date start, Date end) {
@@ -282,7 +252,7 @@ public class UtilBean {
         return 0;
     }
 
-    private long getWeekRecharges(Date start, Date end) {
+    private long getWeekWalletRecharges(Date start, Date end) {
         //return (long) (Math.random() * 100);
         try {
             return businessData.getBusinessTransactionsNumber(loginBean.getCurrentBusiness(), start, end, OperationType.RECHARGE);
@@ -292,10 +262,10 @@ public class UtilBean {
         return 0;
     }
 
-    private long getWeekWithdraws(Date start, Date end) {
+    private long getWeekCardRecharges(Date start, Date end) {
         //return (long) (Math.random() * 100);
         try {
-            return businessData.getBusinessTransactionsNumber(loginBean.getCurrentBusiness(), start, end, OperationType.WITHDRAW);
+            return businessData.getBusinessTransactionsNumber(loginBean.getCurrentBusiness(), start, end, OperationType.CARD_RECHARGE);
         } catch (GeneralException ex) {
             ex.printStackTrace();
         }

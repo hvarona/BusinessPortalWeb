@@ -1,7 +1,13 @@
 package com.alodiga.remittance.beans;
 
 import com.alodiga.remittance.parent.GenericController;
+import com.alodiga.wallet.ws.APIAlodigaWalletProxy;
+import com.alodiga.wallet.ws.BalanceHistoryResponse;
+import com.alodiga.wallet.ws.Product;
+import com.alodiga.wallet.ws.ProductListResponse;
+import com.portal.business.commons.data.PreferencesData;
 import com.portal.business.commons.data.UserData;
+import com.portal.business.commons.enumeration.BusinessServiceType;
 import com.portal.business.commons.exceptions.EmptyListException;
 import com.portal.business.commons.exceptions.GeneralException;
 import com.portal.business.commons.exceptions.NullParameterException;
@@ -10,11 +16,16 @@ import com.portal.business.commons.models.Business;
 import com.portal.business.commons.models.Operator;
 import com.portal.business.commons.models.BPProfile;
 import com.portal.business.commons.models.BPUser;
+import com.portal.business.commons.models.ResponseCode;
+import com.portal.business.commons.models.TransactionCommissionResponse;
 import com.portal.business.commons.utils.Encoder;
 import java.io.IOException;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
+import java.rmi.RemoteException;
 import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -43,14 +54,21 @@ public class LoginBean extends GenericController implements Serializable {
     private BPProfile profile;
     private UserData userData = null;
 
+    private float discountRate = 0;
+
     private String locale;
 
     private float businessPercentFee = 1;
+
+    private Product businessProduct;
+
+    private Map<BusinessServiceType, TransactionCommissionResponse> comissions = new HashMap();
 
     @PostConstruct
     public void init() {
         userData = new UserData();
         locale = "es";
+
     }
 
     public String getPassword() {
@@ -83,6 +101,14 @@ public class LoginBean extends GenericController implements Serializable {
 
     public void setBusinessPercentFee(float businessPercentFee) {
         this.businessPercentFee = businessPercentFee;
+    }
+
+    public float getDiscountRate() {
+        return discountRate;
+    }
+
+    public void setDiscountRate(float discountRate) {
+        this.discountRate = discountRate;
     }
 
     public Map<String, String> getProfiles() {
@@ -157,6 +183,48 @@ public class LoginBean extends GenericController implements Serializable {
                 session.setAttribute("profile", user.getProfile());
                 profile = user.getProfile();
                 userSession = user;
+
+                APIAlodigaWalletProxy alodigaWS = new APIAlodigaWalletProxy();
+                ProductListResponse response;
+                try {
+                    response = alodigaWS.getProductsByBusinessId(Long.toString(this.getCurrentBusiness().getId()));
+                    switch (response.getCodigoRespuesta()) {
+                        case "00":
+                            if (response.getProducts().length <= 0) {
+                                Logger.getLogger(LoginBean.class.getName()).log(Level.SEVERE, "Business sin producto businessId {0}", this.getCurrentBusiness().getId());
+                            } else {
+                                if (response.getProducts().length > 1) {
+                                    Logger.getLogger(LoginBean.class.getName()).log(Level.SEVERE, "Business con mas de un producto businessId {0}", this.getCurrentBusiness().getId());
+                                }
+                                this.businessProduct = response.getProducts(0);
+                                PreferencesData preferencesData = new PreferencesData();
+                                for (BusinessServiceType type : BusinessServiceType.values()) {
+                                    switch (type) {
+                                        case RECHARGE:
+                                        case REMITTANCE: {
+                                            TransactionCommissionResponse commission = preferencesData.getCommission(this.getCurrentBusiness(), type, this.businessProduct.getId());
+                                            comissions.put(type, commission);
+                                            break;
+                                        }
+                                        case WITHDRAW:
+                                            break;
+                                        default: {
+                                            TransactionCommissionResponse commission = preferencesData.getCommission(this.getCurrentBusiness(), type, 3L);
+                                            comissions.put(type, commission);
+                                            break;
+                                        }
+                                    }
+                                }
+                                
+                            }
+                            break;
+                        default:
+                            break;
+                    }
+                } catch (RemoteException ex) {
+                    Logger.getLogger(LoginBean.class.getName()).log(Level.SEVERE, null, ex);
+                }
+
                 return "dashboard.xhtml?faces-redirect=true";
             } catch (RegisterNotFoundException ex) {
                 FacesContext.getCurrentInstance().addMessage(
@@ -206,6 +274,10 @@ public class LoginBean extends GenericController implements Serializable {
         }
     }
 
+    public Product getBusinessProduct() {
+        return businessProduct;
+    }
+
     public Business getCurrentBusiness() {
         if (this.userSession instanceof Business) {
             return (Business) this.userSession;
@@ -213,5 +285,13 @@ public class LoginBean extends GenericController implements Serializable {
             return ((Operator) this.userSession).getCommerce();
         }
         return null;
+    }
+
+    public Map<BusinessServiceType, TransactionCommissionResponse> getComissions() {
+        return comissions;
+    }
+
+    public TransactionCommissionResponse getComission(BusinessServiceType type) {
+        return comissions.get(type);
     }
 }

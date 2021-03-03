@@ -12,6 +12,7 @@ import com.portal.business.commons.data.CardPreRequestData;
 import com.portal.business.commons.exceptions.GeneralException;
 import com.portal.business.commons.exceptions.NullParameterException;
 import com.portal.business.commons.models.CardPreRequest;
+import com.portal.business.commons.utils.SendMailService;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -232,7 +233,8 @@ public class RequestController {
     }
 
     private void sendMail(CardPreRequest cardPreRequest) {
-        StringBuilder body = new StringBuilder();
+        SendMailService.sendCardPreRequestMail(cardPreRequest.getEmail(), cardPreRequest.getFirstName() + " " + cardPreRequest.getLastName(), msg.getLocale());
+        /*StringBuilder body = new StringBuilder();
         body.append("<!DOCTYPE html PUBLIC '-//W3C//DTD XHTML 1.0 Transitional//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd'><html xmlns='http://www.w3.org/1999/xhtml'><head><meta http-equiv='Content-Type' content='text/html; charset=UTF-8'/><style type='text/css'>.Estilo11 {font:13px/0.6em Arial,Helvetica,sans-serif,lighter;color: #333333;font-size:13px;font-weight:bold;}.Estilo12{font:13px/0.6em Arial,Helvetica,sans-serif,lighter;color: #666;font-size:13px;}.EstiloColumn {background-color: #555555;color:#FFBF00;font:12px/1.8em Arial,Helvetica,sans-serif,lighter;font-weight:bold;padding-left:10px}.style1{font:13px/0.6em Arial,Helvetica,sans-serif,lighter;color: #666;font-size:13px;}.style2{background-color: #07b49c;color:#ffff;font:16px/1.8em Arial,Helvetica,sans-serif,lighter;font-weight:bold;padding-left:10px'}</style></head><body><div align='center'><table width='756' border='0'><tr><th width='750'<p><img src='http://sales.alodiga.com/images/img-alodiga-logo.png' align='left' width='114' height='90' longdesc='Logo alodiga' /></p></th></tr></table><table  width='730' border='0' ><tr><th width='728' height='20' align='right' bgcolor='#283593' style='color:#FFFF;font:16px/1.8em Arial,Helvetica,sans-serif,lighter;'> </th></tr><tr><th width='728' height='5' bgcolor='#232323'></th></tr></table><table width='728' border='0'><tr><th width='728'><p align='left' class='Estilo11'><br/>&iexcl;");
         body.append(msg.getString("cardrequest.email.greetings")).append(" ").append(cardPreRequest.getFirstName()).append(" ").append(cardPreRequest.getLastName());
         body.append("&nbsp;! <br/></p></th></tr><tr><th><p align='left' style='font: 16px/1.8em Arial,Helvetica,sans-serif,lighter ; color: #666; font-weight:bold; display: table;  margin: 0; padding:0;' >");
@@ -255,7 +257,7 @@ public class RequestController {
             proxy.sendMail(msg.getString("cardrequest.email.subject"), body.toString(), cardPreRequest.getEmail(), FROM_EMAIL);
         } catch (RemoteException ex) {
             ex.printStackTrace();
-        }
+        }*/
     }
 
     private void sendSms(CardPreRequest cardPreRequest) {

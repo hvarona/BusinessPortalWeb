@@ -20,10 +20,8 @@
                                     <p:messages id="messages"  autoUpdate="true" closable="true" />
                                 </f:facet>
                                 <p:panelGrid id="cardInfoGrid" columns="2" >
-                                    <h:outputText value="#{msg.enterCardNumber}" />
-                                    <p:inputText value="#{rechargeCardController.cardNumber}" >
-                                        <p:ajax event="change" update="@form"/>
-                                    </p:inputText>
+                                    <h:outputText value="#{msg.insertUserEmail}" />
+                                    <p:inputText id="cardNumber" value="#{rechargeCardController.userEmail}" />
 
                                 </p:panelGrid>
                                 <h:inputHidden id="timezone" value="#{rechargeCardController.timezone}"/>
@@ -36,7 +34,7 @@
 
                             <div align="center">
                                 <p:panelGrid  columns="1" >
-                                    <p:commandButton  value="#{msg.checkStatusCard}" update="@form,:dialogForm" oncomplete="PF('confirmDialog').show()" id="btnSubmit" icon="ui-icon-search" actionListener="#{rechargeCardController.searchCard()}" />
+                                    <p:commandButton  value="#{msg.checkStatusCard}" update="@form,:dialogForm" process="@this cardNumber timezone" oncomplete="PF('confirmDialog').show()" id="btnSubmit" icon="ui-icon-search" actionListener="#{rechargeCardController.searchCard()}" />
                                 </p:panelGrid>
                             </div>
 
@@ -49,11 +47,17 @@
             <h:form id="dialogForm" >
                 <p:panel id="amountDetail" style="text-align:center;" rendered="#{not rechargeCardController.hasError and rechargeCardController.phase eq 1}">
                     <p:panelGrid columns="2">
-                        <h:outputText value="#{msg.cardNumber}" />
-                        <h:outputText value="#{rechargeCardController.cardNumber}" />
+                        <h:outputText value="#{msg.cardAlias}" />
+                        <h:outputText value="#{rechargeCardController.cardInfo.aliasCard}" />
 
-                        <h:outputText value="#{msg.accountNumber}:" />
-                        <h:outputText value="#{rechargeCardController.cardInfo.accountNumber}" />
+                        <h:outputText value="#{msg.cardName}" />
+                        <h:outputText value="#{rechargeCardController.cardInfo.name}" />
+
+                        <h:outputText value="#{msg.cardEmail}" />
+                        <h:outputText value="#{rechargeCardController.cardInfo.email}" />
+
+                        <h:outputText value="#{msg.cardPhone}" />
+                        <h:outputText value="#{rechargeCardController.cardInfo.numberPhone}" />
 
                         <h:outputText value="#{msg.rechargeWalletIncludeFee}" />
                         <p:selectBooleanCheckbox  id="includeFee" value="#{rechargeCardController.includeFees}" />
@@ -70,11 +74,17 @@
                 </p:panel>
                 <p:panel id="confirmDetail" style="text-align:center;" rendered="#{not rechargeCardController.hasError and rechargeCardController.phase eq 2}">
                     <p:panelGrid columns="2">
-                        <h:outputText value="#{msg.cardNumber}" />
-                        <h:outputText value="#{rechargeCardController.cardNumber}" />
+                        <h:outputText value="#{msg.cardAlias}" />
+                        <h:outputText value="#{rechargeCardController.cardInfo.aliasCard}" />
 
-                        <h:outputText value="#{msg.accountNumber}:" />
-                        <h:outputText value="#{rechargeCardController.cardInfo.accountNumber}" />
+                        <h:outputText value="#{msg.cardName}" />
+                        <h:outputText value="#{rechargeCardController.cardInfo.name}" />
+
+                        <h:outputText value="#{msg.cardEmail}" />
+                        <h:outputText value="#{rechargeCardController.cardInfo.email}" />
+
+                        <h:outputText value="#{msg.cardPhone}" />
+                        <h:outputText value="#{rechargeCardController.cardInfo.numberPhone}" />
 
                         <h:outputText value="#{msg.rechargeWalletRechargeAmount}" />
                         <h:outputText value="#{rechargeCardController.rechargeAmount}" />
@@ -94,11 +104,17 @@
                         <f:facet name="header">
                             <p:messages id="messages"  autoUpdate="false" closable="false" />
                         </f:facet>
-                        <h:outputText value="#{msg.cardNumber}" />
-                        <h:outputText value="#{rechargeCardController.cardNumber}" />
+                        <h:outputText value="#{msg.cardAlias}" />
+                        <h:outputText value="#{rechargeCardController.cardInfo.aliasCard}" />
 
-                        <h:outputText value="#{msg.accountNumber}:" />
-                        <h:outputText value="#{rechargeCardController.cardInfo.accountNumber}" />
+                        <h:outputText value="#{msg.cardName}" />
+                        <h:outputText value="#{rechargeCardController.cardInfo.name}" />
+
+                        <h:outputText value="#{msg.cardEmail}" />
+                        <h:outputText value="#{rechargeCardController.cardInfo.email}" />
+
+                        <h:outputText value="#{msg.cardPhone}" />
+                        <h:outputText value="#{rechargeCardController.cardInfo.numberPhone}" />
 
                         <h:outputText value="#{msg.rechargeWalletRechargeAmount}" />
                         <h:outputText value="#{rechargeCardController.rechargeAmount}" />

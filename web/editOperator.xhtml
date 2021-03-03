@@ -28,10 +28,12 @@
                             <p:inputText id="lastName" value="#{bpListOperatorController.selectedOperator.lastName}" title="#{msg.lastName}" required="true"/>
 
                             <p:outputLabel value="#{msg.email}" for="email" />
-                            <p:inputText id="email" value="#{bpListOperatorController.selectedOperator.email}" title="#{msg.email}" required="true"/>
+                            <p:inputText id="email" value="#{bpListOperatorController.selectedOperator.email}" title="#{msg.email}" required="true">
+                                <f:validateRegex pattern="^[_A-Za-z0-9-\+]+(\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\.[A-Za-z0-9]+)*(\.[A-Za-z]{2,})$" />
+                            </p:inputText>
 
                             <p:outputLabel value="#{msg.phone}" for="phone" />
-                            <p:inputText id="phone" value="#{bpListOperatorController.selectedOperator.phoneNumber}" title="#{msg.phone}" />
+                            <p:inputMask autocomplete="false" id="phone" value="#{bpListOperatorController.selectedOperator.phoneNumber}" title="#{msg.phone}" mask="+999 (999)999-9999" required="true" />
 
                             <p:outputLabel value="#{msg.receiveNotification}" for="receiveNotification" />
                             <p:selectBooleanCheckbox id="receiveNotification" value="#{bpListOperatorController.selectedOperator.receiveNotification}"/>
@@ -53,14 +55,14 @@
                             </p:selectOneMenu> 
 
                             <p:outputLabel value="#{msg.store}" for="store"  rendered="#{not empty bpListOperatorController.stores}"/>
-                            <p:selectOneMenu id="store" value="#{bpListOperatorController.selectedStore}" converter="storeConverter" rendered="#{not empty bpListOperatorController.stores}" >
+                            <p:selectOneMenu id="store" value="#{bpListOperatorController.selectedStore}" converter="storeConverter" disabled="#{empty bpListOperatorController.stores}" >
                                 <f:selectItem itemLabel="#{msg.unasignedStore}" itemValue="#{null}" />
                                 <f:selectItems value="#{bpListOperatorController.stores}"/>
-                                <f:ajax event="change" render="@form"/>
+                                <f:ajax event="change" render="store pos"/>
                             </p:selectOneMenu> 
 
-                            <p:outputLabel value="#{msg.pos}" for="pos" rendered="#{not empty bpListOperatorController.posList}" />
-                            <p:selectOneMenu id="pos" value="#{bpListOperatorController.selectPos}" converter="posConverter" rendered="#{not empty bpListOperatorController.posList}" >
+                            <p:outputLabel value="#{msg.pos}" for="pos" />
+                            <p:selectOneMenu id="pos" value="#{bpListOperatorController.selectPos}" converter="posConverter" disabled="#{empty bpListOperatorController.posList}" >
                                 <f:selectItem itemLabel="#{msg.unasignedPos}" itemValue="#{null}" />
                                 <f:selectItems value="#{bpListOperatorController.posList}" var="pos" itemLabel="#{pos.posCode}"/>
                             </p:selectOneMenu> 

@@ -1,6 +1,6 @@
 package com.alodiga.businessportal.converter;
 
-import com.alodiga.primefaces.ultima.controller.wallet.rechargeController.Product;
+import com.alodiga.wallet.ws.Product;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.faces.component.UIComponent;

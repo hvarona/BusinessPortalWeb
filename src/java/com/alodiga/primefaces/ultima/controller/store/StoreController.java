@@ -6,6 +6,7 @@ import com.portal.business.commons.data.StoreData;
 import com.portal.business.commons.exceptions.GeneralException;
 import com.portal.business.commons.exceptions.NullParameterException;
 import com.portal.business.commons.models.Store;
+import com.portal.business.commons.utils.AlodigaCryptographyUtils;
 import java.io.IOException;
 import java.time.Instant;
 import java.util.Date;
@@ -122,7 +123,6 @@ public class StoreController {
 
             storeData.saveStore(store);
 
-
             FacesContext.getCurrentInstance().getExternalContext().getFlash().setKeepMessages(true);
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(msg.getString("storeCreated")));
             FacesContext.getCurrentInstance().getExternalContext().redirect("listStore.xhtml");
@@ -156,5 +156,15 @@ public class StoreController {
         } catch (IOException ex) {
             System.out.println("com.alodiga.primefaces.ultima.controller.StoreController.doRediret()");
         }
+    }
+
+    public String getQRCode() {
+        try {
+            String toEncrypt = loginBean.getCurrentBusiness().getCode() + ";" + this.storeCode;
+            return AlodigaCryptographyUtils.encrypt(toEncrypt, "1nt3r4xt3l3ph0ny");
+        } catch (Exception ex) {
+            Logger.getLogger(ListStoreController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return "";
     }
 }

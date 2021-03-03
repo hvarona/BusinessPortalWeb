@@ -2,18 +2,20 @@ package com.alodiga.primefaces.ultima.controller.accountbank;
 
 import com.alodiga.remittance.beans.LanguajeBean;
 import com.alodiga.remittance.beans.LoginBean;
-import com.portal.business.commons.data.AccountBankData;
-import com.portal.business.commons.exceptions.EmptyListException;
-import com.portal.business.commons.exceptions.GeneralException;
-import com.portal.business.commons.exceptions.NullParameterException;
-import com.portal.business.commons.generic.WsRequest;
-import com.portal.business.commons.models.AccountBank;
-import com.portal.business.commons.models.AccountTypeBank;
-import com.portal.business.commons.models.BPBank;
-import com.portal.business.commons.models.StatusAccountBank;
-import com.portal.business.commons.models.Store;
+import com.alodiga.wallet.common.ejb.BusinessPortalEJB;
+import com.alodiga.wallet.common.exception.EmptyListException;
+import com.alodiga.wallet.common.exception.GeneralException;
+import com.alodiga.wallet.common.exception.NullParameterException;
+import com.alodiga.wallet.common.genericEJB.EJBRequest;
+import com.alodiga.wallet.common.model.AccountBank;
+import com.alodiga.wallet.common.model.AccountTypeBank;
+import com.alodiga.wallet.common.model.Bank;
+import com.alodiga.wallet.common.model.StatusAccountBank;
+import com.alodiga.wallet.common.utils.EJBServiceLocator;
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -39,13 +41,11 @@ public class ListAccountBankController implements Serializable {
 
     private AccountBank selectedAccountBank;
 
-    private AccountBankData accountBankData = null;
-
     private List<AccountBank> accountBanks;
     private List<AccountBank> filteredAccountBank;
 
     private Map<String, String> banks = null;
-    private BPBank bank = null;
+    private Bank bank = null;
     private Map<String, String> accountTypeBanks = null;
     private AccountTypeBank accountTypeBank = null;
     private Map<String, String> statusAccountBanks = null;
@@ -59,6 +59,8 @@ public class ListAccountBankController implements Serializable {
     @ManagedProperty(value = "#{languajeBean}")
     private LanguajeBean lenguajeBean;
 
+    private BusinessPortalEJB proxy;
+
     @PostConstruct
     public void init() {
         if (lenguajeBean == null || lenguajeBean.getLanguaje() == null || lenguajeBean.getLanguaje().isEmpty()) {
@@ -66,15 +68,20 @@ public class ListAccountBankController implements Serializable {
         } else {
             msg = ResourceBundle.getBundle("com.alodiga.remittance.messages.message", Locale.forLanguageTag(lenguajeBean.getLanguaje()));
         }
+        proxy = (BusinessPortalEJB) EJBServiceLocator.getInstance().get(com.alodiga.wallet.common.utils.EjbConstants.BUSINESS_PORTAL_EJB);
         try {
-            accountBankData = new AccountBankData();
-            //posList = posData.getPosList(loginBean.getCurrentBusiness());
-            accountBanks = accountBankData.getAccountBankByCommerce(loginBean.getCurrentBusiness());
-        } catch (GeneralException ex) {
+            EJBRequest request = new EJBRequest();
+            Map<String, Object> params = new HashMap();
+            params.put("businessId", loginBean.getCurrentBusiness().getId());
+            request.setParams(params);
+            accountBanks = proxy.getAccountBanksByBusiness(loginBean.getCurrentBusiness().getId());
+            proxy = (BusinessPortalEJB) EJBServiceLocator.getInstance().get(com.alodiga.wallet.common.utils.EjbConstants.BUSINESS_PORTAL_EJB);
+        } catch (GeneralException | NullParameterException ex) {
             Logger.getLogger(ListAccountBankController.class.getName()).log(Level.SEVERE, null, ex);
         } catch (EmptyListException ignored) {
-
+            accountBanks = new ArrayList();
         }
+
     }
 
     public AccountBank getSelectedAccountBank() {
@@ -84,7 +91,6 @@ public class ListAccountBankController implements Serializable {
     public void setSelectedAccountBank(AccountBank selectedAccountBank) {
         this.selectedAccountBank = selectedAccountBank;
     }
-
 
     public List<AccountBank> getAccountBanks() {
         return accountBanks;
@@ -102,11 +108,11 @@ public class ListAccountBankController implements Serializable {
         this.filteredAccountBank = filteredAccountBank;
     }
 
-    public BPBank getBank() {
+    public Bank getBank() {
         return bank;
     }
 
-    public void setBank(BPBank bank) {
+    public void setBank(Bank bank) {
         this.bank = bank;
     }
 
@@ -127,12 +133,11 @@ public class ListAccountBankController implements Serializable {
     }
 
     public Map<String, String> getBanks() {
-         if (banks == null) {
+        if (banks == null) {
             banks = new TreeMap();
             try {
-                WsRequest request = new WsRequest();
-                List<BPBank> list = accountBankData.getBanks(request);
-                for (BPBank b : list) {
+                List<Bank> list = proxy.getBanks(new EJBRequest());
+                for (Bank b : list) {
                     banks.put(b.getName(), String.valueOf(b.getId()));
                 }
             } catch (GeneralException ex) {
@@ -141,7 +146,7 @@ public class ListAccountBankController implements Serializable {
 
             } catch (NullParameterException ignored) {
 
-            } 
+            }
         }
         return banks;
     }
@@ -151,19 +156,16 @@ public class ListAccountBankController implements Serializable {
     }
 
     public Map<String, String> getAccountTypeBanks() {
-       if (accountTypeBanks == null) {
+        if (accountTypeBanks == null) {
             accountTypeBanks = new TreeMap();
             try {
-                WsRequest request = new WsRequest();
-                List<AccountTypeBank> list = accountBankData.getAccountTypeBanks(request);
+                List<AccountTypeBank> list = proxy.getAccountTypeBanks(new EJBRequest());
                 for (AccountTypeBank a : list) {
                     accountTypeBanks.put(a.getDescription(), a.getId().toString());
                 }
             } catch (GeneralException ex) {
                 Logger.getLogger(ListAccountBankController.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (EmptyListException ignored) {
-
-            } catch (NullParameterException ignored) {
+            } catch (EmptyListException | NullParameterException ignored) {
 
             }
         }
@@ -175,11 +177,10 @@ public class ListAccountBankController implements Serializable {
     }
 
     public Map<String, String> getStatusAccountBanks() {
-         if (statusAccountBanks == null) {
+        if (statusAccountBanks == null) {
             statusAccountBanks = new TreeMap();
             try {
-                WsRequest request = new WsRequest();
-                List<StatusAccountBank> list = accountBankData.getStatusAccountBanks(request);
+                List<StatusAccountBank> list = proxy.getStatusAccountBanks(new EJBRequest());
                 for (StatusAccountBank s : list) {
                     statusAccountBanks.put(s.getDescription(), s.getId().toString());
                 }
@@ -198,10 +199,6 @@ public class ListAccountBankController implements Serializable {
         this.statusAccountBanks = statusAccountBanks;
     }
 
-
-
-   
-
     public void setLoginBean(LoginBean loginBean) {
         this.loginBean = loginBean;
     }
@@ -210,8 +207,6 @@ public class ListAccountBankController implements Serializable {
         this.lenguajeBean = lenguajeBean;
     }
 
-   
-
     public void handleReturnDialog(SelectEvent event) {
         if (event != null && event.getObject() != null) {
         }
@@ -219,7 +214,7 @@ public class ListAccountBankController implements Serializable {
 
     public void doRediret() {
         try {
-            FacesContext.getCurrentInstance().getExternalContext().redirect("createPos.xhtml");
+            FacesContext.getCurrentInstance().getExternalContext().redirect("createAccountBank.xhtml");
         } catch (IOException ex) {
             System.out.println("com.alodiga.primefaces.ultima.controller.ListAccountBankController.doRediret()");
         }
@@ -231,7 +226,7 @@ public class ListAccountBankController implements Serializable {
             if (selectedAccountBank.getId() != null) {
                 accountBank = selectedAccountBank;
             }
-            accountBankData.saveAccountBank(accountBank);
+            proxy.saveAccountBank(accountBank);
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(msg.getString("accountBankSaveSuccesfull")));
         } catch (GeneralException | NullParameterException ex) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!", "Error General"));

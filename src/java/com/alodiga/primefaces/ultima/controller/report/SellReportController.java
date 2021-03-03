@@ -6,12 +6,14 @@ import com.portal.business.commons.data.BusinessData;
 import com.portal.business.commons.data.BusinessSellData;
 import com.portal.business.commons.data.PosData;
 import com.portal.business.commons.data.StoreData;
+import com.portal.business.commons.enumeration.BPTransactionStatus;
 import com.portal.business.commons.exceptions.EmptyListException;
 import com.portal.business.commons.exceptions.GeneralException;
 import com.portal.business.commons.exceptions.NullParameterException;
 import com.portal.business.commons.models.BusinessSell;
 import com.portal.business.commons.models.Pos;
 import com.portal.business.commons.models.Store;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -47,7 +49,11 @@ public class SellReportController {
 
     private Pos selectedPos = null;
 
+    private String reportSingleId;
+
     private BusinessSellData businessSellData;
+
+    private BusinessSell selectedSell;
 
     @ManagedProperty(value = "#{loginBean}")
     private LoginBean loginBean;
@@ -134,6 +140,29 @@ public class SellReportController {
         this.lenguajeBean = lenguajeBean;
     }
 
+    public BusinessSell getSelectedSell() {
+        return selectedSell;
+    }
+
+    public void setSelectedSell(BusinessSell selectedSell) {
+        this.selectedSell = selectedSell;
+    }
+
+    public String getReportSingleId() {
+        return reportSingleId;
+    }
+
+    public void setReportSingleId(String reportSingleId) {
+        this.reportSingleId = reportSingleId;
+    }
+
+    public String getOperationStatus(BPTransactionStatus status) {
+        if (!msg.containsKey("TransactionStatus." + status.getCode())) {
+            return status.getCode();
+        }
+        return msg.getString("TransactionStatus." + status.getCode());
+    }
+
     public void doReport() {
         try {
             if (selectedPos != null) {
@@ -143,6 +172,16 @@ public class SellReportController {
             } else {
                 resultList = businessSellData.getBusinessSales(loginBean.getCurrentBusiness(), startDate, endDate);
             }
+
+        } catch (GeneralException ex) {
+            Logger.getLogger(SellReportController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    public void doSingleReport() {
+        try {
+            resultList = new ArrayList();
+            resultList.add(businessSellData.getBusinessSell(loginBean.getCurrentBusiness(), reportSingleId));
 
         } catch (GeneralException ex) {
             Logger.getLogger(SellReportController.class.getName()).log(Level.SEVERE, null, ex);

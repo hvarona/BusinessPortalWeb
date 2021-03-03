@@ -100,7 +100,7 @@ public class ListOperatorController implements Serializable {
     public void setSelectedOperator(Operator selectedOperator) {
         this.selectedOperator = selectedOperator;
         getPermissions();
-        this.selectedStore = selectedOperator.getStore();
+        setSelectedStore(selectedOperator.getStore());
         this.selectPos = selectedOperator.getPos();
     }
 

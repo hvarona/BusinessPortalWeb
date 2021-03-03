@@ -2,37 +2,36 @@
 <persistence version="1.0" xmlns="http://java.sun.com/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/persistence  http://java.sun.com/xml/ns/persistence/persistence_1_0.xsd">
     <persistence-unit name="BusinessPortalWebPu" transaction-type="JTA">
         <jta-data-source>jdbc/businessPortal</jta-data-source>
-        <class>com.portal.business.commons.models.PermissionGroupData</class>
-        <class>com.portal.business.commons.models.PreferenceField</class>
-        <class>com.portal.business.commons.models.PreferenceType</class>
-        <class>com.portal.business.commons.models.Profile</class>
-        <class>com.portal.business.commons.models.PermissionGroup</class>
-        <class>com.portal.business.commons.models.PreferenceValue</class>
-        <class>com.portal.business.commons.models.IpAddress</class>
-        <class>com.portal.business.commons.models.ParameterType</class>
-        <class>com.portal.business.commons.models.Preference</class>
-        <class>com.portal.business.commons.models.ProfileData</class>
-        <class>com.portal.business.commons.models.Permission</class>
-        <class>com.portal.business.commons.models.PermissionData</class>
-        <class>com.portal.business.commons.models.PermissionHasProfile</class>
+        <class>com.portal.business.commons.models.BPPermissionGroupData</class>
+        <class>com.portal.business.commons.models.BPPreferenceField</class>
+        <class>com.portal.business.commons.models.BPPreferenceType</class>
+        <class>com.portal.business.commons.models.BPProfile</class>
+        <class>com.portal.business.commons.models.BPPermissionGroup</class>
+        <class>com.portal.business.commons.models.BPPreferenceValue</class>
+        <class>com.portal.business.commons.models.BPPreference</class>
+        <class>com.portal.business.commons.models.BPProfileData</class>
+        <class>com.portal.business.commons.models.BPPermission</class>
+        <class>com.portal.business.commons.models.BPPermissionData</class>
+        <class>com.portal.business.commons.models.BPPermissionHasProfile</class>
         <class>com.portal.business.commons.models.Store</class>
-        <class>com.portal.business.commons.models.ReportType</class>
-        <class>com.portal.business.commons.models.Language</class>
-        <class>com.portal.business.commons.models.IpBlackList</class>
-        <class>com.portal.business.commons.models.User</class>
+        <class>com.portal.business.commons.models.BPLanguage</class>
+        <class>com.portal.business.commons.models.BPUser</class>
         <class>com.portal.business.commons.models.Pos</class>
         <class>com.portal.business.commons.models.Operator</class>
         <class>com.portal.business.commons.models.Business</class>
         <class>com.portal.business.commons.models.BusinessStatus</class>
-        <class>com.portal.business.commons.models.PreferenceFieldData</class>
-        <class>com.portal.business.commons.models.UserCardTransactionLog</class>
+        <class>com.portal.business.commons.models.BPPreferenceFieldData</class>
         <class>com.portal.business.commons.models.UserCardTransactionLog</class>
         <class>com.portal.business.commons.models.BusinessBalanceIncoming</class>
         <class>com.portal.business.commons.models.BusinessBalanceOutgoing</class>
         <class>com.portal.business.commons.models.BusinessSell</class>
         <class>com.portal.business.commons.models.BusinessClose</class>
-        <class>com.portal.business.commons.models.Register</class>
         <class>com.portal.business.commons.models.CardPreRequest</class>
+        <class>com.portal.business.commons.models.AccountTypeBank</class>
+        <class>com.portal.business.commons.models.BPBank</class>
+        <class>com.portal.business.commons.models.Country</class>
+        <class>com.portal.business.commons.models.BPStatusAccountBank</class>
+        <class>com.portal.business.commons.models.BPAccountBank</class>
         <exclude-unlisted-classes>true</exclude-unlisted-classes>
         <properties>
             <property name="eclipselink.logging.timestamp" value="true"/>

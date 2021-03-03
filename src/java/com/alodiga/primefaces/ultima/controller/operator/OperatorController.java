@@ -234,6 +234,10 @@ public class OperatorController {
 
     public void save() {
         try {
+            if (operatorData.getOperatorByLogin(login) != null) {
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!", msg.getString("error.operatorLoginExist")));
+                return;
+            }
             Operator operator = new Operator();
             operator.setFirstName(firstName);
             operator.setLastName(lastName);
@@ -270,12 +274,17 @@ public class OperatorController {
                 operator.setStore(selectedStore);
             }
             operatorData.saveOperator(operator);
+            //FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(msg.getString("operatorSaveSuccesfull")));
+            FacesContext.getCurrentInstance().getExternalContext().getFlash().setKeepMessages(true);
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(msg.getString("operatorSaveSuccesfull")));
+            FacesContext.getCurrentInstance().getExternalContext().redirect("listOperator.xhtml");
         } catch (NullParameterException ex) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!", "Faltan parametros"));
         } catch (GeneralException ex) {
             ex.printStackTrace();
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!", "Error General"));
+        } catch (IOException ex) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!", "Error Redirección"));
         }
     }
 

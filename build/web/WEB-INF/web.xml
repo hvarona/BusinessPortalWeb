@@ -98,4 +98,9 @@
         <servlet-class>com.portal.business.commons.startup.Startup</servlet-class>
         <load-on-startup>1</load-on-startup>
     </servlet>
+    
+    <context-param>
+        <param-name>primefaces.MOVE_SCRIPTS_TO_BOTTOM</param-name>
+        <param-value>true</param-value>
+    </context-param>
 </web-app>

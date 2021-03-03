@@ -47,8 +47,23 @@
             <p:dataTable id="resultList" var="close" rendered="#{businessCloseReportController.resultList != null}" 
                          value="#{businessCloseReportController.resultList}" emptyMessage="#{msg.reportTransactionEmptyResult}" 
                          filteredValue="#{businessCloseReportController.filterList}" paginator="true" rows="10" style="margin-bottom:20px"
-                         paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}" 
+                         paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink} {Exporters}" 
                          rowsPerPageTemplate="5,10,15" >
+
+                <f:facet name="{Exporters}">
+                    <div style="float:right;padding-top: 5px;">
+                        <h:commandLink>
+                            <p:graphicImage name="/demo/images/excel.png" width="24"/>
+                            <p:dataExporter type="xls" target="resultList" fileName="report" />
+                        </h:commandLink>
+
+                        <h:commandLink>
+                            <p:graphicImage name="/demo/images/csv.png" width="24"/>
+                            <p:dataExporter type="csv" target="resultList" fileName="report" />
+                        </h:commandLink>
+
+                    </div>
+                </f:facet>
                 <p:column filterBy="#{close.id}" headerText="#{msg.id}"  filterMatchMode="contains" style="width:15px">
                     <h:outputText value="#{close.id}" />
                 </p:column>
@@ -60,19 +75,19 @@
                 <p:column filterBy="#{close.status}" headerText="#{msg.status}"  filterMatchMode="contains" style="width:15px">
                     <h:outputText value="#{close.status}" />
                 </p:column>
-                
+
                 <p:column filterBy="#{businessCloseReportController.getTransactionTotal(close)}" headerText="#{msg.closeTransactionTotal}"  filterMatchMode="contains" style="width:15px">
                     <h:outputText value="#{businessCloseReportController.getTransactionTotal(close)}" />
                 </p:column>
-                
+
                 <p:column filterBy="#{businessCloseReportController.getCommisionTotal(close)}" headerText="#{msg.closeComission}"  filterMatchMode="contains" style="width:15px">
                     <h:outputText value="#{businessCloseReportController.getCommisionTotal(close)}" />
                 </p:column>
-                
+
                 <p:column filterBy="#{businessCloseReportController.getSellTotal(close)}" headerText="#{msg.closeSellTotal}"  filterMatchMode="contains" style="width:15px">
                     <h:outputText value="#{businessCloseReportController.getSellTotal(close)}" />
                 </p:column>
-                
+
                 <p:column filterBy="#{businessCloseReportController.getSellAmountTotal(close)}" headerText="#{msg.sellAmount}"  filterMatchMode="contains" style="width:15px">
                     <h:outputText value="#{businessCloseReportController.getSellAmountTotal(close)}" />
                 </p:column>
@@ -84,7 +99,7 @@
             </p:dataTable>
         </h:form>
     </ui:define>
-    
+
     <ui:include src="businessCloseDetail.xhtml"/>
 
 </ui:composition>

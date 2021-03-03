@@ -15,6 +15,7 @@ import com.portal.business.commons.cms.CmsCard;
 import com.portal.business.commons.cms.data.CmsData;
 import com.portal.business.commons.data.BusinessData;
 import com.portal.business.commons.data.LogData;
+import com.portal.business.commons.enumeration.BPTransactionStatus;
 import com.portal.business.commons.enumeration.OperationType;
 import com.portal.business.commons.exceptions.EmptyListException;
 import com.portal.business.commons.exceptions.GeneralException;
@@ -60,25 +61,12 @@ public class AssociatedCardController {
 
     private CmsCard selectedCard;
 
+    // Selected Card Information
     private CardInfo cardInfo;
 
     private String cardStatus;
 
     private String timezone;
-
-    private final APIAlodigaWalletProxy proxy = new APIAlodigaWalletProxy();
-
-    @ManagedProperty(value = "#{loginBean}")
-    private LoginBean loginBean;
-
-    private ResourceBundle msg;
-
-    @ManagedProperty(value = "#{languajeBean}")
-    private LanguajeBean lenguajeBean;
-
-    private CmsData cmsData;
-
-    private LogData logData;
 
     private boolean hasError = false;
 
@@ -98,8 +86,6 @@ public class AssociatedCardController {
 
     private Double rechargeAmount = new Double(0);
 
-    private static final Long CREDENTIALS_USER_ID = 379L;
-
     private boolean isRecharge = false;
 
     private boolean isConsult = false;
@@ -108,6 +94,24 @@ public class AssociatedCardController {
 
     private int rechargePhase = 0;
 
+    private ResourceBundle msg;
+
+    @ManagedProperty(value = "#{loginBean}")
+    private LoginBean loginBean;
+
+    @ManagedProperty(value = "#{languajeBean}")
+    private LanguajeBean lenguajeBean;
+
+    private static final LogData LOGDATA = new LogData();
+
+    private static final CmsData CMSDATA = new CmsData();
+
+    private static final BusinessData businessData = new BusinessData();
+
+    private final APIAlodigaWalletProxy PROXY = new APIAlodigaWalletProxy();
+
+    private static final Long CREDENTIALS_USER_ID = 379L;
+
     @PostConstruct
     public void init() {
         if (lenguajeBean == null || lenguajeBean.getLanguaje() == null || lenguajeBean.getLanguaje().isEmpty()) {
@@ -115,7 +119,6 @@ public class AssociatedCardController {
         } else {
             msg = ResourceBundle.getBundle("com.alodiga.remittance.messages.message", Locale.forLanguageTag(lenguajeBean.getLanguaje()));
         }
-        cmsData = new CmsData();
     }
 
     public void setLoginBean(LoginBean loginBean) {
@@ -242,12 +245,27 @@ public class AssociatedCardController {
         return isActivate;
     }
 
+    private void saveLog(TransactionAction action, boolean success) {
+        try {
+            UserCardTransactionLog log = new UserCardTransactionLog();
+            log.setCardNumber(selectedCard.getCardNumber());
+            log.setDateLog(new Date());
+            log.setSuccess(success);
+            log.setTransactionAction(action);
+            log.setUser(loginBean.getUserSession());
+            log.setTransactionStatus(BPTransactionStatus.COMPLETED);
+            LOGDATA.saveUserCardTransactionLog(log);
+        } catch (NullParameterException | GeneralException ex) {
+            Logger.getLogger(AssociatedCardController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
     public void searchAssociated() {
         associatedCards = null;
         parentCard = null;
 
         try {
-            parentCard = cmsData.getCardByNumber(parentCardNumber);
+            parentCard = CMSDATA.getCardByNumber(parentCardNumber);
         } catch (RegisterNotFoundException ex) {
             Logger.getLogger(AssociatedCardController.class.getName()).log(Level.SEVERE, null, ex);
             return;
@@ -259,7 +277,7 @@ public class AssociatedCardController {
             return;
         }
         try {
-            associatedCards = cmsData.getCardByCustomer(parentCard.getNaturalCustomer());
+            associatedCards = CMSDATA.getCardByCustomer(parentCard.getNaturalCustomer());
         } catch (EmptyListException ex) {
             Logger.getLogger(AssociatedCardController.class.getName()).log(Level.SEVERE, null, ex);
             associatedCards = new ArrayList();
@@ -271,7 +289,7 @@ public class AssociatedCardController {
     public void activateCard() {
         try {
             String cardEncrypted = AlodigaCryptographyUtils.aloDesencrypt(selectedCard.getCardNumber());
-            ActivateCardResponses response = proxy.activateCardbyBusiness(loginBean.getCurrentBusiness().getId(), cardEncrypted, timezone);
+            ActivateCardResponses response = PROXY.activateCardbyBusiness(loginBean.getCurrentBusiness().getId(), cardEncrypted, timezone);
             switch (response.getCodigoRespuesta()) {
                 case "00": {
                     if (response.getCredentialResponse() != null) {
@@ -309,7 +327,7 @@ public class AssociatedCardController {
         try {
 
             String cardEncrypted = AlodigaCryptographyUtils.aloDesencrypt(selectedCard.getCardNumber());
-            DesactivateCardResponses response = proxy.desactivateCardByBusiness(loginBean.getCurrentBusiness().getId(), cardEncrypted, timezone);
+            DesactivateCardResponses response = PROXY.desactivateCardByBusiness(loginBean.getCurrentBusiness().getId(), cardEncrypted, timezone);
             switch (response.getCodigoRespuesta()) {
                 case "00": {
                     if (response.getCredentialResponse() != null) {
@@ -341,12 +359,14 @@ public class AssociatedCardController {
 
     }
 
-    public void checkStatusCard() {
+    public void activatedDeactivatectCardAction() {
         try {
+            isActivate = true;
+            isConsult = false;
+            isRecharge = false;
             hasError = false;
             String cardEncrypted = AlodigaCryptographyUtils.aloDesencrypt(selectedCard.getCardNumber());
-            System.out.println("cardEncrypted " + cardEncrypted);
-            CheckStatusCardResponses statusCardResponse = proxy.checkStatusCardByBusiness(cardEncrypted, timezone);
+            CheckStatusCardResponses statusCardResponse = PROXY.checkStatusCardByBusiness(cardEncrypted, timezone);
             switch (statusCardResponse.getCodigoRespuesta()) {
                 case "00": {
                     CheckStatusCredentialCard statusCard = statusCardResponse.getCheckStatusCredentialCard();
@@ -371,7 +391,7 @@ public class AssociatedCardController {
                     hasError = true;
                     errorMessage = msg.getString("error.general") + " : " + statusCardResponse.getCodigoRespuesta();
             }
-        } catch (Exception ex) {
+        } catch (RemoteException ex) {
             Logger.getLogger(AssociatedCardController.class.getName()).log(Level.SEVERE, null, ex);
             cardStatus = null;
             hasError = true;
@@ -379,14 +399,17 @@ public class AssociatedCardController {
         }
     }
 
-    public void checkBalanceCard() {
+    public void consultCardAction() {
 
         try {
+            isActivate = false;
+            isConsult = true;
+            isRecharge = false;
             hasError = false;
             cardInfo = new CardInfo();
             cardInfo.setCardNumber(selectedCard.getCardNumber());
             String cardEncrypted = AlodigaCryptographyUtils.aloDesencrypt(selectedCard.getCardNumber());
-            CheckStatusCardResponses statusCardResponse = proxy.checkStatusCardByBusiness(cardEncrypted, timezone);
+            CheckStatusCardResponses statusCardResponse = PROXY.checkStatusCardByBusiness(cardEncrypted, timezone);
             switch (statusCardResponse.getCodigoRespuesta()) {
                 case "00": {
                     CheckStatusCredentialCard statusCard = statusCardResponse.getCheckStatusCredentialCard();
@@ -394,7 +417,7 @@ public class AssociatedCardController {
                         String accountNumber = statusCard.getAccountNumber();
                         cardInfo.setAccountNumber(accountNumber);
                         String accountEncrypted = AlodigaCryptographyUtils.aloDesencrypt(accountNumber);
-                        CheckStatusCredentialAccount statusAccount = proxy.checkStatusAccount(CREDENTIALS_USER_ID, accountEncrypted, timezone).getCheckStatusCredentialAccount();
+                        CheckStatusCredentialAccount statusAccount = PROXY.checkStatusAccount(CREDENTIALS_USER_ID, accountEncrypted, timezone).getCheckStatusCredentialAccount();
                         cardInfo.setAccountBalance(statusAccount.getAvailablePurchases());
                         cardInfo.setAccountDollarBalance(statusAccount.getDollarBalance());
                         saveLog(TransactionAction.CONSULT, true);
@@ -408,7 +431,7 @@ public class AssociatedCardController {
                     hasError = true;
                     errorMessage = msg.getString("error.general") + " : " + statusCardResponse.getCodigoRespuesta();
             }
-        } catch (Exception ex) {
+        } catch (RemoteException ex) {
             Logger.getLogger(AssociatedCardController.class.getName()).log(Level.SEVERE, null, ex);
             saveLog(TransactionAction.CONSULT, false);
             cardInfo = null;
@@ -418,22 +441,8 @@ public class AssociatedCardController {
 
     }
 
-    public void rechargeCard() {
+    public void rechargeCardAction() {
 
-    }
-
-    public void saveLog(TransactionAction action, boolean success) {
-        try {
-            UserCardTransactionLog log = new UserCardTransactionLog();
-            log.setCardNumber(selectedCard.getCardNumber());
-            log.setDateLog(new Date());
-            log.setSuccess(success);
-            log.setTransactionAction(action);
-            log.setUser(loginBean.getUserSession());
-            logData.saveUserCardTransactionLog(log);
-        } catch (NullParameterException | GeneralException ex) {
-            Logger.getLogger(AssociatedCardController.class.getName()).log(Level.SEVERE, null, ex);
-        }
     }
 
     public void verifyRecharge() {
@@ -443,7 +452,7 @@ public class AssociatedCardController {
                 businessFee = truncAmount((rechargeAmount.floatValue() * loginBean.getBusinessPercentFee()) / (100 + loginBean.getBusinessPercentFee()));
             }
             double rechargeSubmit = includeFees ? rechargeAmount - businessFee : rechargeAmount;
-            RechargeValidationResponse response = proxy.validateRechargeCard(rechargeSubmit, includeFees);
+            RechargeValidationResponse response = PROXY.validateRechargeCard(rechargeSubmit, includeFees);
             if (response != null) {
                 switch (response.getCodigoRespuesta()) {
                     case "00": {
@@ -474,27 +483,27 @@ public class AssociatedCardController {
     }
 
     public void recharge() {
-
+        BusinessBalanceIncoming log = createIncomingLog();
         try {
+            saveInProcessIncomingLog(log);
             String cardEncrypted = AlodigaCryptographyUtils.aloDesencrypt(selectedCard.getCardNumber());
-            TransactionResponse response = proxy.rechargeCard(loginBean.getCurrentBusiness().getId(), cardEncrypted, rechargeAmount, includeFees);
+            TransactionResponse response = PROXY.rechargeCard(loginBean.getCurrentBusiness().getId(), cardEncrypted, rechargeAmount, includeFees);
             if (response != null) {
                 switch (response.getCodigoRespuesta()) {
                     case "00": {
                         hasError = false;
                         transactionId = response.getResponse().getId();
                         rechargePhase = 3;
-
-                        BusinessBalanceIncoming log = new BusinessBalanceIncoming();
-                        log.setBusiness(loginBean.getCurrentBusiness());
+                        saveCompleteLog(log);
+                        /*g.setBusiness(loginBean.getCurrentBusiness());
                         log.setUser(loginBean.getUserSession());
                         log.setBusinessFee(businessFee);
                         log.setAmountWithoutFee(totalCharge - businessFee);
                         log.setTotalAmount(totalCharge);
                         log.setDateTransaction(new Date());
                         log.setTransactionId(transactionId);
-                        log.setType(OperationType.RECHARGE);
-                        BusinessData businessData = new BusinessData();
+                        log.setType(OperationType.CARD_RECHARGE);*/
+
                         businessData.saveIncomingBalance(log);
 
                         FacesContext.getCurrentInstance().addMessage(null,
@@ -502,14 +511,17 @@ public class AssociatedCardController {
                     }
                     break;
                     default:
+                        saveFailedLog(log);
                         hasError = true;
                         errorMessage = msg.getString("error.general") + " : " + response.getCodigoRespuesta();
                 }
             } else {
+                saveFailedLog(log);
                 hasError = true;
                 errorMessage = msg.getString("error.registerwsconnection");
             }
         } catch (Exception ex) {
+            saveFailedLog(log);
             Logger.getLogger(AssociatedCardController.class.getName()).log(Level.SEVERE, null, ex);
             hasError = true;
             errorMessage = msg.getString("error.registerwsconnection");
@@ -549,6 +561,61 @@ public class AssociatedCardController {
 
     public String getRechargeAmount() {
         return "";
+    }
+
+    public BusinessBalanceIncoming createIncomingLog() {
+        try {
+            BusinessBalanceIncoming log = new BusinessBalanceIncoming();
+            log.setBusiness(loginBean.getCurrentBusiness());
+            log.setUser(loginBean.getUserSession());
+            log.setBusinessFee(0);
+            log.setAmountWithoutFee(0);
+            log.setTotalAmount(0);
+            log.setDateTransaction(new Date());
+            log.setCreatedDate(new Date());
+            log.setTransactionId(-1L);
+            log.setTransactionStatus(BPTransactionStatus.CREATED);
+            log.setType(OperationType.CARD_RECHARGE);
+            return businessData.saveIncomingBalance(log);
+        } catch (NullParameterException | GeneralException ex) {
+            Logger.getLogger(AssociatedCardController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null;
+    }
+
+    public void saveInProcessIncomingLog(BusinessBalanceIncoming log) {
+        try {
+            log.setDateTransaction(new Date());
+            log.setTransactionStatus(BPTransactionStatus.IN_PROCESS);
+            businessData.saveIncomingBalance(log);
+
+        } catch (NullParameterException | GeneralException ex) {
+            Logger.getLogger(AssociatedCardController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    public void saveCompleteLog(BusinessBalanceIncoming log) {
+        try {
+            log.setBusinessFee(businessFee);
+            log.setAmountWithoutFee(totalCharge - businessFee);
+            log.setTotalAmount(totalCharge);
+            log.setDateTransaction(new Date());
+            log.setTransactionId(transactionId);
+            log.setTransactionStatus(BPTransactionStatus.COMPLETED);
+            businessData.saveIncomingBalance(log);
+        } catch (NullParameterException | GeneralException ex) {
+            Logger.getLogger(AssociatedCardController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    public void saveFailedLog(BusinessBalanceIncoming log) {
+        try {
+            log.setDateTransaction(new Date());
+            log.setTransactionStatus(BPTransactionStatus.FAILED);
+            businessData.saveIncomingBalance(log);
+        } catch (NullParameterException | GeneralException ex) {
+            Logger.getLogger(AssociatedCardController.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
 }

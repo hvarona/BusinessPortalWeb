@@ -1,25 +1,11 @@
-/*
- * Copyright 2009 Prime Technology.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package com.alodiga.businessportal.converter;
 
-import com.portal.business.commons.data.AccountBankData;
-import com.portal.business.commons.exceptions.GeneralException;
-import com.portal.business.commons.exceptions.NullParameterException;
-import com.portal.business.commons.exceptions.RegisterNotFoundException;
-import com.portal.business.commons.models.BPBank;
+import com.alodiga.wallet.common.ejb.BusinessPortalEJB;
+import com.alodiga.wallet.common.exception.GeneralException;
+import com.alodiga.wallet.common.exception.NullParameterException;
+import com.alodiga.wallet.common.exception.RegisterNotFoundException;
+import com.alodiga.wallet.common.model.Bank;
+import com.alodiga.wallet.common.utils.EJBServiceLocator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.faces.component.UIComponent;
@@ -32,11 +18,12 @@ public class BankConverter implements Converter {
 
     @Override
     public Object getAsObject(FacesContext facesContext, UIComponent component, String submittedValue) {
-        BPBank bank = null;
+        Bank bank = null;
         try {
-            AccountBankData accountBankData = new AccountBankData();
+            BusinessPortalEJB proxy = (BusinessPortalEJB) EJBServiceLocator.getInstance().get(com.alodiga.wallet.common.utils.EjbConstants.BUSINESS_PORTAL_EJB);
             Long bankId = Long.parseLong(submittedValue);
-            bank = accountBankData.getBank(bankId);
+
+            bank = proxy.loadBankById(bankId);
         } catch (GeneralException | NullParameterException | RegisterNotFoundException | NumberFormatException ex) {
             Logger.getLogger(BankConverter.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -49,8 +36,8 @@ public class BankConverter implements Converter {
         if (value == null || value.equals("")) {
             return "";
         } else {
-            if (value instanceof BPBank) {
-                  return Long.toString(((BPBank) value).getId());
+            if (value instanceof Bank) {
+                return Long.toString(((Bank) value).getId());
             } else {
                 return value.toString();
             }

@@ -8,6 +8,7 @@ import com.portal.business.commons.exceptions.GeneralException;
 import com.portal.business.commons.exceptions.NullParameterException;
 import com.portal.business.commons.generic.WsRequest;
 import com.portal.business.commons.models.Store;
+import com.portal.business.commons.utils.AlodigaCryptographyUtils;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.List;
@@ -87,6 +88,18 @@ public class ListStoreController implements Serializable {
 
     public void setLenguajeBean(LanguajeBean lenguajeBean) {
         this.lenguajeBean = lenguajeBean;
+    }
+
+    public String getQRCode() {
+        if (selectedStore != null) {
+            try {
+                String toEncrypt = loginBean.getCurrentBusiness().getCode() + ";" + selectedStore.getStoreCode();
+                return AlodigaCryptographyUtils.encrypt(toEncrypt, "1nt3r4xt3l3ph0ny");
+            } catch (Exception ex) {
+                Logger.getLogger(ListStoreController.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        return "";
     }
 
     public void changeEnable(Store store) {

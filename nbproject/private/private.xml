@@ -3,20 +3,17 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/Users/hamor/Documents/NetBeansProjects/BusinessPortalWeb/web/createOperator.xhtml</file>
-            <file>file:/C:/Users/hamor/Documents/NetBeansProjects/BusinessPortalWeb/web/activateCard.xhtml</file>
-            <file>file:/C:/Users/hamor/Documents/NetBeansProjects/BusinessPortalWeb/web/login.xhtml</file>
-            <file>file:/C:/Users/hamor/Documents/NetBeansProjects/BusinessPortalWeb/web/listOperator.xhtml</file>
-            <file>file:/C:/Users/hamor/Documents/NetBeansProjects/BusinessPortalWeb/src/java/com/alodiga/primefaces/ultima/controller/card/CardController.java</file>
-            <file>file:/C:/Users/hamor/Documents/NetBeansProjects/BusinessPortalWeb/web/checkCard.xhtml</file>
-            <file>file:/C:/Users/hamor/Documents/NetBeansProjects/BusinessPortalWeb/web/associatedCard.xhtml</file>
-            <file>file:/C:/Users/hamor/Documents/NetBeansProjects/BusinessPortalWeb/src/java/com/alodiga/businessportal/data/model/CardInfo.java</file>
-            <file>file:/C:/Users/hamor/Documents/NetBeansProjects/BusinessPortalWeb/src/conf/persistence.xml</file>
-            <file>file:/C:/Users/hamor/Documents/NetBeansProjects/BusinessPortalWeb/src/java/com/alodiga/businessportal/controlller/associatedcard/AssociatedCardController.java</file>
-            <file>file:/C:/Users/hamor/Documents/NetBeansProjects/BusinessPortalWeb/src/java/com/alodiga/remittance/messages/message_es.properties</file>
+            <file>file:/C:/Users/hamor/Documents/NetBeansProjects/BusinessPortalWeb/web/rechargeCard.xhtml</file>
             <file>file:/C:/Users/hamor/Documents/NetBeansProjects/BusinessPortalWeb/src/java/com/alodiga/primefaces/ultima/controller/card/RechargeCardController.java</file>
-            <file>file:/C:/Users/hamor/Documents/NetBeansProjects/BusinessPortalWeb/src/java/com/alodiga/businessportal/controlller/request/RequestController.java</file>
-            <file>file:/C:/Users/hamor/Documents/NetBeansProjects/BusinessPortalWeb/web/editOperator.xhtml</file>
+            <file>file:/C:/Users/hamor/Documents/NetBeansProjects/BusinessPortalWeb/src/java/com/alodiga/remittance/messages/message_es.properties</file>
+            <file>file:/C:/Users/hamor/Documents/NetBeansProjects/BusinessPortalWeb/src/java/com/alodiga/remittance/beans/MenuView_.java</file>
+            <file>file:/C:/Users/hamor/Documents/NetBeansProjects/BusinessPortalWeb/web/walletWithdraw.xhtml</file>
+            <file>file:/C:/Users/hamor/Documents/NetBeansProjects/BusinessPortalWeb/src/java/com/alodiga/businessportal/controlller/wallet/walletTransferToUserController.java</file>
+            <file>file:/C:/Users/hamor/Documents/NetBeansProjects/BusinessPortalWeb/src/java/com/alodiga/primefaces/ultima/controller/remittance/RemittanceController.java</file>
+            <file>file:/C:/Users/hamor/Documents/NetBeansProjects/BusinessPortalWeb/src/java/com/alodiga/remittance/filter/CharacterEncodingFilter.java</file>
+            <file>file:/C:/Users/hamor/Documents/NetBeansProjects/BusinessPortalWeb/src/java/com/alodiga/businessportal/controlller/wallet/walletWithdrawController.java</file>
+            <file>file:/C:/Users/hamor/Documents/NetBeansProjects/BusinessPortalWeb/src/java/com/alodiga/primefaces/ultima/controller/qr/ViewQrController.java</file>
+            <file>file:/C:/Users/hamor/Documents/NetBeansProjects/BusinessPortalWeb/web/walletTransferUser.xhtml</file>
         </group>
     </open-files>
 </project-private>

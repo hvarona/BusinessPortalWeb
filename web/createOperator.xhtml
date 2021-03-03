@@ -12,57 +12,70 @@
         <h:form id="OperatorCreateForm">
             <div class="card card-w-title">
                 <h1>#{msg.operator}</h1>
-                <p:panelGrid id="containerGrid" columns="2" style="border:0px none; background-color:transparent;">
-                    <f:facet name="header">
-                        <p:messages id="messages"  autoUpdate="true" closable="true" />
-                    </f:facet>
-                    <p:panelGrid id="dataGrid" columns="2" columnClasses="ui-grid-col-4,ui-grid-col-6" layout="grid" styleClass="ui-panelgrid-blank form-group" style="border:0px none; background-color:transparent;">
+                <p:messages id="general" globalOnly="true" autoUpdate="true" showDetail="true" showSummary="false"  />
+
+                <p:panelGrid id="containerGrid" columns="2" style="border:0px none; background-color:transparent;width: 100%">
+
+                    <p:panelGrid id="dataGrid" columns="3" columnClasses="ui-grid-col-4,ui-grid-col-6" layout="grid" styleClass="ui-panelgrid-blank form-group" style="border:0px none; background-color:transparent;width: 100%">
                         <p:outputLabel value="#{msg.login}" for="login" />
                         <p:inputText autocomplete="false" id="login" value="#{operatorController.login}" title="#{msg.login}" required="true"/>
+                        <p:message for="login"/>
 
                         <p:outputLabel value="#{msg.password}" for="password" />
                         <p:password autocomplete="false" id="password" value="#{operatorController.password}" title="#{msg.password}" required="true"/>
+                        <p:message for="password"/>
 
                         <p:outputLabel value="#{msg.firstName}" for="firstName" />
                         <p:inputText autocomplete="false" id="firstName" value="#{operatorController.firstName}" title="#{msg.firstName}" required="true" />
+                        <p:message for="firstName"/>
 
                         <p:outputLabel value="#{msg.lastName}" for="lastName" />
                         <p:inputText autocomplete="false" id="lastName" value="#{operatorController.lastName}" title="#{msg.lastName}" required="true"/>
+                        <p:message for="lastName"/>
 
                         <p:outputLabel value="#{msg.email}" for="email" />
-                        <p:inputText autocomplete="false" id="email" value="#{operatorController.email}" title="#{msg.email}" required="true"/>
+                        <p:inputText autocomplete="false" id="email" value="#{operatorController.email}" title="#{msg.email}" required="true" validatorMessage="#{msg.invalidEmailAddress}">
+                            <f:validateRegex pattern="^[_A-Za-z0-9-\+]+(\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\.[A-Za-z0-9]+)*(\.[A-Za-z]{2,})$" />
+                        </p:inputText>
+                        <p:message for="email"/>
 
                         <p:outputLabel value="#{msg.phone}" for="phone" />
-                        <p:inputText autocomplete="false" id="phone" value="#{operatorController.phoneNumber}" title="#{msg.phone}" />
+                        <p:inputMask autocomplete="false" id="phone" value="#{operatorController.phoneNumber}" title="#{msg.phone}" mask="+999 (999)999-9999" required="true" />
+                        <p:message for="phone"/>
 
                         <p:outputLabel value="#{msg.receiveNotification}" for="receiveNotification" />
                         <p:selectBooleanCheckbox id="receiveNotification" value="#{operatorController.receiveNotification}" />
+                        <p:message for="receiveNotification"/>
 
                         <p:outputLabel value="#{msg.language}" for="language" />
-                        <p:selectOneMenu id="language" value="#{operatorController.language}" converter="languageConverter" >
+                        <p:selectOneMenu id="language" value="#{operatorController.language}" converter="languageConverter" required="true" >
                             <f:selectItem itemLabel="#{msg.SelectOne}" />
                             <f:selectItems value="#{bpListOperatorController.languages}"/>
                         </p:selectOneMenu> 
+                        <p:message for="language"/>
 
                         <p:outputLabel value="#{msg.profile}" for="profile" />
-                        <p:selectOneMenu id="profile" value="#{operatorController.profile}" converter="profileConverter" >
+                        <p:selectOneMenu id="profile" value="#{operatorController.profile}" converter="profileConverter" required="true" >
                             <f:selectItem itemLabel="#{msg.SelectOne}" />
                             <f:selectItems value="#{bpListOperatorController.profiles}"/>
                             <f:ajax event="change" listener="#{operatorController.reloadPermission()}" render="excludedList" execute="@this"/>
                         </p:selectOneMenu> 
-                        
+                        <p:message for="profile"/>
+
                         <p:outputLabel value="#{msg.store}" for="store"  rendered="#{not empty bpListOperatorController.stores}"/>
-                        <p:selectOneMenu id="store" value="#{operatorController.selectedStore}" converter="storeConverter" rendered="#{not empty bpListOperatorController.stores}" >
+                        <p:selectOneMenu id="store" value="#{operatorController.selectedStore}" converter="storeConverter" disabled="#{empty bpListOperatorController.stores}" >
                             <f:selectItem itemLabel="#{msg.unasignedStore}" itemValue="#{null}" />
                             <f:selectItems value="#{bpListOperatorController.stores}"/>
-                            <f:ajax event="change" render="@form"/>
+                            <f:ajax event="change" render="store pos"/>
                         </p:selectOneMenu> 
-                        
-                        <p:outputLabel value="#{msg.pos}" for="pos" rendered="#{not empty operatorController.posList}" />
-                        <p:selectOneMenu id="pos" value="#{operatorController.selectPos}" converter="posConverter" rendered="#{not empty operatorController.posList}" >
+                        <p:message for="store"/>
+
+                        <p:outputLabel value="#{msg.pos}" for="pos"/>
+                        <p:selectOneMenu id="pos" value="#{operatorController.selectPos}" converter="posConverter" disabled="#{empty operatorController.posList}" >
                             <f:selectItem itemLabel="#{msg.unasignedPos}" itemValue="#{null}" />
                             <f:selectItems value="#{operatorController.posList}" var="pos" itemLabel="#{pos.posCode}"/>
                         </p:selectOneMenu> 
+                        <p:message for="pos"/>
 
                     </p:panelGrid>
                     <p:panelGrid id="permissionGrid" columns="1" layout="grid" style="border:0px none; background-color:transparent;">
@@ -75,7 +88,7 @@
                 </p:panelGrid>
             </div>
             <div align="center">
-                <p:commandButton  value="#{msg.save}" id="btnSubmit" icon="ui-icon-save" actionListener="#{operatorController.save()}" />
+                <p:commandButton  value="#{msg.save}" id="btnSubmit" update="@form" icon="ui-icon-save" actionListener="#{operatorController.save()}" />
                 <p:commandButton  value="#{msg.cancel}" id="btnCancel" icon="ui-icon-cancel" update=":OperatorCreateForm" actionListener="#{operatorController.reset()}" immediate="true" process="@this"/>
                 <p:commandButton  value="#{msg.goBack}" id="btnReturn"  icon="ui-icon-replay" update=":OperatorCreateForm" actionListener="#{operatorController.doRediret()}" immediate="true" process="@this"/>
             </div>

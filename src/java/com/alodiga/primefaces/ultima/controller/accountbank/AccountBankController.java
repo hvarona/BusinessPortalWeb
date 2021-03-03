@@ -2,20 +2,21 @@ package com.alodiga.primefaces.ultima.controller.accountbank;
 
 import com.alodiga.remittance.beans.LanguajeBean;
 import com.alodiga.remittance.beans.LoginBean;
-import com.portal.business.commons.data.AccountBankData;
-import com.portal.business.commons.exceptions.GeneralException;
-import com.portal.business.commons.exceptions.NullParameterException;
-import com.portal.business.commons.models.AccountBank;
-import com.portal.business.commons.models.AccountTypeBank;
-import com.portal.business.commons.models.BPBank;
-import com.portal.business.commons.models.Pos;
-import com.portal.business.commons.models.StatusAccountBank;
-import com.portal.business.commons.models.Store;
-import com.portal.business.commons.utils.AlodigaCryptographyUtils;
+import com.alodiga.wallet.common.ejb.BusinessPortalEJB;
+import com.alodiga.wallet.common.exception.EmptyListException;
+import com.alodiga.wallet.common.exception.GeneralException;
+import com.alodiga.wallet.common.exception.NullParameterException;
+import com.alodiga.wallet.common.exception.RegisterNotFoundException;
+import com.alodiga.wallet.common.genericEJB.EJBRequest;
+import com.alodiga.wallet.common.model.AccountBank;
+import com.alodiga.wallet.common.model.AccountTypeBank;
+import com.alodiga.wallet.common.model.Bank;
+import com.alodiga.wallet.common.model.StatusAccountBank;
+import com.alodiga.wallet.common.utils.EJBServiceLocator;
 import java.io.IOException;
 import java.sql.Timestamp;
-import java.time.Instant;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
@@ -36,11 +37,9 @@ public class AccountBankController {
 
     private Long id;
     private String accountBankNumber;
-    private BPBank bank;
+    private Bank bank;
     private AccountTypeBank accountTypeBank;
     private StatusAccountBank statusAccountBank;
-
-    private AccountBankData accountBankData = null;
 
     @ManagedProperty(value = "#{loginBean}")
     private LoginBean loginBean;
@@ -50,14 +49,17 @@ public class AccountBankController {
     @ManagedProperty(value = "#{languajeBean}")
     private LanguajeBean lenguajeBean;
 
+    private BusinessPortalEJB proxy;
+
     @PostConstruct
     public void init() {
-        accountBankData = new AccountBankData();
         if (lenguajeBean == null || lenguajeBean.getLanguaje() == null || lenguajeBean.getLanguaje().isEmpty()) {
             msg = ResourceBundle.getBundle("com.alodiga.remittance.messages.message", Locale.forLanguageTag("es"));
         } else {
             msg = ResourceBundle.getBundle("com.alodiga.remittance.messages.message", Locale.forLanguageTag(lenguajeBean.getLanguaje()));
         }
+
+        proxy = (BusinessPortalEJB) EJBServiceLocator.getInstance().get(com.alodiga.wallet.common.utils.EjbConstants.BUSINESS_PORTAL_EJB);
     }
 
     public Long getId() {
@@ -76,11 +78,11 @@ public class AccountBankController {
         this.accountBankNumber = accountBankNumber;
     }
 
-    public BPBank getBank() {
+    public Bank getBank() {
         return bank;
     }
 
-    public void setBank(BPBank bank) {
+    public void setBank(Bank bank) {
         this.bank = bank;
     }
 
@@ -114,21 +116,37 @@ public class AccountBankController {
             accountBank.setAccountNumber(accountBankNumber);
             accountBank.setAccountTypeBankId(accountTypeBank);
             accountBank.setBankId(bank);
-            accountBank.setCommerce(loginBean.getCurrentBusiness());
+            accountBank.setBusinessId(loginBean.getCurrentBusiness().getId());
             accountBank.setCreateDate(new Timestamp(new Date().getTime()));
+            List<StatusAccountBank> status = proxy.getStatusAccountBanks(new EJBRequest());
+            for (StatusAccountBank stat : status) {
+                if (stat.getDescription().equalsIgnoreCase("activo")) {
+                    statusAccountBank = stat;
+                    break;
+                }
+            }
+            if (statusAccountBank == null) {
+                if (status.size() > 0) {
+                    statusAccountBank = status.get(0);
+                } else {
+                    statusAccountBank = null;
+                }
+            }
             accountBank.setStatusAccountBankId(statusAccountBank);
-            accountBankData.saveAccountBank(accountBank);
+            proxy.saveAccountBank(accountBank);
 
             FacesContext.getCurrentInstance().getExternalContext().getFlash().setKeepMessages(true);
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(msg.getString("accountBankSaveSuccesfull")));
             FacesContext.getCurrentInstance().getExternalContext().redirect("listAccountBank.xhtml");
-        } catch (NullParameterException ex) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!", msg.getString("error.missparameters")));
-        } catch (GeneralException ex) {
+        } catch (RegisterNotFoundException ex) {
             ex.printStackTrace();
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!", msg.getString("error.missparameters")));
-        } catch (IOException ex) {
+        } catch (NullParameterException ex) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!", msg.getString("error.missparameters")));
+        } catch (GeneralException | IOException ex) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!", msg.getString("error.general")));
+        } catch (EmptyListException ex) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!", msg.getString("error.internalError")));
         }
     }
 
@@ -144,5 +162,4 @@ public class AccountBankController {
         }
     }
 
- 
 }

@@ -37,6 +37,15 @@
                                     <p:commandButton  value="#{msg.reportTransactionGenerate}" update="@form" id="btnSubmit" icon="ui-icon-search" actionListener="#{sellReportController.doReport()}" />
                                 </p:panelGrid>
                             </div>
+                            <div align="center">
+                                <p:panel header="#{msg.reportSingleSearchTitle}">
+                                    <p:panelGrid columns="3" >
+                                        <h:outputText value="#{msg.resportSingleSearch}" />
+                                        <p:inputNumber id="singleSearchId" value="#{sellReportController.reportSingleId}" />
+                                        <p:commandButton  value="#{msg.reportTransactionGenerate}" update="@form" id="btnSingleSubmit" icon="ui-icon-search" actionListener="#{sellReportController.doSingleReport()}" />
+                                    </p:panelGrid>
+                                </p:panel>
+                            </div>
 
                         </div>
                     </div>
@@ -46,8 +55,24 @@
             <p:dataTable id="resultList" var="sell" rendered="#{sellReportController.resultList != null}" 
                          value="#{sellReportController.resultList}" emptyMessage="#{msg.reportTransactionEmptyResult}" 
                          filteredValue="#{sellReportController.filteredResult}" paginator="true" rows="10" style="margin-bottom:20px"
-                         paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}" 
+                         paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink} {Exporters}" 
                          rowsPerPageTemplate="5,10,15" >
+
+                <f:facet name="{Exporters}">
+                    <div style="float:right;padding-top: 5px;">
+                        <h:commandLink>
+                            <p:graphicImage name="/demo/images/excel.png" width="24"/>
+                            <p:dataExporter type="xls" target="resultList" fileName="#{msg.reportSellTitle}" />
+                        </h:commandLink>
+
+                        <h:commandLink>
+                            <p:graphicImage name="/demo/images/csv.png" width="24"/>
+                            <p:dataExporter type="csv" target="resultList" fileName="#{msg.reportSellTitle}" />
+                        </h:commandLink>
+
+                    </div>
+                </f:facet>
+                
                 <p:column filterBy="#{sell.id}" headerText="#{msg.id}"  filterMatchMode="contains" style="width:15px">
                     <h:outputText value="#{sell.id}" />
                 </p:column>
@@ -68,17 +93,65 @@
                     <h:outputText value="#{sell.idWalletTransaction}" />
                 </p:column>
 
+                <p:column filterBy="#{sell.amountWithoutFee}" headerText="#{msg.sellAmountWithoutFee}"  filterMatchMode="contains" style="width:15px">
+                    <h:outputText value="#{sell.amountWithoutFee}" />
+                </p:column>
+
+                <p:column filterBy="#{sell.discountRate}" headerText="#{msg.discountRate}"  filterMatchMode="contains" style="width:15px">
+                    <h:outputText value="#{sell.discountRate}" />
+                </p:column>
+
                 <p:column filterBy="#{sell.amount}" headerText="#{msg.sellAmount}"  filterMatchMode="contains" style="width:15px">
                     <h:outputText value="#{sell.amount}" />
                 </p:column>
 
-                <p:column filterBy="#{sell.origin}" headerText="#{msg.origin}"  filterMatchMode="contains" style="width:15px">
-                    <h:outputText value="#{sell.origin}" />
+                <p:column filterBy="#{sell.transactionStatus}" headerText="#{msg.status}"  filterMatchMode="contains" style="width:15px">
+                    <h:outputText value="#{sellReportController.getOperationStatus(sell.transactionStatus)}" />
                 </p:column>
 
-
-
+                <p:column style="width:10px;text-align: center" exportable="false">
+                    <p:commandButton update=":cardForm:transactionDetail" oncomplete="PF('transactionDialog').show()" icon="ui-icon-search" title="#{msg.view}">
+                        <f:setPropertyActionListener value="#{sell}" target="#{sellReportController.selectedSell}" />
+                    </p:commandButton>
+                </p:column>
             </p:dataTable>
+            <p:dialog header="#{msg.transactionDetail}" widgetVar="transactionDialog" modal="true" showEffect="fade" hideEffect="fade" resizable="false">
+                <p:outputPanel id="transactionDetail" style="text-align:center;">
+                    <p:panelGrid  columns="2" rendered="#{not empty sellReportController.selectedSell}" columnClasses="label,value">
+                        <h:outputText value="#{msg.date}:" />
+                        <h:outputText value="#{sellReportController.selectedSell.dateSell}" />
+
+                        <h:outputText value="#{msg.id}:" />
+                        <h:outputText value="#{sellReportController.selectedSell.id}" />
+
+                        <h:outputText value="#{msg.status}:" />
+                        <h:outputText value="#{sellReportController.getOperationStatus(sellReportController.selectedSell.transactionStatus)}"/>
+
+                        <h:outputText value="#{msg.reportTransactionTransactionId}:" />
+                        <h:outputText value="#{sellReportController.selectedSell.idWalletTransaction}" />
+
+                        <h:outputText value="#{msg.reportTransactionAmountWithoutFee}:" />
+                        <h:outputText value="#{sellReportController.selectedSell.amountWithoutFee}" />
+
+                        <h:outputText value="#{msg.discountRate}:" />
+                        <h:outputText value="#{sellReportController.selectedSell.discountRate}" />
+
+                        <h:outputText value="#{msg.reportTransactionTotalAmount}:" />
+                        <h:outputText value="#{sellReportController.selectedSell.amount}" />
+
+                        <h:outputText value="#{msg.store}:" rendered="#{not empty sellReportController.selectedSell.store}"/>
+                        <h:outputText value="#{sellReportController.selectedSell.store.name}" rendered="#{not empty sellReportController.selectedSell.store}"/>
+
+                        <h:outputText value="#{msg.pos}:" rendered="#{not empty sellReportController.selectedSell.pos}"/>
+                        <h:outputText value="#{sellReportController.selectedSell.pos.posCode}" rendered="#{not empty sellReportController.selectedSell.pos}"/>
+
+                        <h:outputText value="#{msg.reportTransactionCloseDate}:" rendered="#{not empty sellReportController.selectedSell.businessClose}"/>
+                        <h:outputText value="#{sellReportController.selectedSell.businessClose.dateClose}" rendered="#{not empty sellReportController.selectedSell.businessClose}"/>
+                    </p:panelGrid>
+                </p:outputPanel>
+            </p:dialog>
+
+
         </h:form>
     </ui:define>
 

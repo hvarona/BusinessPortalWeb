@@ -10,12 +10,17 @@ import com.ericsson.alodiga.ws.APIRegistroUnificadoProxy;
 import com.ericsson.alodiga.ws.RespuestaUsuario;
 import com.ericsson.alodiga.ws.Usuario;
 import com.portal.business.commons.data.BusinessData;
+import com.portal.business.commons.data.PreferencesData;
+import com.portal.business.commons.enumeration.BPTransactionStatus;
+import com.portal.business.commons.enumeration.BusinessServiceType;
 import com.portal.business.commons.enumeration.OperationType;
+import com.portal.business.commons.exceptions.GeneralException;
+import com.portal.business.commons.exceptions.NullParameterException;
 import com.portal.business.commons.models.BusinessBalanceIncoming;
+import com.portal.business.commons.models.LimitedsTransactionsResponse;
+import com.portal.business.commons.models.ResponseCode;
 import java.rmi.RemoteException;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
@@ -46,17 +51,11 @@ public class rechargeController {
 
     private String lastName;
 
-    private List<Product> activateProducts;
-
-    private Product selectedProduct;
-
     private String accountNumber;
 
     private boolean includeFees;
 
     private Double rechargeAmount = new Double(0);
-
-    private float rechargeAfterBusiness;
 
     private float businessFee;
 
@@ -72,11 +71,14 @@ public class rechargeController {
 
     private String errorMessage;
 
-    private APIAlodigaWalletProxy allodigaWS = new APIAlodigaWalletProxy();
+    private final APIAlodigaWalletProxy allodigaWS = new APIAlodigaWalletProxy();
 
-    private APIRegistroUnificadoProxy registerWS = new APIRegistroUnificadoProxy();
+    private final APIRegistroUnificadoProxy registerWS = new APIRegistroUnificadoProxy();
 
     private Usuario userForRecharge;
+
+    private final BusinessData businessData = new BusinessData();
+    private final PreferencesData preferenceData = new PreferencesData();
 
     @ManagedProperty(value = "#{loginBean}")
     private LoginBean loginBean;
@@ -153,42 +155,12 @@ public class rechargeController {
         this.lastName = lastName;
     }
 
-    public Product getSelectedProduct() {
-        return selectedProduct;
-    }
-
-    public void setSelectedProduct(Product selectedProduct) {
-        if (selectedProduct != null) {
-            for (Product prod : activateProducts) {
-                if (prod.getId() == selectedProduct.getId()) {
-                    this.selectedProduct = prod;
-                }
-            }
-        }
-    }
-
-    public List<Product> getActivateProducts() {
-        return activateProducts;
-    }
-
-    public void setActivateProducts(List<Product> activateProducts) {
-        this.activateProducts = activateProducts;
-    }
-
     public String getAccountNumber() {
         return accountNumber;
     }
 
     public void setAccountNumber(String accountNumber) {
         this.accountNumber = accountNumber;
-    }
-
-    public float getRechargeAfterBusiness() {
-        return rechargeAfterBusiness;
-    }
-
-    public void setRechargeAfterBusiness(float rechargeAfterBusiness) {
-        this.rechargeAfterBusiness = rechargeAfterBusiness;
     }
 
     public float getBusinessFee() {
@@ -257,43 +229,51 @@ public class rechargeController {
 
     public void searchUser() {
         try {
-            if (this.userEmailOrPhone == null || this.userEmailOrPhone.isEmpty()) {
-                hasError = true;
-                errorMessage = msg.getString("rechargeWalletRechargeErrorInvalidEmailPhone");
-            } else {
-                RespuestaUsuario response;
-                if (PHONE_PATTERN.matcher(userEmailOrPhone).matches()) {
-                    response = registerWS.getUsuariopormovil("usuarioWS", "passwordWS", userEmailOrPhone);
-                } else {
-                    response = registerWS.getUsuarioporemail("usuarioWS", "passwordWS", userEmailOrPhone);
-                }
-                if (response != null) {
-                    switch (response.getCodigoRespuesta()) {
-                        case "00": {
-                            userForRecharge = response.getDatosRespuesta();
-                            this.processUserInfo();
-                            this.getUserProductList();
-                        }
-                        break;
-                        default:
-                            hasError = true;
-                            errorMessage = msg.getString("error.general") + " : " + response.getCodigoRespuesta();
-                    }
-                } else {
+            LimitedsTransactionsResponse limitedsTransactionsResponse = preferenceData.validateService(loginBean.getCurrentBusiness(), BusinessServiceType.RECHARGE, loginBean.getBusinessProduct().getId());
+            if (limitedsTransactionsResponse.getCode() == ResponseCode.SUCESS.getCodigo()) {
+                if (this.userEmailOrPhone == null || this.userEmailOrPhone.isEmpty()) {
                     hasError = true;
-                    errorMessage = msg.getString("error.registerwsconnection");
+                    errorMessage = msg.getString("rechargeWalletRechargeErrorInvalidEmailPhone");
+                } else {
+                    RespuestaUsuario response;
+                    if (PHONE_PATTERN.matcher(userEmailOrPhone).matches()) {
+                        response = registerWS.getUsuariopormovil("usuarioWS", "passwordWS", userEmailOrPhone);
+                    } else {
+                        response = registerWS.getUsuarioporemail("usuarioWS", "passwordWS", userEmailOrPhone);
+                    }
+                    if (response != null) {
+                        switch (response.getCodigoRespuesta()) {
+                            case "00": {
+                                userForRecharge = response.getDatosRespuesta();
+                                this.processUserInfo();
+                                this.verifirUserProduct();
+                            }
+                            break;
+                            case "97": {
+                                hasError = true;
+                                errorMessage = msg.getString("error.rechargeUserNoExist");
+                            }
+                            default:
+                                hasError = true;
+                                errorMessage = msg.getString("error.general") + " (" + response.getCodigoRespuesta() + ") : " + response.getMensajeRespuesta();
+                        }
+                    } else {
+                        hasError = true;
+                        errorMessage = msg.getString("error.registerwsconnection");
+                    }
                 }
+            } else {
+                hasError = true;
+                errorMessage = msg.getString(limitedsTransactionsResponse.getMessage());
             }
         } catch (RemoteException ex) {
             Logger.getLogger(rechargeController.class.getName()).log(Level.SEVERE, null, ex);
             hasError = true;
             errorMessage = msg.getString("error.registerwsconnection");
         }
-
     }
 
-    private void getUserProductList() throws RemoteException {
-        activateProducts = new ArrayList();
+    private void verifirUserProduct() throws RemoteException {
         ProductListResponse productResponse = allodigaWS.getProductsByUserId(Integer.toString(userForRecharge.getUsuarioID()));
         switch (productResponse.getCodigoRespuesta()) {
             case "00": {
@@ -303,19 +283,21 @@ public class rechargeController {
                     errorMessage = msg.getString(("rechargeWalletRechargeErrorNoProducts"));
                 } else {
                     for (com.alodiga.wallet.ws.Product userProduct : userProducts) {
-                        if (!userProduct.getName().equalsIgnoreCase("Tarjeta Prepagada")) {
-                            activateProducts.add(new Product(userProduct.getId(),
-                                    userProduct.getName(), userProduct.getSymbol()));
+                        if (!userProduct.equals(loginBean.getBusinessProduct())) {
+                            hasError = false;
+                            phase = 1;
+                            return;
                         }
                     }
-                    hasError = false;
-                    phase = 1;
+                    hasError = true;
+                    errorMessage = msg.getString(("rechargeWalletRechargeErrorNoProducts"));
+
                 }
             }
             break;
             default:
                 hasError = true;
-                errorMessage = msg.getString(("rechargeWalletRechargeErrorNoProducts"));
+                errorMessage = msg.getString(("rechargeWalletErrorFetchignProducts") + " " + productResponse.getCodigoRespuesta());
         }
     }
 
@@ -338,32 +320,36 @@ public class rechargeController {
     public void verifyRecharge() {
         try {
             rechargeAmount = (double) truncAmount(rechargeAmount.floatValue());
-            if (includeFees) {
-                businessFee = truncAmount((rechargeAmount.floatValue() * loginBean.getBusinessPercentFee()) / (100 + loginBean.getBusinessPercentFee()));
-            }
-            double rechargeSubmit = includeFees ? rechargeAmount - businessFee : rechargeAmount;
-            RechargeValidationResponse response = allodigaWS.validateRechargeProduct((long) userForRecharge.getUsuarioID(), selectedProduct.getId(), rechargeSubmit, includeFees);
-            if (response != null) {
-                switch (response.getCodigoRespuesta()) {
-                    case "00": {
-                        hasError = false;
-                        alodigaFee = response.getTotalFee().floatValue();
-                        rechargeAmount = response.getAmountBeforeFee();
-                        if (!includeFees) {
-                            businessFee = ((long) ((totalCharge * loginBean.getBusinessPercentFee() / 100) * 100)) / 100;
-                        }
+            double rechargeSubmit = rechargeAmount;
+            LimitedsTransactionsResponse limitedsTransactionsResponse = preferenceData.validateServiceAmount(loginBean.getCurrentBusiness(), BusinessServiceType.RECHARGE, loginBean.getBusinessProduct().getId(), (float) rechargeSubmit);
+            if (limitedsTransactionsResponse.getCode() == ResponseCode.SUCESS.getCodigo()) {
+                RechargeValidationResponse response = allodigaWS.validateRechargeProduct((long) userForRecharge.getUsuarioID(), loginBean.getBusinessProduct().getId(), rechargeSubmit, includeFees);
 
-                        totalCharge = response.getTotalAmount().floatValue() + businessFee;
-                        phase = 2;
+                if (response != null) {
+                    switch (response.getCodigoRespuesta()) {
+                        case "00": {
+                            hasError = false;
+                            alodigaFee = truncAmount(response.getTotalFee().floatValue());
+                            totalCharge = truncAmount(response.getAmountBeforeFee().floatValue());
+
+                            businessFee = truncAmount((float) (rechargeAmount * loginBean.getBusinessPercentFee() / 100));
+
+                            //totalCharge = truncAmount(rechargeAmount.floatValue() - alodigaFee);
+                            rechargeAmount = (double) truncAmount(response.getTotalAmount().floatValue());
+                            phase = 2;
+                        }
+                        break;
+                        default:
+                            hasError = true;
+                            errorMessage = msg.getString("error.general") + " (" + response.getCodigoRespuesta() + ") : " + response.getMensajeRespuesta();
                     }
-                    break;
-                    default:
-                        hasError = true;
-                        errorMessage = msg.getString("error.general") + " : " + response.getCodigoRespuesta();
+                } else {
+                    hasError = true;
+                    errorMessage = msg.getString("error.registerwsconnection");
                 }
             } else {
                 hasError = true;
-                errorMessage = msg.getString("error.registerwsconnection");
+                errorMessage = msg.getString(limitedsTransactionsResponse.getMessage());
             }
         } catch (Exception ex) {
             Logger.getLogger(rechargeController.class.getName()).log(Level.SEVERE, null, ex);
@@ -373,42 +359,36 @@ public class rechargeController {
     }
 
     public void recharge() {
-
+        BusinessBalanceIncoming log = createIncomingLog();
         try {
-            TransactionResponse response = allodigaWS.rechargeWalletProduct(loginBean.getCurrentBusiness().getId(), (long) userForRecharge.getUsuarioID(), selectedProduct.getId(), (double) rechargeAmount, false);
+            saveInProcessIncomingLog(log);
+            TransactionResponse response = allodigaWS.rechargeWalletProduct(loginBean.getCurrentBusiness().getId(), (long) userForRecharge.getUsuarioID(), loginBean.getBusinessProduct().getId(), (double) totalCharge, false);
             if (response != null) {
                 switch (response.getCodigoRespuesta()) {
                     case "00": {
                         hasError = false;
                         transactionId = response.getResponse().getId();
                         phase = 3;
+                        saveCompleteLog(log);
 
-                        BusinessBalanceIncoming log = new BusinessBalanceIncoming();
-                        log.setBusiness(loginBean.getCurrentBusiness());
-                        log.setUser(loginBean.getUserSession());
-                        log.setBusinessFee(businessFee);
-                        log.setAmountWithoutFee(totalCharge - businessFee);
-                        log.setTotalAmount(totalCharge);
-                        log.setDateTransaction(new Date());
-                        log.setTransactionId(transactionId);
-                        log.setType(OperationType.RECHARGE);
-                        BusinessData businessData = new BusinessData();
-                        businessData.saveIncomingBalance(log);
-
+                        //businessData.saveIncomingBalance(log);
                         //TODO save transaction log
                         FacesContext.getCurrentInstance().addMessage(null,
                                 new FacesMessage("Recarga realizada con exito"));
                     }
                     break;
                     default:
+                        saveFailedLog(log);
                         hasError = true;
-                        errorMessage = msg.getString("error.general") + " : " + response.getCodigoRespuesta();
+                        errorMessage = msg.getString("error.general") + " (" + response.getCodigoRespuesta() + ") : " + response.getMensajeRespuesta();
                 }
             } else {
+                saveFailedLog(log);
                 hasError = true;
                 errorMessage = msg.getString("error.registerwsconnection");
             }
         } catch (Exception ex) {
+            saveFailedLog(log);
             Logger.getLogger(rechargeController.class.getName()).log(Level.SEVERE, null, ex);
             hasError = true;
             errorMessage = msg.getString("error.registerwsconnection");
@@ -419,70 +399,60 @@ public class rechargeController {
         FacesContext.getCurrentInstance().getViewRoot().getViewMap().clear();
     }
 
-    public static class Product {
-
-        private long id;
-        private String name;
-        private String symbol;
-
-        public Product() {
+    public BusinessBalanceIncoming createIncomingLog() {
+        try {
+            BusinessBalanceIncoming log = new BusinessBalanceIncoming();
+            log.setBusiness(loginBean.getCurrentBusiness());
+            log.setUser(loginBean.getUserSession());
+            log.setBusinessFee(0);
+            log.setAmountWithoutFee(0);
+            log.setTotalAmount(0);
+            log.setDateTransaction(new Date());
+            log.setCreatedDate(new Date());
+            log.setTransactionId(-1L);
+            log.setTransactionStatus(BPTransactionStatus.CREATED);
+            log.setType(OperationType.RECHARGE);
+            return businessData.saveIncomingBalance(log);
+        } catch (NullParameterException | GeneralException ex) {
+            Logger.getLogger(rechargeController.class.getName()).log(Level.SEVERE, null, ex);
         }
+        return null;
+    }
 
-        public Product(long id, String name, String symbol) {
-            this.id = id;
-            this.name = name;
-            this.symbol = symbol;
+    public void saveInProcessIncomingLog(BusinessBalanceIncoming log) {
+        try {
+            log.setDateTransaction(new Date());
+            log.setTransactionStatus(BPTransactionStatus.IN_PROCESS);
+            businessData.saveIncomingBalance(log);
+
+        } catch (NullParameterException | GeneralException ex) {
+            Logger.getLogger(rechargeController.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
 
-        public long getId() {
-            return id;
+    public void saveCompleteLog(BusinessBalanceIncoming log) {
+        try {
+            log.setBusinessFee(alodigaFee);
+            log.setBusinessCommission(businessFee);
+            log.setAmountWithoutFee(rechargeAmount);
+            log.setTotalAmount(totalCharge);
+            log.setDateTransaction(new Date());
+            log.setTransactionId(transactionId);
+            log.setTransactionStatus(BPTransactionStatus.COMPLETED);
+            businessData.saveIncomingBalance(log);
+        } catch (NullParameterException | GeneralException ex) {
+            Logger.getLogger(rechargeController.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
 
-        public void setId(long id) {
-            this.id = id;
+    public void saveFailedLog(BusinessBalanceIncoming log) {
+        try {
+            log.setDateTransaction(new Date());
+            log.setTransactionStatus(BPTransactionStatus.FAILED);
+            businessData.saveIncomingBalance(log);
+        } catch (NullParameterException | GeneralException ex) {
+            Logger.getLogger(rechargeController.class.getName()).log(Level.SEVERE, null, ex);
         }
-
-        public String getName() {
-            return name;
-        }
-
-        public void setName(String name) {
-            this.name = name;
-        }
-
-        public String getSymbol() {
-            return symbol;
-        }
-
-        public void setSymbol(String symbol) {
-            this.symbol = symbol;
-        }
-
-        @Override
-        public int hashCode() {
-            int hash = 3;
-            hash = 71 * hash + (int) (this.id ^ (this.id >>> 32));
-            return hash;
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            if (this == obj) {
-                return true;
-            }
-            if (obj == null) {
-                return false;
-            }
-            if (getClass() != obj.getClass()) {
-                return false;
-            }
-            final Product other = (Product) obj;
-            if (this.id != other.id) {
-                return false;
-            }
-            return true;
-        }
-
     }
 
 }

@@ -2,7 +2,8 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="http://java.sun.com/jsf/html"
       xmlns:f="http://java.sun.com/jsf/core"
-      xmlns:p="http://primefaces.org/ui">
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
     <h:head>
         <f:facet name="first" >
             <meta http-equiv="X-UA-Compatible" content="IE=edge" />
@@ -15,52 +16,64 @@
         <h:outputScript name="js/layout.js" library="ultima-layout" />
 
     </h:head>
-    <h:body styleClass="login-body" >
-        <f:view contentType="text/html" locale='#{languajeBean.languaje}' id="fview" >
-            <p:messages autoUpdate="true" id="msgs" showDetail="true" showSummary="true" />
-            <h:form id="loginForm" >
-                <div class="card login-panel ui-fluid">
-                    <div class="ui-g">
-                        <div class="ui-g-12">
-                            <p:graphicImage name="images/splasss.png" library="ultima-layout" />
-                            <!--<p:graphicImage name="images/img-alodiga-logo.png" library="ultima-layout" />-->
+    <h:body >
+        <p:layout fullPage="true" style="border: none">
+            <p:layoutUnit position="north" size="80px" style="border: none">
+                <p:messages autoUpdate="true" id="msgs" showDetail="true" showSummary="true" />
+            </p:layoutUnit>
+            <p:layoutUnit position="center" style="border: none">
+                <f:view contentType="text/html" locale='#{languajeBean.languaje}' id="fview" >
+
+                    <h:form id="loginForm" styleClass="login-body" style="overflow:hidden; height: 100%;" >                        
+                        <div class="card login-panel ui-fluid" style="overflow: auto; height: 100%;">
+                            <div class="ui-g">
+                                <div class="ui-g-12">
+                                    <p:graphicImage name="images/splasss.png" library="ultima-layout" />
+                                    <!--<p:graphicImage name="images/img-alodiga-logo.png" library="ultima-layout" />-->
+                                </div>
+                                <div class="ui-g-12">
+                                    <h:panelGroup styleClass="md-inputfield">
+                                        <p:inputText id="username" value="#{loginBean.uname}"/>
+                                        <label>#{msg.login}</label>
+                                    </h:panelGroup>
+                                </div>
+                                <div class="ui-g-12">
+                                    <h:panelGroup styleClass="md-inputfield">
+                                        <p:password id="password" value="#{loginBean.password}"  feedback="false"/>
+                                        <label>#{msg.password}</label>
+                                    </h:panelGroup>
+                                </div>
+                                <div class="ui-g-12">
+                                    <p:commandButton value="#{msg.signins}" icon="ui-icon-person" update="loginForm" action="#{loginBean.loginProject}"  ajax="true"></p:commandButton>
+                                    <p:button outcome="/recover" value="#{msg.forgot}" icon="ui-icon-help" styleClass="secondary"/>
+                                </div>
+                                <div class="ui-g-12">
+                                    <p:button onclick="window.open('/BusinessPortalRegister/register.xhtml')" href="/BusinessPortalRegister/register.xhtml" icon="ui-icon-edit" value="#{msg.register}" />
+                                </div>
+                                <div class="ui-g-12">
+                                    <p:selectOneMenu value="#{languajeBean.languaje}" onchange="submit()" valueChangeListener="#{languajeBean.localityChanged}">
+                                        <f:selectItem itemLabel="Español" itemValue="es"/>
+                                        <f:selectItem itemLabel="English" itemValue="en"/>
+                                    </p:selectOneMenu>
+                                </div>
+                            </div>  
                         </div>
-                        <div class="ui-g-12">
-                            <h:panelGroup styleClass="md-inputfield">
-                                <p:inputText id="username" value="#{loginBean.uname}"/>
-                                <label>#{msg.login}</label>
-                            </h:panelGroup>
-                        </div>
-                        <div class="ui-g-12">
-                            <h:panelGroup styleClass="md-inputfield">
-                                <p:password id="password" value="#{loginBean.password}"  feedback="false"/>
-                                <label>#{msg.password}</label>
-                            </h:panelGroup>
-                        </div>
-                        <div class="ui-g-12">
-                            <p:commandButton value="#{msg.signins}" icon="ui-icon-person" update="loginForm" action="#{loginBean.loginProject}"  ajax="true"></p:commandButton>
-                            <p:button outcome="/recover"    value="#{msg.forgot}"   icon="ui-icon-help" styleClass="secondary"/>
-                        </div>
-                        <div class="ui-g-12">
-                            <h:outputLink value="/BusinessPortalRegister/register.xhtml" > #{msg.register}</h:outputLink>
-                        </div>
-                        <div class="ui-g-12">
-                            <p:selectOneMenu value="#{languajeBean.languaje}" onchange="submit()" valueChangeListener="#{languajeBean.localityChanged}">
-                                <f:selectItem itemLabel="Español" itemValue="es"/>
-                                <f:selectItem itemLabel="English" itemValue="en"/>
-                            </p:selectOneMenu>
-                        </div>
-                    </div>  
+
+                    </h:form>
+
+                    <h:outputStylesheet name="css/ripple.css" library="ultima-layout" />
+                    <h:outputStylesheet name="css/layout-#{guestPreferences.theme}.css" library="ultima-layout" />
+                </f:view>
+            </p:layoutUnit>
+            <p:layoutUnit position="south" style="border: none">
+                <div  style="color: #757575; text-align: center;">
+                    #{msg.copyright}
+                    <p:graphicImage name="images/icon-mc.png" library="ultima-layout" />
+                    <p:graphicImage name="images/icon-veri.png" library="ultima-layout" />
+                    <p:graphicImage name="images/icon-visa.png" library="ultima-layout" />
                 </div>
-            </h:form>
-            <div class="login-footer">
-                #{msg.copyright}
-                <p:graphicImage name="images/icon-mc.png" library="ultima-layout" />
-                <p:graphicImage name="images/icon-veri.png" library="ultima-layout" />
-                <p:graphicImage name="images/icon-visa.png" library="ultima-layout" />
-            </div>
-            <h:outputStylesheet name="css/ripple.css" library="ultima-layout" />
-            <h:outputStylesheet name="css/layout-#{guestPreferences.theme}.css" library="ultima-layout" />
-        </f:view>
+            </p:layoutUnit>
+
+        </p:layout>
     </h:body>
 </html>

@@ -1,0 +1,127 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:pe="http://primefaces.org/ui/extensions"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="title">#{msg.walletWithdrawTitle}</ui:define>
+
+    <ui:define name="content">
+        <h:form id="cardForm" >
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12">
+                        <f:facet name="header">
+                            <p:messages id="messages"  closable="true" />
+                        </f:facet>
+                        <p:panel class="card card-w-title" rendered="#{walletWithdrawController.balance gt 0}">
+                            <div align="center">
+                                <h1>#{msg.walletWithdrawTitle}</h1>
+
+                                <p:panelGrid id="cardInfoGrid" columns="2" >
+                                    <h:outputText value="#{msg.bankAccount}" />
+                                    <p:selectOneMenu id="bankAccountSelection" value="#{walletWithdrawController.selectedAccountBankId}" required="true">
+                                        <f:selectItem itemLabel="#{msg.SelectOne}" noSelectionOption="true" />
+                                        <f:selectItems value="#{walletWithdrawController.accountBankIdList}" var="bank" itemLabel="#{walletWithdrawController.getAccountBankName(bank)}" />
+                                        <p:ajax update="@this"/>
+                                    </p:selectOneMenu>
+
+                                    <h:outputText value="#{msg.amountToTransfer}" />
+                                    <p:inputNumber id="transferAmount" value="#{walletWithdrawController.withdrawAmount}" required="true"/>
+
+                                    <h:outputText value="#{msg.includeFees}" />
+                                    <p:selectBooleanCheckbox  id="includeFee" value="#{walletWithdrawController.includeFees}" />
+
+                                </p:panelGrid>
+                            </div>
+
+                            <div align="center">
+                                <p:panelGrid  columns="1" >
+                                    <p:commandButton  value="#{msg.withdraw}" update="@form :dialogForm" oncomplete="PF('confirmDialog').show()" id="btnSubmit" icon="ui-icon-search" actionListener="#{walletWithdrawController.verifyWithdraw()}" />
+                                </p:panelGrid>
+                            </div>
+
+                        </p:panel>
+                        <p:panel class="card card-w-title" rendered="#{walletWithdrawController.balance lt 1}">
+                            <div align="center">
+                                <h1>#{msg.walletWithdrawTitle}</h1>
+                                <h:outputText value="#{msg.noBalanceForService}" />
+                            </div>
+                        </p:panel>
+                    </div>
+                </div>
+            </div>
+        </h:form>
+        <p:dialog header="#{msg.rechargeWalletRechargeConfirm}" id="confirmDialog" widgetVar="confirmDialog" modal="true" showEffect="fade" hideEffect="fade" resizable="false">
+            <h:form id="dialogForm" >
+                <p:panel id="confirmDetail" style="text-align:center;" rendered="#{(not walletWithdrawController.hasError) and walletWithdrawController.phase eq 1}">
+                    <p:panelGrid columns="2">
+
+                        <h:outputText value="#{msg.bank}" />
+                        <h:outputText value="#{walletWithdrawController.selectedBank.bankId.name}" />
+
+                        <h:outputText value="#{msg.accountNumber}" />
+                        <h:outputText value="#{walletWithdrawController.selectedBank.accountNumber}" />
+
+                        <h:outputText value="#{msg.amountToTransfer}" />
+                        <h:outputText value="#{walletWithdrawController.withdrawAmount}" />
+
+                        <h:outputText value="#{msg.includeFees}" />
+                        <p:selectBooleanCheckbox  id="includeFee" value="#{walletWithdrawController.includeFees}" />
+
+                        <h:outputText value="#{msg.transferFee}" />
+                        <h:outputText value="#{walletTransferToUserController.transactionFee}" />
+
+                        <h:outputText value="#{msg.totalCharge}" />
+                        <h:outputText value="#{walletTransferToUserController.totalCharge}" />
+
+                        <p:commandButton  value="#{msg.confirm}" update="@form" oncomplete="PF('confirmDialog').show()" id="btnConfirm" icon="ui-icon-check" actionListener="#{walletWithdrawController.withdraw()}" />
+                        <p:commandButton  value="#{msg.cancel}" update=":dialogForm :cardForm" oncomplete="PF('confirmDialog').hide()" id="btnCancelRecharge" icon="ui-icon-cancel" actionListener="#{walletWithdrawController.reset()}"/>
+                    </p:panelGrid>
+                </p:panel>
+                <p:panel id="finalDetail" style="text-align:center;" rendered="#{(not walletWithdrawController.hasError) and walletWithdrawController.phase eq 2}">
+                    <p:panelGrid columns="1">
+                        <f:facet name="header">
+                            <p:messages id="messages"  autoUpdate="false" closable="false" />
+                        </f:facet>
+                        <p:panelGrid columns="2" id="pageToPrint">
+                            <h:outputText value="#{msg.bank}" />
+                            <h:outputText value="#{walletWithdrawController.selectedBank.bankId.name}" />
+
+                            <h:outputText value="#{msg.accountNumber}" />
+                            <h:outputText value="#{walletWithdrawController.selectedBank.accountNumber}" />
+
+                            <h:outputText value="#{msg.amountToTransfer}" />
+                            <h:outputText value="#{walletWithdrawController.withdrawAmount}" />
+
+                            <h:outputText value="#{msg.transferTransaction}" />
+                            <h:outputText value="#{walletWithdrawController.transactionId}" />
+
+                            <h:outputText value="#{msg.transferFee}" />
+                            <h:outputText value="#{walletTransferToUserController.transactionFee}" />
+
+                            <h:outputText value="#{msg.totalCharge}" />
+                            <h:outputText value="#{walletTransferToUserController.totalCharge}" />
+
+                        </p:panelGrid>
+                        <p:panelGrid columns="2">
+                            <p:commandButton  value="#{msg.accept}" update=":confirmDialog :cardForm" oncomplete="PF('confirmDialog').hide()" id="btnAccepLast" icon="ui-icon-check" actionListener="#{walletWithdrawController.reset()}"/>
+                            <p:commandButton  value="#{msg.print}" id="btnPrint" icon="ui-icon-print" >
+                                <p:printer target="pageToPrint" />
+                            </p:commandButton>
+                        </p:panelGrid>
+                    </p:panelGrid>
+                </p:panel>
+                <p:panel id="errorDetail" style="text-align:center;" rendered="#{walletWithdrawController.hasError}">
+                    <h:outputText value="#{walletWithdrawController.errorMessage}" />
+                </p:panel>
+            </h:form>
+        </p:dialog>
+
+
+    </ui:define>
+
+</ui:composition>
+

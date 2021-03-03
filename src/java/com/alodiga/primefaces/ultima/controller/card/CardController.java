@@ -12,6 +12,9 @@ import com.alodiga.wallet.ws.CheckStatusCredentialCard;
 import com.alodiga.wallet.ws.DesactivateCardResponses;
 import com.portal.business.commons.data.BusinessData;
 import com.portal.business.commons.data.LogData;
+import com.portal.business.commons.data.PreferencesData;
+import com.portal.business.commons.enumeration.BPTransactionStatus;
+import com.portal.business.commons.enumeration.BusinessServiceType;
 import com.portal.business.commons.enumeration.OperationType;
 import com.portal.business.commons.exceptions.GeneralException;
 import com.portal.business.commons.exceptions.NullParameterException;
@@ -64,7 +67,7 @@ public class CardController {
     @ManagedProperty(value = "#{loginBean}")
     LoginBean loginBean;
 
-    private LogData logData;
+    private final LogData logData = new LogData();
 
     private boolean hasError = false;
 
@@ -80,7 +83,6 @@ public class CardController {
             bundle = ResourceBundle.getBundle("com.alodiga.remittance.messages.message", Locale.forLanguageTag(lenguajeBean.getLanguaje()));
         }
         userId = 379L; //TODO implement User Id
-        logData = new LogData();
     }
 
     public String getCardNumber() {
@@ -172,21 +174,24 @@ public class CardController {
     }
 
     public void activateCard() {
+        UserCardTransactionLog log = createLog();
         try {
+            messages = null;
             String cardEncrypted = AlodigaCryptographyUtils.aloDesencrypt(cardNumber);
             BusinessData businessData = new BusinessData();
-            LimitedsTransactionsResponse  limitedsTransactionsResponse = businessData.validTransacionalLimit(loginBean.getCurrentBusiness(),OperationType.CARD_ACTIVATED);
-            if (limitedsTransactionsResponse.getCode()==ResponseCode.SUCESS.getCodigo()){
+            saveInProcessLog(log);
+            LimitedsTransactionsResponse limitedsTransactionsResponse = businessData.validTransacionalLimit(loginBean.getCurrentBusiness(), OperationType.CARD_ACTIVATED);
+            if (limitedsTransactionsResponse.getCode() == ResponseCode.SUCESS.getCodigo()) {
                 ActivateCardResponses response = proxy.activateCardbyBusiness(loginBean.getCurrentBusiness().getId(), cardEncrypted, timezone);
                 switch (response.getCodigoRespuesta()) {
                     case "00": {
                         if (response.getCredentialResponse() != null) {
                             FacesContext.getCurrentInstance().addMessage(null,
                                     new FacesMessage(bundle.getString("cardActivateSuccess")));
-                            saveLog(TransactionAction.ACTIVATE, true);
+                            saveCompleteLog(log, TransactionAction.ACTIVATE, true);
                         } else {
                             messages = bundle.getString("cardActivateFail");
-                            saveLog(TransactionAction.ACTIVATE, false);
+                            saveCompleteLog(log, TransactionAction.ACTIVATE, false);
                         }
                     }
                     break;
@@ -195,13 +200,12 @@ public class CardController {
                     }
                     break;
                     default:
-
                         messages = bundle.getString("error.general") + " : " + response.getCodigoRespuesta();
                 }
-            }else {
+            } else {
                 hasError = true;
                 errorMessage = bundle.getString("error.registerwsconnection");
-            }       
+            }
         } catch (GeneralException | NullParameterException | RemoteException ex) {
             Logger.getLogger(rechargeController.class.getName()).log(Level.SEVERE, null, ex);
             hasError = true;
@@ -209,24 +213,27 @@ public class CardController {
         }
 
         if (messages != null && !messages.isEmpty()) {
+            saveFailedLog(log);
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!", messages));
         }
 
     }
 
     public void deactivateCard() {
+        UserCardTransactionLog log = createLog();
         try {
-
+            messages = null;
             String cardEncrypted = AlodigaCryptographyUtils.aloDesencrypt(cardNumber);
+            saveInProcessLog(log);
             DesactivateCardResponses response = proxy.desactivateCardByBusiness(loginBean.getCurrentBusiness().getId(), cardEncrypted, timezone);
             switch (response.getCodigoRespuesta()) {
                 case "00": {
                     if (response.getCredentialResponse() != null) {
-                        saveLog(TransactionAction.DEACTIVATE, true);
+                        saveCompleteLog(log, TransactionAction.DEACTIVATE, true);
                         FacesContext.getCurrentInstance().addMessage(null,
                                 new FacesMessage(bundle.getString("cardDeactivateSuccess")));
                     } else {
-                        saveLog(TransactionAction.DEACTIVATE, false);
+                        saveCompleteLog(log, TransactionAction.DEACTIVATE, false);
                         messages = bundle.getString("cardDeactivateFail");
                     }
 
@@ -241,10 +248,10 @@ public class CardController {
             }
         } catch (RemoteException ex) {
             Logger.getLogger(CardController.class.getName()).log(Level.SEVERE, null, ex);
-            saveLog(TransactionAction.DEACTIVATE, false);
             messages = bundle.getString("error.cardwsconnection");
         }
         if (messages != null && !messages.isEmpty()) {
+            saveFailedLog(log);
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!", messages));
         }
 
@@ -254,10 +261,9 @@ public class CardController {
         try {
             hasError = false;
             String cardEncrypted = AlodigaCryptographyUtils.aloDesencrypt(cardNumber);
-            System.out.println("cardEncrypted " + cardEncrypted);
-            BusinessData businessData = new BusinessData();
-            LimitedsTransactionsResponse  limitedsTransactionsResponse = businessData.validTransacionalLimit(loginBean.getCurrentBusiness(),OperationType.CARD_ACTIVATED);
-            if (limitedsTransactionsResponse.getCode()==ResponseCode.SUCESS.getCodigo()){
+            PreferencesData preferenceData = new PreferencesData();
+            LimitedsTransactionsResponse limitedsTransactionsResponse = preferenceData.validateService(loginBean.getCurrentBusiness(), BusinessServiceType.CARD_ACTIVATION, 3);
+            if (limitedsTransactionsResponse.getCode() == ResponseCode.SUCESS.getCodigo()) {
                 CheckStatusCardResponses statusCardResponse = proxy.checkStatusCardByBusiness(cardEncrypted, timezone);
                 switch (statusCardResponse.getCodigoRespuesta()) {
                     case "00": {
@@ -278,16 +284,22 @@ public class CardController {
                         }
                     }
                     break;
+                    case "58": {
+                        cardStatus = null;
+                        hasError = true;
+                        errorMessage = bundle.getString("error.invalidCardNumber");
+                    }
+                    break;
                     default:
                         cardStatus = null;
                         hasError = true;
                         errorMessage = bundle.getString("error.general") + " : " + statusCardResponse.getCodigoRespuesta();
                 }
-             }else {
+            } else {
                 hasError = true;
                 errorMessage = bundle.getString("error.registerwsconnection");
-            }       
-        } catch (GeneralException | NullParameterException | RemoteException ex) {
+            }
+        } catch (RemoteException ex) {
             Logger.getLogger(CardController.class.getName()).log(Level.SEVERE, null, ex);
             cardStatus = null;
             hasError = true;
@@ -296,12 +308,13 @@ public class CardController {
     }
 
     public void checkBalanceCard() {
-
+        UserCardTransactionLog log = createLog();
         try {
             hasError = false;
             cardInfo = new CardInfo();
             cardInfo.setCardNumber(cardNumber);
             String cardEncrypted = AlodigaCryptographyUtils.aloDesencrypt(cardNumber);
+            saveInProcessLog(log);
             CheckStatusCardResponses statusCardResponse = proxy.checkStatusCardByBusiness(cardEncrypted, timezone);
             switch (statusCardResponse.getCodigoRespuesta()) {
                 case "00": {
@@ -313,20 +326,28 @@ public class CardController {
                         CheckStatusCredentialAccount statusAccount = proxy.checkStatusAccount(userId, accountEncrypted, timezone).getCheckStatusCredentialAccount();
                         cardInfo.setAccountBalance(statusAccount.getAvailablePurchases());
                         cardInfo.setAccountDollarBalance(statusAccount.getDollarBalance());
-                        saveLog(TransactionAction.CONSULT, true);
+                        saveCompleteLog(log, TransactionAction.CONSULT, true);
                     } else {
-                        saveLog(TransactionAction.CONSULT, false);
+                        saveCompleteLog(log, TransactionAction.CONSULT, false);
                     }
                 }
                 break;
+                case "58": {
+                    saveFailedLog(log);
+                    cardStatus = null;
+                    hasError = true;
+                    errorMessage = bundle.getString("error.invalidCardNumber");
+                }
+                break;
                 default:
+                    saveFailedLog(log);
                     cardInfo = null;
                     hasError = true;
                     errorMessage = bundle.getString("error.general") + " : " + statusCardResponse.getCodigoRespuesta();
             }
         } catch (Exception ex) {
             Logger.getLogger(CardController.class.getName()).log(Level.SEVERE, null, ex);
-            saveLog(TransactionAction.CONSULT, false);
+            saveFailedLog(log);
             cardInfo = null;
             hasError = true;
             errorMessage = bundle.getString("error.cardwsconnection");
@@ -334,14 +355,60 @@ public class CardController {
 
     }
 
-    public void saveLog(TransactionAction action, boolean success) {
+    public UserCardTransactionLog createLog() {
         try {
             UserCardTransactionLog log = new UserCardTransactionLog();
+            log.setCardNumber(cardNumber);
+            log.setDateLog(new Date());
+            log.setCreatedDate(new Date());
+            log.setSuccess(false);
+            log.setTransactionAction(null);
+            log.setTransactionStatus(BPTransactionStatus.CREATED);
+            log.setUser(loginBean.getUserSession());
+            return logData.saveUserCardTransactionLog(log);
+        } catch (NullParameterException | GeneralException ex) {
+            Logger.getLogger(CardController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null;
+    }
+
+    public void saveInProcessLog(UserCardTransactionLog log) {
+        try {
+            log.setCardNumber(cardNumber);
+            log.setDateLog(new Date());
+            log.setSuccess(false);
+            log.setTransactionAction(null);
+            log.setTransactionStatus(BPTransactionStatus.IN_PROCESS);
+            log.setUser(loginBean.getUserSession());
+            logData.saveUserCardTransactionLog(log);
+
+        } catch (NullParameterException | GeneralException ex) {
+            Logger.getLogger(CardController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    public void saveCompleteLog(UserCardTransactionLog log, TransactionAction action, boolean success) {
+        try {
             log.setCardNumber(cardNumber);
             log.setDateLog(new Date());
             log.setSuccess(success);
             log.setTransactionAction(action);
             log.setUser(loginBean.getUserSession());
+            log.setTransactionStatus(BPTransactionStatus.COMPLETED);
+            logData.saveUserCardTransactionLog(log);
+        } catch (NullParameterException | GeneralException ex) {
+            Logger.getLogger(CardController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    public void saveFailedLog(UserCardTransactionLog log) {
+        try {
+            log.setCardNumber(cardNumber);
+            log.setDateLog(new Date());
+            log.setSuccess(false);
+            log.setTransactionAction(null);
+            log.setUser(loginBean.getUserSession());
+            log.setTransactionStatus(BPTransactionStatus.FAILED);
             logData.saveUserCardTransactionLog(log);
         } catch (NullParameterException | GeneralException ex) {
             Logger.getLogger(CardController.class.getName()).log(Level.SEVERE, null, ex);

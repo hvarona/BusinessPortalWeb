@@ -10,7 +10,8 @@
 
     <ui:define name="content">
         <h:form id="AccountBankCreateForm">
-            <h1>#{msg.pos}</h1>
+            <h1>#{msg.accountBank}</h1>
+            <p:messages id="general" globalOnly="true" autoUpdate="true" showDetail="true" showSummary="false"  />
             <p:panelGrid id="containerGrid" columns="2" layout="grid"  style="border:0px none; background-color:transparent;">
                 <p:panelGrid id="dataGrid" columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group" style="border:0px none; background-color:transparent;">
 
@@ -20,10 +21,12 @@
                     <p:message for="accountBankNumber"/>
 
                     <p:outputLabel value="#{msg.bank}" for="bank" />
+                    
                     <p:selectOneMenu id="bank" value="#{accountBankController.bank}" converter="bankConverter" required="true" >
                         <f:selectItem itemLabel="Selecione Uno" noSelectionOption="true"/>
                         <f:selectItems value="#{dtListAccountBankController.banks}"/>
-                    </p:selectOneMenu> 
+                    </p:selectOneMenu>
+                    
                     <p:message for="bank"/>
                     <p:outputLabel value="#{msg.accountType}" for="accountType" />
                     <p:selectOneMenu id="accountType" value="#{accountBankController.accountTypeBank}" converter="accountTypeBankConverter" required="true" >
@@ -31,13 +34,6 @@
                         <f:selectItems value="#{dtListAccountBankController.accountTypeBanks}"/>
                     </p:selectOneMenu> 
                     <p:message for="accountType"/>
-                   <p:outputLabel value="#{msg.status}" for="status" />
-                   <p:selectOneMenu id="status" value="#{accountBankController.statusAccountBank}" converter="statusAccountBankConverter" required="true" >
-                        <f:selectItem itemLabel="Selecione Uno" noSelectionOption="true"/>
-                        <f:selectItems value="#{dtListAccountBankController.statusAccountBanks}"/>
-                    </p:selectOneMenu> 
-                    <p:message for="status"/>
-                    
                     
                 </p:panelGrid>
             </p:panelGrid>

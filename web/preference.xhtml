@@ -6,7 +6,7 @@
                 template="/WEB-INF/template.xhtml"
                 xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
 
-    <ui:define name="title">#{msg.preference}</ui:define>
+    <ui:define name="title">#{msg.transactionLimitsTitle}</ui:define>
 
     <ui:define name="content">
         <h:form id="PreferenceValueForm">
@@ -14,55 +14,43 @@
                 <div class="ui-g">
                     <div class="ui-g-12">
                         <div class="card card-w-title">
-                            <h1>#{msg.preference}</h1>
-                            <p:panelGrid id="grid" columns="1" >
-                                <f:facet name="header">
-                                    <p:messages id="messages"  autoUpdate="true" closable="true" />
-                                </f:facet>
-                                <p:panelGrid columns="2" columnClasses="ui-grid-col-4,ui-grid-col-6" layout="grid" styleClass="ui-panelgrid-blank form-group" style="border:0px none; background-color:transparent;">
-                                    <p:outputLabel value="#{msg.preferenceType}" for="selectedPreference" />
-                                    <p:selectOneMenu id="selectedPreference" value="#{preferenceValueController.selectedPreference}" converter="preferenceConverter">
-                                        <f:selectItem itemLabel="#{msg.SelectOne}" transient="true" noSelectionOption="true"/>
-                                        <f:selectItems value="#{preferenceValueController.preferences}" var="pref" itemLabel="#{pref.name}" itemValue="#{pref}"/>
-                                        <f:ajax listener="#{preferenceValueController.reloadSelectedFields()}" render="fieldMenu" />
-                                    </p:selectOneMenu>
-                                </p:panelGrid>
+                            <h1>#{msg.transactionLimitsTitle}</h1>
+                            <f:facet name="header">
+                                <p:messages id="messages"  autoUpdate="true" closable="true" />
+                            </f:facet>
 
-                                <p:dataTable id="fieldMenu" var="field" value="#{preferenceValueController.selectedFields}" >
-                                    <p:column headerText="#{msg.field}" >
-                                        <h:outputText value="#{field.displayName}" />
-                                    </p:column>
+                            <p:tabView>
+                                <c:forEach items="#{preferenceValueController.serviceTransactionLimites}" var="serviceTransacitonLimit">
+                                    <p:tab title="#{serviceTransacitonLimit.title}"> 
+                                        <p:panelGrid id="transactionLimitsGrid" columns="2">
 
-                                    <p:column headerText="#{msg.value}" rendered="#{field.preferenceType.type eq 'STRING'}" >
-                                        <h:inputText value="#{field.currentValue}" />
-                                    </p:column>
-                                    
-                                    <p:column headerText="#{msg.value}" rendered="#{field.preferenceType.type eq 'FLOAT'}" >
-                                        <p:inputNumber value="#{field.currentValue}" />
-                                    </p:column>
-                                    
-                                    <p:column headerText="#{msg.value}" rendered="#{field.preferenceType.type eq 'INTEGER'}" >
-                                        <p:inputNumber value="#{field.currentValue}"  decimalPlaces="0" />
-                                    </p:column>
-                                    
-                                    <p:column headerText="#{msg.value}" rendered="#{field.preferenceType.type eq 'DATE'}" >
-                                        <p:inputMask value="#{field.currentValue}"  mask="99/99/9999" />
-                                    </p:column>
+                                            <p:outputLabel value="#{msg.transactionLimitsTransactionDailyQuantity}"/>
+                                            <h:outputText value="#{serviceTransacitonLimit.maxDailyTransactionQuantity}"/>
 
-                                    <p:column headerText="#{msg.value}" rendered="#{field.preferenceType.type eq 'PERIOD'}" >
-                                        <h:inputText value="#{field.currentValue}"/>
-                                    </p:column>
-                                    
-                                    <p:column headerText="#{msg.value}" rendered="#{field.preferenceType.type eq 'BOOLEAN'}" >
-                                        <h:selectBooleanCheckbox value="#{field.currentBooleanValue}"/>
-                                    </p:column>
-                                    
-                                </p:dataTable>
-                            </p:panelGrid>
+                                            <p:outputLabel value="#{msg.transactionLimitsTransactionMonthlyQuantity}"/>
+                                            <h:outputText value="#{serviceTransacitonLimit.maxMonthlyTransactionQuantity}"/>
+
+                                            <p:outputLabel value="#{msg.transactionLimitsTransactionYearlyQuantity}"/>
+                                            <h:outputText value="#{serviceTransacitonLimit.maxYearTransactionQuantity}"/>
+
+                                            <p:outputLabel value="#{msg.transactionLimitsTransactionDailyAmount}" rendered="#{serviceTransacitonLimit.type.hasAmount}"/>
+                                            <h:outputText value="#{serviceTransacitonLimit.maxDailyTransactionAmount}" rendered="#{serviceTransacitonLimit.type.hasAmount}"/>
+
+                                            <p:outputLabel value="#{msg.transactionLimitsTransactionMonthlyAmount}" rendered="#{serviceTransacitonLimit.type.hasAmount}"/>
+                                            <h:outputText value="#{serviceTransacitonLimit.maxMonthlyTransactionAmount}" rendered="#{serviceTransacitonLimit.type.hasAmount}"/>
+
+                                            <p:outputLabel value="#{msg.transactionLimitsTransactionYearlyAmount}" rendered="#{serviceTransacitonLimit.type.hasAmount}"/>
+                                            <h:outputText value="#{serviceTransacitonLimit.maxYearTransactionAmount}" rendered="#{serviceTransacitonLimit.type.hasAmount}"/>
+
+                                        </p:panelGrid>
+                                    </p:tab>
+                                </c:forEach>
+
+                            </p:tabView>
                         </div>
                     </div>
                 </div>
-            </div>            
+            </div>
         </h:form>
     </ui:define>
 

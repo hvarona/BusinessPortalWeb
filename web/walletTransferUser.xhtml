@@ -1,0 +1,153 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:pe="http://primefaces.org/ui/extensions"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="title">#{msg.walletTransferUserTitle}</ui:define>
+
+    <ui:define name="content">
+        <h:form id="transferForm" >
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12">
+                        <div class="card card-w-title">
+                            <div align="center">
+                                <h1>#{msg.walletTransferUserTitle}</h1>
+                                <f:facet name="header">
+                                    <p:messages id="messages"  autoUpdate="true" closable="true" />
+                                </f:facet>
+                                <p:panelGrid id="cardInfoGrid" columns="2" >
+                                    <h:outputText value="#{msg.userEmailOrPhone}" />
+                                    <p:inputText value="#{walletTransferToUserController.userEmailOrPhone}" >
+                                        <p:ajax event="change" update="@form"/>
+                                    </p:inputText>
+                                </p:panelGrid>
+                            </div>
+
+                            <div align="center">
+                                <p:panelGrid  columns="1" >
+                                    <p:commandButton  value="#{msg.searchUser}" update="@form,:dialogForm" oncomplete="PF('confirmDialog').show()" id="btnSubmit" icon="ui-icon-search" actionListener="#{walletTransferToUserController.searchUser()}" />
+                                </p:panelGrid>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </h:form>
+        <p:dialog header="#{msg.rechargeWalletRechargeConfirm}" id="confirmDialog" widgetVar="confirmDialog" modal="true" showEffect="fade" hideEffect="fade" resizable="false">
+            <h:form id="dialogForm" >
+                <p:panel id="amountDetail" style="text-align:center;" rendered="#{not walletTransferToUserController.hasError and walletTransferToUserController.phase eq 1}">
+                    <p:panelGrid columns="2">
+                        <h:outputText value="#{msg.firstName}" />
+                        <h:outputText value="#{walletTransferToUserController.firstName}" />
+
+                        <h:outputText value="#{msg.lastName}" />
+                        <h:outputText value="#{walletTransferToUserController.lastName}" />
+
+                        <h:outputText value="#{msg.userEmail}" />
+                        <h:outputText value="#{walletTransferToUserController.userEmail}" />
+
+                        <h:outputText value="#{msg.userPhone}" />
+                        <h:outputText value="#{walletTransferToUserController.userPhone}" />
+
+                        <h:outputText value="#{msg.accountNumber}" />
+                        <h:outputText value="#{walletTransferToUserController.accountNumber}" />
+
+                        <h:outputText value="#{msg.amountToTransfer}" />
+                        <p:inputNumber id="amountToTransfer" value="#{walletTransferToUserController.transferAmount}" />
+                        
+                        <h:outputText value="#{msg.includeFees}" />
+                        <p:selectBooleanCheckbox  id="includeFee" value="#{walletTransferToUserController.includeFees}" />
+
+                        <p:commandButton  value="#{msg.accept}" process="dialogForm:amountToTransfer @this" update="@form" 
+                                          oncomplete="PF('confirmDialog').show()" 
+                                          id="btnAcceptTransfer" icon="ui-icon-send" 
+                                          action="#{walletTransferToUserController.verifyTransfer()}" />
+                        <p:commandButton  value="#{msg.cancel}" update=":confirmDialog :transferForm" oncomplete="PF('confirmDialog').hide()" id="btnCancel" icon="ui-icon-cancel" actionListener="#{walletTransferToUserController.reset()}"/>
+                    </p:panelGrid>
+                </p:panel>
+                <p:panel id="confirmDetail" style="text-align:center;" rendered="#{not walletTransferToUserController.hasError and walletTransferToUserController.phase eq 2}">
+                    <p:panelGrid columns="2">
+                        <h:outputText value="#{msg.firstName}" />
+                        <h:outputText value="#{walletTransferToUserController.firstName}" />
+
+                        <h:outputText value="#{msg.lastName}" />
+                        <h:outputText value="#{walletTransferToUserController.lastName}" />
+
+                        <h:outputText value="#{msg.userEmail}" />
+                        <h:outputText value="#{walletTransferToUserController.userEmail}" />
+
+                        <h:outputText value="#{msg.userPhone}" />
+                        <h:outputText value="#{walletTransferToUserController.userPhone}" />
+
+                        <h:outputText value="#{msg.accountNumber}" />
+                        <h:outputText value="#{walletTransferToUserController.accountNumber}" />
+
+                        <h:outputText value="#{msg.amountToTransfer}" />
+                        <h:outputText value="#{walletTransferToUserController.transferAmount}" />
+                        
+                        <h:outputText value="#{msg.transferFee}" />
+                        <h:outputText value="#{walletTransferToUserController.transactionFee}" />
+
+                        <h:outputText value="#{msg.totalCharge}" />
+                        <h:outputText value="#{walletTransferToUserController.totalCharge}" />
+
+                        <p:commandButton  value="#{msg.confirm}" update="@form" oncomplete="PF('confirmDialog').show()" id="btnConfirm" icon="ui-icon-check" actionListener="#{walletTransferToUserController.transfer()}" />
+                        <p:commandButton  value="#{msg.cancel}" update=":confirmDialog :transferForm" oncomplete="PF('confirmDialog').hide()" id="btnCancelRecharge" icon="ui-icon-cancel" actionListener="#{walletTransferToUserController.reset()}"/>
+                    </p:panelGrid>
+                </p:panel>
+                <p:panel id="finalDetail" style="text-align:center;" rendered="#{not walletTransferToUserController.hasError and walletTransferToUserController.phase eq 3}">
+
+                    <f:facet name="header">
+                        <p:messages id="messages"  autoUpdate="false" closable="false" />
+                    </f:facet>
+                    <p:panelGrid columns="2" id="pageToPrint">
+                        <h:outputText value="#{msg.firstName}" />
+                        <h:outputText value="#{walletTransferToUserController.firstName}" />
+
+                        <h:outputText value="#{msg.lastName}" />
+                        <h:outputText value="#{walletTransferToUserController.lastName}" />
+
+                        <h:outputText value="#{msg.userEmail}" />
+                        <h:outputText value="#{walletTransferToUserController.userEmail}" />
+
+                        <h:outputText value="#{msg.userPhone}" />
+                        <h:outputText value="#{walletTransferToUserController.userPhone}" />
+
+                        <h:outputText value="#{msg.accountNumber}" />
+                        <h:outputText value="#{walletTransferToUserController.accountNumber}" />
+
+                        <h:outputText value="#{msg.amountToTransfer}" />
+                        <h:outputText value="#{walletTransferToUserController.transferAmount}" />
+
+                        <h:outputText value="#{msg.transferTransaction}" />
+                        <h:outputText value="#{walletTransferToUserController.transactionId}" />
+                        
+                        <h:outputText value="#{msg.transferFee}" />
+                        <h:outputText value="#{walletTransferToUserController.transactionFee}" />
+
+                        <h:outputText value="#{msg.totalCharge}" />
+                        <h:outputText value="#{walletTransferToUserController.totalCharge}" />
+                    </p:panelGrid>
+                    <p:panelGrid columns="2">
+                        <p:commandButton  value="#{msg.accept}" update=":confirmDialog :transferForm" oncomplete="PF('confirmDialog').hide()" id="btnAccepLast" icon="ui-icon-check" actionListener="#{walletTransferToUserController.reset()}"/>
+                        <p:commandButton  value="#{msg.print}" id="btnPrint" icon="ui-icon-print" >
+                            <p:printer target="pageToPrint" />
+                        </p:commandButton>
+                    </p:panelGrid>
+                </p:panel>
+                <p:panel id="errorDetail" style="text-align:center;" rendered="#{walletTransferToUserController.hasError}">
+                    <h:outputText value="#{walletTransferToUserController.errorMessage}" />
+                </p:panel>
+            </h:form>
+        </p:dialog>
+
+
+    </ui:define>
+
+</ui:composition>
+

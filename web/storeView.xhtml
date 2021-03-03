@@ -15,80 +15,84 @@
                     <div class="ui-g-12">
                         <div class="card card-w-title">
                             <h1>#{msg.store}</h1>
+                            <p:messages id="general" globalOnly="true" autoUpdate="true" showDetail="true" showSummary="false"  />
+                            <p:panelGrid id="containerGrid" columns="2" layout="grid"  style="border:0px none; background-color:transparent;">
+                                <p:panelGrid id="dataGrid" columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group" style="border:0px none; background-color:transparent;">
+                                    <p:outputLabel value="#{msg.storeCode}" for="storeCode" />
+                                    <p:inputText id="storeCode" value="#{storeController.storeCode}" title="#{msg.storeCode}" required="true" requiredMessage="#{msg.valueRequired}">
+                                        <p:ajax event="keyup" update="qrCode"/>
+                                    </p:inputText>
+                                    <p:message for="storeCode"/>
 
-                            <!--<p:panelGrid id="grid" columns="6" columnClasses="ui-grid-col-2,ui-grid-col-4,ui-grid-col-2,ui-grid-col-4" layout="grid" styleClass="ui-panelgrid-blank form-group" style="border:0px none; background-color:transparent;">!-->
-                            <!--<f:facet name="header">
-                                <p:messages id="messages"  autoUpdate="true" closable="true" />
-                            </f:facet>!-->
+                                    <p:outputLabel value="#{msg.name}" for="name" />
+                                    <p:inputText id="name" value="#{storeController.name}" title="#{msg.name}" required="true" requiredMessage="#{msg.valueRequired}"/>
+                                    <p:message for="name"/>
 
-                            <p:panelGrid id="grid" columns="6" layout="grid" style="border:0px none; background-color:transparent;">
-                                <p:outputLabel value="#{msg.storeCode}" for="storeCode" />
-                                <p:inputText id="storeCode" value="#{storeController.storeCode}" title="#{msg.storeCode}" required="true" requiredMessage="#{msg.valueRequired}"/>
-                                <p:message for="storeCode"/>
+                                    <p:outputLabel value="#{msg.address}" for="address" />
+                                    <p:inputTextarea id="address" value="#{storeController.address}" title="#{msg.address}"/>
+                                    <p:message for="address"/>
 
-                                <p:outputLabel value="#{msg.name}" for="name" />
-                                <p:inputText id="name" value="#{storeController.name}" title="#{msg.name}" required="true" requiredMessage="#{msg.valueRequired}"/>
-                                <p:message for="name"/>
-                                
-                                <p:outputLabel value="#{msg.address}" for="address" />
-                                <p:inputTextarea id="address" value="#{storeController.address}" title="#{msg.address}"/>
-                                <p:message for="address"/>
+                                    <p:outputLabel value="#{msg.openTime}" for="openTime" />
+                                    <pe:timePicker id="openTime" value="#{storeController.openTime}" 
+                                                   mode="popup" onHourShow="tpOpenStoreOnHourShowCallback" 
+                                                   onMinuteShow="tpOpenStoreOnMinuteShowCallback" 
+                                                   required="true" widgetVar="openStoreTime" requiredMessage="#{msg.valueRequired}"/>
+                                    <p:message for="openTime"/>
 
-                                <p:outputLabel value="#{msg.openTime}" for="openTime" />
-                                <pe:timePicker id="openTime" value="#{storeController.openTime}" 
-                                               mode="popup" onHourShow="tpOpenStoreOnHourShowCallback" 
-                                               onMinuteShow="tpOpenStoreOnMinuteShowCallback" 
-                                               required="true" widgetVar="openStoreTime" requiredMessage="#{msg.valueRequired}"/>
-                                <p:message for="openTime"/>
+                                    <p:outputLabel value="#{msg.closeTime}" for="closeTime" />
+                                    <pe:timePicker id="closeTime" value="#{storeController.closeTime}" 
+                                                   mode="popup" onHourShow="tpCloseStoreOnHourShowCallback"
+                                                   onMinuteShow="tpCloseStoreOnMinuteShowCallback"
+                                                   required="true" widgetVar="closeStoreTime" requiredMessage="#{msg.valueRequired}"/>
+                                    <p:message for="closeTime"/>
 
-                                <p:outputLabel value="#{msg.closeTime}" for="closeTime" />
-                                <pe:timePicker id="closeTime" value="#{storeController.closeTime}" 
-                                               mode="popup" onHourShow="tpCloseStoreOnHourShowCallback"
-                                               onMinuteShow="tpCloseStoreOnMinuteShowCallback"
-                                               required="true" widgetVar="closeStoreTime" requiredMessage="#{msg.valueRequired}"/>
-                                <p:message for="closeTime"/>
+                                    <script type="text/javascript">
+                                        /* <![CDATA[ */
+                                        function tpOpenStoreOnHourShowCallback(hour) {
+                                            if (!PrimeFaces.widgets['closeStoreTime']) {
+                                                return false;
+                                            }
 
-                                <script type="text/javascript">
-                                    /* <![CDATA[ */
-                                    function tpOpenStoreOnHourShowCallback(hour) {
-                                        if (!PrimeFaces.widgets['closeStoreTime']) {
-                                            return false;
+                                            return (parseInt(hour) <= parseInt(PF('closeStoreTime').getHours()));
+
                                         }
 
-                                        return (parseInt(hour) <= parseInt(PF('closeStoreTime').getHours()));
+                                        function tpOpenStoreOnMinuteShowCallback(hour, minute) {
+                                            if (!PrimeFaces.widgets['closeStoreTime']) {
+                                                return false;
+                                            }
 
-                                    }
+                                            var tpCloseHour = parseInt(PF('closeStoreTime').getHours());
 
-                                    function tpOpenStoreOnMinuteShowCallback(hour, minute) {
-                                        if (!PrimeFaces.widgets['closeStoreTime']) {
-                                            return false;
+                                            return (parseInt(hour) < tpCloseHour) || ((parseInt(hour) == tpCloseHour) && (parseInt(minute) < parseInt(PF('closeStoreTime').getMinutes())));
+
                                         }
 
-                                        var tpCloseHour = parseInt(PF('closeStoreTime').getHours());
+                                        function tpCloseStoreOnHourShowCallback(hour) {
+                                            if (!PrimeFaces.widgets['openStoreTime']) {
+                                                return false;
+                                            }
 
-                                        return (parseInt(hour) < tpCloseHour) || ((parseInt(hour) == tpCloseHour) && (parseInt(minute) < parseInt(PF('closeStoreTime').getMinutes())));
-
-                                    }
-
-                                    function tpCloseStoreOnHourShowCallback(hour) {
-                                        if (!PrimeFaces.widgets['openStoreTime']) {
-                                            return false;
+                                            return parseInt(hour) >= parseInt(PF('openStoreTime').getHours());
                                         }
 
-                                        return parseInt(hour) >= parseInt(PF('openStoreTime').getHours());
-                                    }
+                                        function tpCloseStoreOnMinuteShowCallback(hour, minute) {
+                                            if (!PrimeFaces.widgets['openStoreTime']) {
+                                                return false;
+                                            }
 
-                                    function tpCloseStoreOnMinuteShowCallback(hour, minute) {
-                                        if (!PrimeFaces.widgets['openStoreTime']) {
-                                            return false;
+                                            var tpStartHour = parseInt(PF('openStoreTime').getHours());
+
+                                            return (parseInt(hour) > tpStartHour) || ((parseInt(hour) == tpStartHour) && (parseInt(minute) > parseInt(PF('openStoreTime').getMinutes())));
                                         }
-
-                                        var tpStartHour = parseInt(PF('openStoreTime').getHours());
-
-                                        return (parseInt(hour) > tpStartHour) || ((parseInt(hour) == tpStartHour) && (parseInt(minute) > parseInt(PF('openStoreTime').getMinutes())));
-                                    }
-                                    /* ]]> */
-                                </script>
+                                        /* ]]> */
+                                    </script>
+                                </p:panelGrid>
+                                <pe:qrCode id="qrCode" 
+                                           renderMethod="image" 
+                                           rendererType="normal" 
+                                           size="200" 
+                                           text="#{storeController.QRCode}"/>
                             </p:panelGrid>
                         </div>
                     </div>

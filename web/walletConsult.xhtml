@@ -1,0 +1,83 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:pe="http://primefaces.org/ui/extensions"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="title">#{msg.walletConsultTitle}</ui:define>
+
+    <ui:define name="content">
+        <h:form id="cardForm" >
+            <div class="ui-fluid">
+                <div class="ui-g">
+                    <div class="ui-g-12">
+                        <div class="card card-w-title">
+                            <div align="center">
+                                <h1>#{msg.walletConsultTitle}</h1>
+                                <h:panelGrid columns="2">
+                                    <h:outputText value="#{msg.balance}" />
+                                    <h:outputText value="#{walletConsultController.balance}" />
+                                </h:panelGrid>
+
+
+                                <f:facet name="header">
+                                    <p:messages id="messages"  autoUpdate="true" closable="true" />
+                                </f:facet>
+                                <p:panelGrid id="balanceHistoryFormGrid" columns="6" >
+                                    <h:outputText value="#{msg.startDate}" />
+                                    <p:calendar id="startDate" value="#{walletConsultController.startDate}" pattern="dd/MM/yyyy" required="true">
+                                        <p:ajax event="dateSelect" update="startDate endDate" />
+                                    </p:calendar>
+
+                                    <h:outputText value="#{msg.endDate}" />
+                                    <p:calendar id="endDate" value="#{walletConsultController.endDate}" 
+                                                pattern="dd/MM/yyyy" mindate="#{walletConsultController.startDate}" 
+                                                maxdate="#{walletConsultController.maxDate}" required="true" />
+
+                                </p:panelGrid>
+                            </div>
+
+                            <div align="center">
+                                <p:panelGrid  columns="1" >
+                                    <p:commandButton  value="#{msg.walletGenerateBalanceHistory}" update="@form" id="btnSubmit" icon="ui-icon-search" actionListener="#{walletConsultController.doReport()}"  oncomplete="PF('resultListTable').filter()"/>
+                                </p:panelGrid>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <p:dataTable  widgetVar="resultListTable" id="resultList" var="transaction" rendered="#{walletConsultController.resultList != null}" 
+                          value="#{walletConsultController.resultList}" emptyMessage="#{msg.reportTransactionEmptyResult}" 
+                          filteredValue="#{walletConsultController.filteredResult}" paginator="true" rows="10" style="margin-bottom:20px"
+                          paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}" 
+                          rowsPerPageTemplate="5,10,15" >
+
+                <p:column filterBy="#{transaction.transactionNumber}" headerText="#{msg.transactionNumber}"  filterMatchMode="contains" style="width:15px">
+                    <h:outputText value="#{transaction.transactionNumber}" />
+                </p:column>
+
+                <p:column filterBy="#{walletConsultController.formatCreationDate(transaction.creationDate)}" headerText="#{msg.date}"  filterMatchMode="contains" style="width:15px">
+                    <h:outputText value="#{walletConsultController.formatCreationDate(transaction.creationDate)}" />
+                </p:column>
+
+                <p:column filterBy="#{transaction.transactionTypeId.description}" headerText="#{msg.transactionType}"  filterMatchMode="contains" style="width:15px">
+                    <h:outputText value="#{transaction.transactionTypeId.description}" />
+                </p:column>
+                
+                <p:column filterBy="#{transaction.transactionStatus}" headerText="#{msg.status}"  filterMatchMode="contains" style="width:15px">
+                    <h:outputText value="#{transaction.transactionStatus}" />
+                </p:column>
+
+                <p:column filterBy="#{transaction.totalAmount}" headerText="#{msg.transactionAmount}"  filterMatchMode="contains" style="width:15px">
+                    <h:outputText value="#{transaction.totalAmount}" />
+                </p:column>
+            </p:dataTable>
+        </h:form>
+    </ui:define>
+
+</ui:composition>
+

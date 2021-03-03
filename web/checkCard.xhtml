@@ -19,9 +19,7 @@
                                 <h1>#{msg.checkCard}</h1>
                                 <p:panelGrid id="cardInfoGrid" columns="2" >
                                     <h:outputText value="#{msg.enterCardNumber}" />
-                                    <p:inputText value="#{cardController.cardNumber}" >
-                                        <p:ajax event="change" update="@form"/>
-                                    </p:inputText>
+                                    <p:inputText id="cardNumber" value="#{cardController.cardNumber}" />
                                 </p:panelGrid>
                                 <h:inputHidden id="timezone" value="#{cardController.timezone}"/>
 
@@ -34,7 +32,7 @@
 
                             <div align="center">
                                 <p:panelGrid  columns="1" >
-                                    <p:commandButton  value="#{msg.checkCard}" update="@form" oncomplete="PF('cardDialog').show()" id="btnSubmit" icon="ui-icon-search" actionListener="#{cardController.checkBalanceCard()}" />
+                                    <p:commandButton  value="#{msg.checkCard}" process="@this cardNumber timezone" update="@form" oncomplete="PF('cardDialog').show()" id="btnSubmit" icon="ui-icon-search" actionListener="#{cardController.checkBalanceCard()}" />
                                 </p:panelGrid>
                             </div>
                         </div>
@@ -53,9 +51,6 @@
 
                         <h:outputText value="#{msg.balance}:" />
                         <h:outputText value="#{cardController.cardInfo.accountBalance}" />
-
-                        <h:outputText value="#{msg.dollarBalance}:" />
-                        <h:outputText value="#{cardController.cardInfo.accountDollarBalance}" />
                     </p:panelGrid>
                 </p:outputPanel>
                 <p:outputPanel id="errorPanel" style="text-align:center;" rendered="#{cardController.hasError}">

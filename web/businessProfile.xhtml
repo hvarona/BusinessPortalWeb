@@ -12,31 +12,149 @@
         <h:form id="qrForm" >
             <div align="center">
                 <h1>#{msg.businessProfile}</h1>
-                <p:panelGrid id="businessInfoGrid" columns="2" >
+                <p:panelGrid id="businessInfoGrid" columns="2" rendered="#{not businessProfileController.hasAffiliationRequest()}">
                     <h:outputText value="#{msg.businessCode}" />
-                    <h:outputText value="#{viewqrController.business.code}" />
+                    <h:outputText value="#{businessProfileController.business.code}" />
 
                     <h:outputText value="#{msg.identification}" />
-                    <h:outputText value="#{viewqrController.business.identification}" />
+                    <h:outputText value="#{businessProfileController.business.identification}" />
 
                     <h:outputText value="#{msg.commercialDenomination}" />
-                    <h:outputText value="#{viewqrController.business.commercialDenomination}" />
+                    <h:outputText value="#{businessProfileController.business.commercialDenomination}" />
 
                     <h:outputText value="#{msg.businessName}" />
-                    <h:outputText value="#{viewqrController.business.name}" />
+                    <h:outputText value="#{businessProfileController.business.name}" />
 
                     <h:outputText value="#{msg.legalAddress}" />
-                    <h:outputText value="#{viewqrController.business.legalAddress}" />
+                    <h:outputText value="#{businessProfileController.business.legalAddress}" />
 
                     <h:outputText value="#{msg.address}" />
-                    <h:outputText value="#{viewqrController.business.address}" />
+                    <h:outputText value="#{businessProfileController.business.address}" />
 
                     <h:outputText value="#{msg.phone}" />
-                    <h:outputText value="#{viewqrController.business.phoneNumber}" />
-                    
+                    <h:outputText value="#{businessProfileController.business.phoneNumber}" />
+
                     <h:outputText value="#{msg.website}" />
-                    <h:outputText value="#{viewqrController.business.website}" />
+                    <h:outputText value="#{businessProfileController.business.website}" />
                 </p:panelGrid>
+                
+                <p:panel header="#{msg.personalDetail}" rendered="#{businessProfileController.hasAffiliationRequest() and businessProfileController.naturalPerson}">
+                    <p:panelGrid columns="4" columnClasses="label, value, label, value">
+                        <h:outputText value="#{msg.documentType}"/>
+                        <h:outputText value="#{businessProfileController.affiliationRequest.businessPersonId.naturalPerson.documentsPersonTypeId.description}"/>
+
+                        <h:outputText value="#{msg.identificationNumber}"/>
+                        <h:outputText value="#{businessProfileController.affiliationRequest.businessPersonId.naturalPerson.identificationNumber}"/>
+
+                        <h:outputText value="#{msg.firstName}"/>
+                        <h:outputText value="#{businessProfileController.affiliationRequest.businessPersonId.naturalPerson.firstName}"/>
+
+                        <h:outputText value="#{msg.lastName}"/>
+                        <h:outputText value="#{businessProfileController.affiliationRequest.businessPersonId.naturalPerson.lastName}"/>
+
+                        <h:outputText value="#{msg.gender}"/>
+                        <h:outputText value="#{businessProfileController.affiliationRequest.businessPersonId.naturalPerson.gender}"/>
+
+                        <h:outputText value="#{msg.civilStatus}"/>
+                        <h:outputText value="#{businessProfileController.affiliationRequest.businessPersonId.naturalPerson.civilStatusId.description}"/>
+
+                        <h:outputText value="#{msg.birthdate}"/>
+                        <h:outputText value="#{businessProfileController.affiliationRequest.businessPersonId.naturalPerson.dateBirth}"/>
+
+                        <h:outputText value="#{msg.placeBirth}"/>
+                        <h:outputText value="#{businessProfileController.affiliationRequest.businessPersonId.naturalPerson.placeBirth}"/>
+
+                        <h:outputText value="#{msg.profession}"/>
+                        <h:outputText value="#{businessProfileController.affiliationRequest.businessPersonId.naturalPerson.professionId.name}"/>
+
+                    </p:panelGrid>
+                </p:panel>
+                <p:panel header="#{msg.legalPerson}" rendered="#{businessProfileController.hasAffiliationRequest() and businessProfileController.legalPerson}">
+                    <p:panelGrid columns="4" columnClasses="label, value, label, value">
+                        <h:outputText value="#{msg.documentType}"/>
+                        <h:outputText value="#{businessProfileController.affiliationRequest.businessPersonId.legalPerson.documentsPersonTypeId.description}"/>
+
+                        <h:outputText value="#{msg.identificationNumber}"/>
+                        <h:outputText value="#{businessProfileController.affiliationRequest.businessPersonId.legalPerson.identificationNumber}"/>
+
+                        <h:outputText value="#{msg.businessName}"/>
+                        <h:outputText value="#{businessProfileController.affiliationRequest.businessPersonId.legalPerson.businessName}"/>
+
+                        <h:outputText value="#{msg.businessCategory}"/>
+                        <h:outputText value="#{businessProfileController.affiliationRequest.businessPersonId.legalPerson.businessCategoryId.description}"/>
+
+                        <h:outputText value="#{msg.legalAddress}"/>
+                        <h:outputText value="#{businessProfileController.business.address}"/>
+
+                        <h:outputText value="#{msg.registationDate}"/>
+                        <h:outputText value="#{businessProfileController.affiliationRequest.businessPersonId.legalPerson.dateInscriptionRegister}"/>
+
+                        <h:outputText value="#{msg.registerNumber}"/>
+                        <h:outputText value="#{businessProfileController.affiliationRequest.businessPersonId.legalPerson.registerNumber}"/>
+
+                        <h:outputText value="#{msg.payedCapital}"/>
+                        <h:outputText value="#{businessProfileController.affiliationRequest.businessPersonId.legalPerson.payedCapital}"/>
+                    </p:panelGrid>
+                </p:panel>
+                <p:panel header="#{msg.address}" rendered="#{businessProfileController.hasAffiliationRequest()}">
+                    <p:panelGrid columns="4" columnClasses="label, value, label, value" >
+                        <h:outputText value="#{msg.country}"/>
+                        <h:outputText value="#{businessProfileController.affiliationRequest.businessPersonId.personHasAddress.addressId.countryId.name}"/>
+
+                        <h:outputText value="#{msg.address1}"/>
+                        <h:outputText value="#{businessProfileController.affiliationRequest.businessPersonId.personHasAddress.addressId.addressLine1}"/>
+
+                        <h:outputText value="#{msg.address2}"/>
+                        <h:outputText value="#{businessProfileController.affiliationRequest.businessPersonId.personHasAddress.addressId.addressLine2}"/>
+                    </p:panelGrid>
+                </p:panel>
+                <p:panel header="#{msg.contact}" rendered="#{businessProfileController.hasAffiliationRequest()}">
+                    <p:panelGrid columns="6" columnClasses="label, value, label, value, label, value">
+                        <h:outputText value="#{msg.countryCode}"/>
+                        <h:outputText value="#{businessProfileController.affiliationRequest.businessPersonId.phonePerson.countryCode}"/>
+
+                        <h:outputText value="#{msg.areaCode}"/>
+                        <h:outputText value="#{businessProfileController.affiliationRequest.businessPersonId.phonePerson.areaCode}"/>
+
+                        <h:outputText value="#{msg.phoneNumber}"/>
+                        <h:outputText value="#{businessProfileController.affiliationRequest.businessPersonId.phonePerson.numberPhone}"/>
+
+                        <h:outputText value="#{msg.website}"/>
+                        <h:outputText value="#{businessProfileController.affiliationRequest.businessPersonId.webSite}"/>
+
+                        <h:outputText value="#{msg.email}"/>
+                        <h:outputText value="#{businessProfileController.affiliationRequest.businessPersonId.email}"/>
+
+                    </p:panelGrid>
+                </p:panel>
+
+                <p:panel header="#{msg.legalPersonRepresentative}" rendered="#{businessProfileController.hasAffiliationRequest() and businessProfileController.legalPerson}">
+                    <p:panelGrid columns="4" columnClasses="label, value, label, value">
+                        <h:outputText value="#{msg.documentType}"/>
+                        <h:outputText value="#{businessProfileController.affiliationRequest.businessPersonId.legalRepresentative.documentsPersonTypeId.description}"/>
+
+                        <h:outputText value="#{msg.identificationNumber}"/>
+                        <h:outputText value="#{businessProfileController.affiliationRequest.businessPersonId.legalRepresentative.identificationNumber}"/>
+
+                        <h:outputText value="#{msg.firstName}"/>
+                        <h:outputText value="#{businessProfileController.affiliationRequest.businessPersonId.legalRepresentative.firstNames}"/>
+
+                        <h:outputText value="#{msg.lastName}"/>
+                        <h:outputText value="#{businessProfileController.affiliationRequest.businessPersonId.legalRepresentative.lastNames}"/>
+
+                        <h:outputText value="#{msg.gender}"/>
+                        <h:outputText value="#{businessProfileController.affiliationRequest.businessPersonId.legalRepresentative.gender}"/>
+
+                        <h:outputText value="#{msg.civilStatus}"/>
+                        <h:outputText value="#{businessProfileController.affiliationRequest.businessPersonId.legalRepresentative.civilStatusId.description}"/>
+
+                        <h:outputText value="#{msg.birthdate}"/>
+                        <h:outputText value="#{businessProfileController.affiliationRequest.businessPersonId.legalRepresentative.dateBirth}"/>
+
+                        <h:outputText value="#{msg.placeBirth}"/>
+                        <h:outputText value="#{businessProfileController.affiliationRequest.businessPersonId.legalRepresentative.placeBirth}"/>
+                    </p:panelGrid>
+                </p:panel>
             </div>
         </h:form>
     </ui:define>
